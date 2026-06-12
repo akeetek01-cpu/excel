@@ -11,6 +11,15 @@ exports.register = (req, res) => {
     res.sendFile("Register.html", { root: "./public" });
 };
 
-exports.page = (req, res) => {
-    res.send("<h2>Excel Web Route</h2><a href='/'>Back</a>");
+exports.forgotPassword = (req, res) => {
+    res.sendFile("forgot-password.html", { root: "./public" });
 };
+
+exports.dashboard = (req, res) => {
+     res.sendFile("dashboard.html", { root: "./public" });
+};
+
+exports.leadForm = (req, res) => {
+    res.sendFile("lead-capture.html", { root: "./public" });
+};
+

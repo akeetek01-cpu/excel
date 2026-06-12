@@ -75,6 +75,57 @@
           "500": { "description": "Server error" }
         }
       }
+    },
+    "/api/changePassword": {
+    "post": {
+      "summary": "Change user password",
+      "requestBody": {
+        "required": true,
+        "content": {
+          "application/json": {
+            "schema": {
+              "type": "object",
+              "properties": {
+                "email": {
+                  "type": "string",
+                  "example": "t.solley@excel.co.nz"
+                },
+                "oldPassword": {
+                  "type": "string",
+                  "example": "t.solley"
+                },
+                "newPassword": {
+                  "type": "string",
+                  "example": "Welcome@123"
+                }
+              },
+              "required": [
+                "email",
+                "oldPassword",
+                "newPassword"
+              ]
+            }
+          }
+        }
+      },
+      "responses": {
+        "200": {
+          "description": "Password updated successfully"
+        },
+        "400": {
+          "description": "Email, old password and new password are required"
+        },
+        "401": {
+          "description": "Invalid email or old password"
+        },
+        "404": {
+          "description": "Users not found"
+        },
+        "500": {
+          "description": "Server error"
+        }
+      }
     }
+  }
   }
 }

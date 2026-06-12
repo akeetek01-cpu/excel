@@ -1,0 +1,144 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Excel Dashboard</title>
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+        <script src="script/dashboard.js"></script>
+
+<link href="css/style.css" rel="stylesheet">
+
+
+</head>
+
+<body>
+
+<div class="pre-login container">
+
+    <img class="logo" src="images/excel_log.png" alt="logo">
+
+    <div id="welcomeMessage" class="welcome">
+        Welcome Ashok!
+    </div>
+
+    <button id="createLeadBtn" class="btn">
+        Create a Lead
+        <span>➜</span>
+    </button>
+
+    <div class="stats-card">
+
+        <!-- Jobs -->
+        <div class="stat-row">
+
+            <div class="circle"
+                 data-percent="80"
+                 data-text="80">
+            </div>
+
+            <div>
+                <div class="stat-title">
+                    Jobs Attended
+                </div>
+                <div class="stat-sub">
+                    in last 4 weeks
+                </div>
+            </div>
+
+        </div>
+
+        <div class="divider"></div>
+
+        <!-- Leads -->
+        <div class="stat-row">
+
+            <div class="circle"
+                 data-percent="46"
+                 data-text="46">
+            </div>
+
+            <div>
+                <div class="stat-title">
+                    Leads Created
+                </div>
+                <div class="stat-sub">
+                    in last 4 weeks
+                </div>
+            </div>
+
+        </div>
+
+        <div class="divider"></div>
+
+        <!-- Quotes -->
+        <div class="stat-row">
+
+            <div class="circle"
+                 data-percent="65"
+                 data-text="65%">
+            </div>
+
+            <div>
+                <div class="stat-title">
+                    Quotes Approved
+                </div>
+                <div class="stat-sub">
+                    by the Customer
+                </div>
+            </div>
+
+        </div>
+
+    </div>
+
+</div>
+
+<script>
+const createLeadBtn = document.getElementById("createLeadBtn");
+
+// Attach the click event listener
+createLeadBtn.addEventListener("click", function() {
+        window.location.href = '/lead-form';
+});
+document.querySelectorAll('.circle').forEach(circle => {
+
+    const percent = circle.dataset.percent;
+    const text = circle.dataset.text;
+
+    const radius = 40;
+    const circumference = 2 * Math.PI * radius;
+
+    const offset =
+        circumference -
+        (percent / 100) * circumference;
+
+    circle.innerHTML = `
+        <svg viewBox="0 0 100 100">
+            <circle
+                class="circle-bg"
+                cx="50"
+                cy="50"
+                r="${radius}">
+            </circle>
+
+            <circle
+                class="circle-progress"
+                cx="50"
+                cy="50"
+                r="${radius}"
+                stroke-dasharray="${circumference}"
+                stroke-dashoffset="${offset}">
+            </circle>
+        </svg>
+
+        <div class="circle-text">
+            ${text}
+        </div>
+    `;
+});
+
+</script>
+
+</body>
+</html>

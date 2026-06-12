@@ -1,0 +1,208 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Create Lead</title>
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+        <script src="script/lead-capture.js"></script>
+<link href="css/style.css" rel="stylesheet">
+
+<style>
+
+
+
+
+
+</style>
+</head>
+<body>
+
+<div class="lead-capture container">
+
+    <div class="logo">
+        <img src="images/excel_log.png" alt="Excel Logo">
+    </div>
+
+    <!-- SECTION 1 -->
+    <h3 class="section-title">SECTION 1: Your Details</h3>
+
+    <div class="section-box">
+
+        <div class="form-row">
+            <div class="form-label">Your Name</div>
+            <div class="form-control">
+                <input type="text" id="yourName" placeholder="Auto - based on Login">
+            </div>
+        </div>
+
+        <div class="form-row">
+            <div class="form-label">Your Manager Name</div>
+            <div class="form-control">
+                <input type="text" id="yourManagerName" placeholder="Auto - based on hierarchy mapping">
+            </div>
+        </div>
+
+    </div>
+
+    <!-- SECTION 2 -->
+    <h3 class="section-title">SECTION 2: Customer & Asset Details</h3>
+
+    <div class="section-box">
+
+        <div class="form-row">
+            <div class="form-label">Job Number</div>
+            <div class="form-control">
+                <input type="text" placeholder="Enter Job Number">
+            </div>
+        </div>
+
+        <div class="form-row">
+            <div class="form-label">Customer Name</div>
+            <div class="form-control">
+                <input type="text" placeholder="Auto Populate / Enter">
+            </div>
+        </div>
+
+        <div class="form-row">
+            <div class="form-label">Customer Phone</div>
+            <div class="form-control">
+                <input type="text" placeholder="Auto Populate / Enter">
+            </div>
+        </div>
+
+        <div class="form-row">
+            <div class="form-label">Customer Email</div>
+            <div class="form-control">
+                <input type="email" placeholder="Auto Populate / Enter">
+            </div>
+        </div>
+
+        <div class="form-row">
+            <div class="form-label">Asset Description</div>
+            <div class="form-control">
+                <select>
+                    <option>Select / Enter</option>
+                </select>
+            </div>
+        </div>
+
+        <div class="form-row">
+            <div class="form-label">Asset Location</div>
+            <div class="form-control">
+                <select>
+                    <option>Select / Enter</option>
+                </select>
+            </div>
+        </div>
+
+    </div>
+
+    <!-- SECTION 3 -->
+    <h3 class="section-title">SECTION 3: Fault & Material Requirements</h3>
+
+    <div class="section-box">
+
+        <div class="form-row">
+            <div class="form-label">Fault Description</div>
+            <div class="form-control">
+                <input type="text" placeholder="Select / Enter Fault Description">
+            </div>
+        </div>
+
+        <div class="form-row">
+            <div class="form-label">Work Required</div>
+            <div class="form-control">
+                <input type="text" placeholder="Auto Populate / Enter">
+            </div>
+        </div>
+
+        <div class="form-row">
+            <div class="form-label">Parts & Material</div>
+            <div class="form-control">
+                <input type="text" placeholder="Auto Populate / Enter">
+            </div>
+        </div>
+
+        <div class="form-row">
+            <div class="form-label">Special Equipment</div>
+            <div class="form-control">
+                <input type="text" placeholder="Auto Populate / Enter">
+            </div>
+        </div>
+
+        <div class="form-row">
+            <div class="form-label">No. of Tech Required</div>
+            <div class="form-control">
+                <input type="number" placeholder="Auto Populate / Enter">
+            </div>
+        </div>
+
+        <div class="form-row">
+            <div class="form-label">Hours per TECH</div>
+            <div class="form-control">
+                <input type="number" placeholder="Auto Populate / Enter">
+            </div>
+        </div>
+
+        <div class="form-row">
+            <div class="form-label">Apprentice Required</div>
+            <div class="form-control">
+                <select>
+                    <option>Select Yes / No</option>
+                    <option>Yes</option>
+                    <option>No</option>
+                </select>
+            </div>
+        </div>
+
+    </div>
+
+    <!-- SECTION 4 -->
+    <h3 class="section-title">SECTION 4: Additional Info. & Photos</h3>
+
+    <div class="section-box">
+
+        <div class="form-row">
+            <div class="form-label">Final Questions</div>
+            <div class="form-control">
+                <input type="text" placeholder="Enter if any">
+            </div>
+        </div>
+
+        <div class="form-row">
+            <div class="form-label">Additional Notes</div>
+            <div class="form-control">
+                <input type="text" placeholder="Enter if any">
+            </div>
+        </div>
+
+        <div class="form-row">
+            <div class="form-label">Work after Hours?</div>
+            <div class="form-control">
+                <select>
+                    <option>Select Yes / No</option>
+                    <option>Yes</option>
+                    <option>No</option>
+                </select>
+            </div>
+        </div>
+
+        <div class="form-row">
+            <div class="form-label">Upload Images</div>
+            <div class="form-control upload-wrapper">
+                <input type="file" multiple>
+            </div>
+        </div>
+
+    </div>
+
+    <div class="button-group">
+        <button class="btn">Submit</button>
+        <button class="btn">Submit & Create Another</button>
+    </div>
+
+</div>
+
+</body>
+</html>

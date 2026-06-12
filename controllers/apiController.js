@@ -3,7 +3,7 @@ exports.dashboard = (req, res) => {
 };
 
 const db = require("../firebase");
-const { ref, set, get, child } = require("firebase/database");
+const { ref, set, get, child, update } = require("firebase/database");
 
 exports.registerUser = async (req, res) => {
      //res.json({ message: "Excel Protected API" });
@@ -47,18 +47,78 @@ exports.loginUser = async (req, res) => {
         const snapshot = await get(child(dbRef, 'users'));
         if (snapshot.exists()) {
             let found = false;
+            let currentUser = null;
             snapshot.forEach(childSnap => {
-                user = childSnap.val();
+                const user = childSnap.val();
                 if (user.email === email && user.password === password) {
                     found = true;
+                    currentUser = user;
                 }
             });
             if (found) {
-                return res.json({ message: "Login successful" });
+                return res.json({ message: "Login successful", user: currentUser });
             }
         }
         res.status(401).json({ error: "Invalid credentials" });
     } catch (err) {
         res.status(500).json({ error: "Error logging in" });
+    }
+};
+
+
+exports.changePassword = async (req, res) => {
+    
+    const { email, oldPassword, newPassword } = req.body;
+    console.log("Request Body:", req.body);
+
+    if (!email || !oldPassword || !newPassword) {
+        return res.status(400).json({
+            error: "Email, old password and new password are required"
+        });
+    }
+
+    try {
+        const dbRef = ref(db);
+        const snapshot = await get(child(dbRef, "users"));
+
+        if (!snapshot.exists()) {
+            return res.status(404).json({
+                error: "Users not found"
+            });
+        }
+
+        let userKey = null;
+
+        snapshot.forEach((childSnap) => {
+            const user = childSnap.val();
+
+            if (
+                user.email === email &&
+                user.password === oldPassword
+            ) {
+                userKey = childSnap.key;
+            }
+        });
+
+        if (!userKey) {
+            return res.status(401).json({
+                error: "Invalid email or old password"
+            });
+        }
+
+        await update(ref(db, `users/${userKey}`), {
+            password: newPassword
+        });
+
+        return res.status(200).json({
+            message: "Password updated successfully"
+        });
+
+    } catch (error) {
+        console.error(error);
+
+        return res.status(500).json({
+            error: "Failed to update password"
+        });
     }
 };

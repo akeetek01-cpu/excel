@@ -3,8 +3,10 @@ const router = express.Router();
 const controller = require("../controllers/webController");
 
 router.get("/", controller.home);
-router.get("/home", controller.page);
+router.get("/dashboard", controller.dashboard);
 router.get("/login", controller.login);
 router.get("/register", controller.register);
+router.get("/forgotPassword", controller.forgotPassword);
+router.get("/lead-form", controller.leadForm);
 
 module.exports = router;

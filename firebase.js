@@ -4,14 +4,14 @@ const { getDatabase } = require('firebase/database');
 
 // TODO: Replace with your Firebase project config
 const firebaseConfig = {
-  apiKey: "AIzaSyAo3EOTHcXCRNgA4Y6LooTdJi_uK9Y5xvY",
-  authDomain: "excel-bhush.firebaseapp.com",
-  databaseURL: "https://excel-bhush-default-rtdb.firebaseio.com", // <-- Add this line
-  projectId: "excel-bhush",
-  storageBucket: "excel-bhush.firebasestorage.app",
-  messagingSenderId: "653127275390",
-  appId: "1:653127275390:web:8ae1624c1a934ca6b4592f",
-  measurementId: "G-9WFZVE8GGV"
+  apiKey: "AIzaSyDLfrp-89vElULCo3mxH3LaZiG6Z54HNkE",
+  authDomain: "excel-4c142.firebaseapp.com",
+  databaseURL: "https://excel-4c142-default-rtdb.firebaseio.com",
+  projectId: "excel-4c142",
+  storageBucket: "excel-4c142.firebasestorage.app",
+  messagingSenderId: "332372580946",
+  appId: "1:332372580946:web:58757ba9c24b04636a9d8b",
+  measurementId: "G-MRQJ8K917N"
 };
 
 const app = initializeApp(firebaseConfig);

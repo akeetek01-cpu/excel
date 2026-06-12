@@ -8,5 +8,7 @@ router.get("/dashboard", auth, controller.dashboard);
 router.post("/register", auth, controller.registerUser);
 router.get("/users", controller.getUsers);
 router.post("/login", controller.loginUser);
+router.post("/changePassword", controller.changePassword);
+
 
 module.exports = router;

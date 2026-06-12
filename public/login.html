@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Login</title>
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
-    <script src="login.js"></script>
+    <script src="script/login.js"></script>
 <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600&display=swap" rel="stylesheet">
 <link href="css/style.css" rel="stylesheet">
 
@@ -13,7 +13,7 @@
 
 <body>
 
-<div class="container">
+<div class="pre-login container">
 
     <!-- Logo -->
    <img class="logo" src="images/excel_log.png" alt="logo">
@@ -41,11 +41,15 @@
         </div>
 
         <div class="forgot">
-            <a href="#">Change or Forgot Your Password?</a>
+            <a href="/forgotPassword">Change or Forgot Your Password?</a>
         </div>
 
-        <button class="btn">Log In</button>
-
+        <button id="loginBtn" type="button" class="button btn">
+            <span class="button__text">Log In</span>
+        </button>
+         <div class="error" id="errorMsg">
+            Passwords do not match.
+        </div>
     </form>
 
 </div>
