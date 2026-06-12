@@ -1,0 +1,21 @@
+{
+  "name": "excel",
+  "version": "1.0.0",
+  "main": "server.js",
+  "description": "excel - MVC app with middleware, Swagger and Firebase",
+  "scripts": {
+    "start": "node server.js",
+    "dev": "concurrently \"nodemon server.js\" \"live-server public\""
+  },
+  "dependencies": {
+    "cors": "^2.8.6",
+    "express": "^4.18.2",
+    "firebase": "^12.12.0",
+    "swagger-ui-express": "^4.6.3"
+  },
+  "devDependencies": {
+    "concurrently": "^9.2.1",
+    "live-server": "^1.2.2",
+    "nodemon": "^3.1.14"
+  }
+}

@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Login</title>
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script src="login.js"></script>
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600&display=swap" rel="stylesheet">
+<link href="css/style.css" rel="stylesheet">
+
+</head>
+
+<body>
+
+<div class="container">
+
+    <!-- Logo -->
+   <img class="logo" src="images/excel_log.png" alt="logo">
+
+    <!-- Title -->
+    <h2>Login</h2>
+    <div class="sub-text">
+        Don’t have an account? <a href="/register">Sign Up</a>
+    </div>
+
+    <!-- Form -->
+    <form id="loginForm">
+
+        <div class="card">
+            <div class="input-row">
+                <img class="lable_icon" src="images/email.png" alt="email">
+                <input type="email" id="email" placeholder="Enter email" required>
+            </div>
+
+            <div class="input-row">
+                <img class="lable_icon" src="images/password.png" alt="password">
+                <input type="password" id="password" placeholder="Password" required>
+                <span class="eye" onclick="togglePassword()"><img id="password_eye" class="lable_icon" src="images/password_eye_hide.png" alt="password_eye"></span>
+            </div>
+        </div>
+
+        <div class="forgot">
+            <a href="#">Change or Forgot Your Password?</a>
+        </div>
+
+        <button class="btn">Log In</button>
+
+    </form>
+
+</div>
+
+<script>
+// Show/Hide Password
+function togglePassword() {
+    const pwd = document.getElementById("password");
+    pwd.type = pwd.type === "password" ? "text" : "password";
+
+    document.getElementById("password_eye").src = pwd.type === "password" ? "images/password_eye_hide.png" : "images/password_eye_show.png";
+}
+</script>
+
+</body>
+</html>

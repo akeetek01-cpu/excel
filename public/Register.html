@@ -1,0 +1,199 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Register</title>
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script src="register.js"></script>
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600&display=swap" rel="stylesheet">
+
+<style>
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    font-family: 'Poppins', sans-serif;
+}
+
+body {
+    height: 100vh;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    background: linear-gradient(180deg, #0c2340 0%, #2e63b6 100%);
+    color: #fff;
+}
+
+/* Container */
+.container {
+    width: 100%;
+    max-width: 380px;
+    padding: 20px;
+    text-align: center;
+}
+
+/* Logo */
+.logo {
+    font-size: 42px;
+    font-weight: 600;
+    margin-bottom: 20px;
+}
+
+/* Back */
+.back {
+    text-align: left;
+    margin-bottom: 10px;
+    cursor: pointer;
+}
+
+/* Title */
+h2 {
+    font-size: 28px;
+    margin-bottom: 8px;
+}
+
+.sub-text {
+    font-size: 14px;
+    margin-bottom: 25px;
+    color: #cbd5e1;
+}
+
+.sub-text a {
+    color: #6ea8ff;
+    text-decoration: none;
+}
+
+/* Card */
+.card {
+    background: #f1f1f1;
+    border-radius: 14px;
+    overflow: hidden;
+    margin-bottom: 20px;
+}
+
+/* Input row */
+.input-row {
+    display: flex;
+    align-items: center;
+    padding: 14px;
+    border-bottom: 1px solid #ddd;
+}
+
+.input-row:last-child {
+    border-bottom: none;
+}
+
+.input-row i {
+    margin-right: 10px;
+    color: #2e63b6;
+}
+
+.input-row input {
+    border: none;
+    outline: none;
+    width: 100%;
+    font-size: 14px;
+    background: transparent;
+}
+
+/* Phone */
+.phone {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+/* Eye */
+.eye {
+    cursor: pointer;
+}
+
+/* Button */
+.btn {
+    width: 100%;
+    padding: 16px;
+    border-radius: 14px;
+    border: none;
+    background: linear-gradient(90deg, #3b82f6, #2563eb);
+    color: #fff;
+    font-size: 16px;
+    cursor: pointer;
+}
+
+/* Responsive */
+@media(max-width: 480px) {
+    .container {
+        padding: 15px;
+    }
+}
+</style>
+</head>
+
+<body>
+
+<div class="container">
+
+    <!-- Logo -->
+   <img src="images/excel_log.png" alt="logo">
+
+
+    <!-- Back -->
+    <div class="back" onclick="window.history.back()">⬅</div>
+
+    <!-- Title -->
+    <h2>Register</h2>
+    <div class="sub-text">
+        Already have an account? <a href="/login">Login</a>
+    </div>
+
+    <!-- Form -->
+    <form id="registerForm">
+
+        <div class="card">
+
+            <!-- Name -->
+            <div class="input-row">
+                <i>👤</i>
+                <input type="text" id="name" placeholder="Full Name" required>
+            </div>
+
+            <!-- Email -->
+            <div class="input-row">
+                <i>📧</i>
+                <input type="email" id="email" placeholder="Email" required>
+            </div>
+
+            <!-- Phone -->
+            <div class="input-row phone">
+                <i>🇳🇿</i>
+                <i>+64</i>
+                <input type="text" id="phone" placeholder="000-000-00" required>
+            </div>
+
+            <!-- Password -->
+            <div class="input-row">
+                <i>🔒</i>
+                <input type="password" id="password" placeholder="Password" required>
+                <span class="eye" onclick="togglePassword()">👁️</span>
+            </div>
+
+        </div>
+
+        <button class="btn">Register</button>
+
+    </form>
+
+</div>
+
+<script>
+// Toggle Password
+function togglePassword() {
+    const pwd = document.getElementById("password");
+    pwd.type = pwd.type === "password" ? "text" : "password";
+}
+
+</script>
+
+</body>
+</html>
