@@ -48,7 +48,7 @@ exports.loginUser = async (req, res) => {
         if (snapshot.exists()) {
             let found = false;
             snapshot.forEach(childSnap => {
-                const user = childSnap.val();
+                user = childSnap.val();
                 if (user.email === email && user.password === password) {
                     found = true;
                 }
