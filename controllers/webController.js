@@ -20,6 +20,6 @@ exports.dashboard = (req, res) => {
 };
 
 exports.leadForm = (req, res) => {
-    res.sendFile("lead-capture.html", { root: "./public" });
+    res.sendFile("lead-capture-new.html", { root: "./public" });
 };
 

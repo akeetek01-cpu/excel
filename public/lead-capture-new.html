@@ -1,0 +1,239 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Excel Lead Capture</title>
+    <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600&display=swap" rel="stylesheet">
+<link href="css/style.css" rel="stylesheet">
+   
+</head>
+
+<body>
+    <div class="lead-capture container">
+        <div class="logo">
+            <img src="images/excel_log.png" alt="Excel Logo">
+        </div>
+
+        <div class="section-title">SECTION 1: Customer Details & Notes</div>
+        <div class="section-box">
+            <div class="row"><label>Job Number</label><input placeholder="Enter Job Number"></div>
+            <div class="row"><label>Customer Name</label><input placeholder="Auto Populate / Enter"></div>
+            <div class="row"><label>Customer Phone</label><input placeholder="Auto Populate / Enter"></div>
+            <div class="row"><label>Customer Email</label><input placeholder="Auto Populate / Enter"></div>
+            <div class="row"><label>Tenancy / Shop No.</label><input placeholder="Auto Populate / Enter"></div>
+            <div class="row"><label>Additional Notes</label><textarea rows="1" placeholder="Enter"></textarea></div>
+        </div>
+
+        <div class="section-title">SECTION 2: Asset & Fault Details</div>
+        <div class="section-box">
+            <div class="row"><label>Asset Description</label><select>
+                    <option>Select / Enter</option>
+                </select></div>
+            <div class="row"><label>Asset Location</label><select>
+                    <option>Select / Enter</option>
+                </select></div>
+
+            <div id="faultContainer"></div>
+            <div class="addFaultContainer"><button id="addFault" class="btn">Add Another Fault +</button></div>
+        </div>
+
+        <div class="section-title">SECTION 3: Estimates & Photos</div>
+        <div class="section-box">
+            <div class="two-section">
+            <div class="row technician-container"><label>No. of Technicians</label><input type="number"></div>
+            <div class="row hours-container"><label>Hrs. Req.</label><input type="number"></div>
+             <div class="clear"></div>
+</div>
+<div class="two-section">
+            <div class="row apprentice-container">
+                <label>Apprentice Req.</label>
+                <label class="switch"><input type="checkbox"><span class="slider"></span></label>
+            </div>
+            
+
+            <div class="row afterhrs-container">
+                <label class="after-label">After Hrs.</label>
+                <label class="switch"><input type="checkbox"><span class="slider"></span></label>
+            </div>
+             <div class="clear"></div>
+            </div>
+
+             <div class="row align-items-center">
+
+            <div class="col-md-4 field-label">
+                Upload Photos
+            </div>
+
+            <div class="col-md-3">
+
+                <input
+                    type="file"
+                    id="photoUpload"
+                    multiple
+                    accept="image/*"
+                    hidden>
+
+                <button
+                    type="button"
+                    class="upload-btn"
+                    id="uploadBtn">
+
+                    Upload Photo ↑
+
+                </button>
+
+            </div>
+
+            <div class="col-md-4">
+
+                <div class="upload-preview" id="previewContainer">
+
+                    <div class="upload-status">
+                        No images uploaded
+                    </div>
+
+                </div>
+
+            </div>
+
+        </div>
+        </div>
+
+        <div class="section-title">SECTION 4: Verify & Submit</div>
+        <div class="section-box">
+            <div class="summary">
+                <span>Bruce Williams</span><span>3 Faults</span><span>1 Tech.</span><span>4 Hrs</span><span>After
+                    Hrs.</span>
+            </div>
+            <div class="row"><label>Your Manager Name</label><input placeholder="Auto/Select"></div>
+        </div>
+
+        <div class="bottom">
+            <button class="btn">Submit Lead</button>
+            <button class="btn">+ Create New</button>
+        </div>
+    </div>
+
+    <script>
+        let faultCount = 0;
+
+        function addFault() {
+            faultCount++;
+            $("#faultContainer").append(`
+<div class="fault">
+<div class="fault-header">
+<div><span class="circle">${faultCount}</span>Fault #${faultCount}</div>
+<div><span class="badge">✨ AI pre-filled please verify</span> ▼</div>
+</div>
+<div class="fault-body">
+<div class="row"><label>Fault Description</label><textarea rows="1" placeholder="Enter"></textarea></div>
+<div class="row"><label>Work Required</label><input placeholder="AI Recommended / Enter"></div>
+<div class="row"><label>Parts & Material</label><input placeholder="AI Recommended / Enter"></div>
+<div class="row"><label>Special Equipment</label><input placeholder="AI Recommended / Enter"></div>
+<button class="btn deleteBtn">Delete</button>
+</div>
+</div>`);
+        }
+
+        addFault();
+
+        $("#addFault").click(addFault);
+
+        $(document).on("click", ".deleteBtn", function () {
+            $(this).closest(".fault").remove();
+        });
+
+        $(document).on("click", ".fault-header", function () {
+            $(this).next(".fault-body").slideToggle();
+        });
+
+        $("#photos").on("change", function () {
+        
+            $("#preview").empty();
+            $("#count").html(this.files.length + " uploaded successfully");
+            [...this.files].forEach(file => {
+                let r = new FileReader();
+                r.onload = e => $("#preview").append('<img src="' + e.target.result + '">');
+                r.readAsDataURL(file);
+            });
+        });
+    </script>
+
+    <script>
+$(function () {
+
+    const $txt = $("textarea");
+    const lineHeight = 22;
+    const maxLines = 4;
+    const maxHeight = lineHeight * maxLines;
+
+    let previousValue = "";
+
+    $txt.on("input", function () {
+
+        this.style.height = "auto";
+        this.style.height = this.scrollHeight + "px";
+
+        // If content exceeds 3 visual lines
+        if (this.scrollHeight > maxHeight + 2) {
+            $(this).val(previousValue);
+
+            this.style.height = "auto";
+            this.style.height =
+                Math.min(this.scrollHeight, maxHeight) + "px";
+
+            return;
+        }
+
+        previousValue = $(this).val();
+
+        this.style.height =
+            Math.min(this.scrollHeight, maxHeight) + "px";
+    });
+
+});
+
+$("#uploadBtn").click(function(){
+    $("#photoUpload").click();
+});
+
+$("#photoUpload").change(function(){
+
+    let files = this.files;
+
+    if(files.length > 4){
+        alert("Maximum 4 images allowed");
+        $(this).val('');
+        return;
+    }
+
+    let html = '<div class="preview-images">';
+
+    $.each(files,function(index,file){
+
+        let imageUrl = URL.createObjectURL(file);
+
+        html += `
+            <img src="${imageUrl}">
+        `;
+    });
+
+    html += '</div>';
+
+    html += `
+        <div class="upload-status">
+            ${files.length}
+            ${files.length === 1 ? 'image' : 'images'}
+            uploaded successfully
+        </div>
+    `;
+
+    $("#previewContainer").html(html);
+});
+</script>
+</body>
+
+</html>
