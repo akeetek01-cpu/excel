@@ -120,35 +120,49 @@
     <script>
         let faultCount = 0;
 
-        function addFault() {
-            faultCount++;
-            $("#faultContainer").append(`
+function updateFaultIndices() {
+  $("#faultContainer .fault").each(function(idx) {
+    const num = idx + 1;
+    $(this).find('.circle').text(num);
+    $(this).find('.fault-header > div:first-child').html(`<span class="circle">${num}</span>Fault #${num}`);
+  });
+}
+
+function createFaultHtml(index) {
+  return `
 <div class="fault">
-<div class="fault-header">
-<div><span class="circle">${faultCount}</span>Fault #${faultCount}</div>
-<div><span class="badge">✨ AI pre-filled please verify</span> ▼</div>
-</div>
-<div class="fault-body">
-<div class="row"><label>Fault Description</label><textarea rows="1" placeholder="Enter"></textarea></div>
-<div class="row"><label>Work Required</label><input placeholder="AI Recommended / Enter"></div>
-<div class="row"><label>Parts & Material</label><input placeholder="AI Recommended / Enter"></div>
-<div class="row"><label>Special Equipment</label><input placeholder="AI Recommended / Enter"></div>
-<button class="btn deleteBtn">Delete</button>
-</div>
-</div>`);
-        }
+  <div class="fault-header">
+    <div><span class="circle">${index}</span>Fault #${index}</div>
+    <div><span class="badge">✨ AI pre-filled please verify</span> ▼</div>
+  </div>
+  <div class="fault-body">
+    <div class="row"><label>Fault Description</label><textarea rows="1" placeholder="Enter"></textarea></div>
+    <div class="row"><label>Work Required</label><input placeholder="AI Recommended / Enter"></div>
+    <div class="row"><label>Parts & Material</label><input placeholder="AI Recommended / Enter"></div>
+    <div class="row"><label>Special Equipment</label><input placeholder="AI Recommended / Enter"></div>
+    <button class="btn deleteBtn">Delete</button>
+  </div>
+</div>`;
+}
 
-        addFault();
+function addFault() {
+  const nextIndex = $("#faultContainer .fault").length + 1;
+  $("#faultContainer").append(createFaultHtml(nextIndex));
+  faultCount = $("#faultContainer .fault").length;
+}
 
-        $("#addFault").click(addFault);
+addFault();
+$("#addFault").click(addFault);
 
-        $(document).on("click", ".deleteBtn", function () {
-            $(this).closest(".fault").remove();
-        });
+$(document).on("click", ".deleteBtn", function () {
+  $(this).closest('.fault').remove();
+  updateFaultIndices();
+  faultCount = $("#faultContainer .fault").length;
+});
 
-        $(document).on("click", ".fault-header", function () {
-            $(this).next(".fault-body").slideToggle();
-        });
+$(document).on("click", ".fault-header", function () {
+  $(this).next(".fault-body").slideToggle();
+});
 
         $("#photos").on("change", function () {
         
