@@ -7,8 +7,8 @@
     <title>Excel Lead Capture</title>
     <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600&display=swap" rel="stylesheet">
-<link href="css/style.css" rel="stylesheet">
-   
+    <link href="css/style.css" rel="stylesheet">
+
 </head>
 
 <body>
@@ -43,63 +43,55 @@
         <div class="section-title">SECTION 3: Estimates & Photos</div>
         <div class="section-box">
             <div class="two-section">
-            <div class="row technician-container"><label>No. of Technicians</label><input type="number"></div>
-            <div class="row hours-container"><label>Hrs. Req.</label><input type="number"></div>
-             <div class="clear"></div>
-</div>
-<div class="two-section">
-            <div class="row apprentice-container">
-                <label>Apprentice Req.</label>
-                <label class="switch"><input type="checkbox"><span class="slider"></span></label>
+                <div class="row technician-container"><label>No. of Technicians</label><input type="number"></div>
+                <div class="row hours-container"><label>Hrs. Req.</label><input type="number"></div>
+                <div class="clear"></div>
             </div>
-            
+            <div class="two-section">
+                <div class="row apprentice-container">
+                    <label>Apprentice Req.</label>
+                    <label class="switch"><input type="checkbox"><span class="slider"></span></label>
+                </div>
 
-            <div class="row afterhrs-container">
-                <label class="after-label">After Hrs.</label>
-                <label class="switch"><input type="checkbox"><span class="slider"></span></label>
-            </div>
-             <div class="clear"></div>
-            </div>
 
-             <div class="row align-items-center">
-
-            <div class="col-md-4 field-label">
-                Upload Photos
+                <div class="row afterhrs-container">
+                    <label class="after-label">After Hrs.</label>
+                    <label class="switch"><input type="checkbox"><span class="slider"></span></label>
+                </div>
+                <div class="clear"></div>
             </div>
 
-            <div class="col-md-3">
+            <div class="row align-items-center">
 
-                <input
-                    type="file"
-                    id="photoUpload"
-                    multiple
-                    accept="image/*"
-                    hidden>
+                <div class="col-md-4 field-label">
+                    Upload Photos
+                </div>
 
-                <button
-                    type="button"
-                    class="upload-btn"
-                    id="uploadBtn">
+                <div class="col-md-3">
 
-                    Upload Photo ↑
+                    <input type="file" id="photoUpload" multiple accept="image/*" hidden>
 
-                </button>
+                    <button type="button" class="upload-btn" id="uploadBtn">
 
-            </div>
+                        Upload Photo ↑
 
-            <div class="col-md-4">
+                    </button>
 
-                <div class="upload-preview" id="previewContainer">
+                </div>
 
-                    <div class="upload-status">
-                        No images uploaded
+                <div class="col-md-4">
+
+                    <div class="upload-preview" id="previewContainer">
+
+                        <div class="upload-status">
+                            No images uploaded
+                        </div>
+
                     </div>
 
                 </div>
 
             </div>
-
-        </div>
         </div>
 
         <div class="section-title">SECTION 4: Verify & Submit</div>
@@ -120,16 +112,16 @@
     <script>
         let faultCount = 0;
 
-function updateFaultIndices() {
-  $("#faultContainer .fault").each(function(idx) {
-    const num = idx + 1;
-    $(this).find('.circle').text(num);
-    $(this).find('.fault-header > div:first-child').html(`<span class="circle">${num}</span>Fault #${num}`);
-  });
-}
+        function updateFaultIndices() {
+            $("#faultContainer .fault").each(function (idx) {
+                const num = idx + 1;
+                $(this).find('.circle').text(num);
+                $(this).find('.fault-header > div:first-child').html(`<span class="circle">${num}</span>Fault #${num}`);
+            });
+        }
 
-function createFaultHtml(index) {
-  return `
+        function createFaultHtml(index) {
+            return `
 <div class="fault">
   <div class="fault-header">
     <div><span class="circle">${index}</span>Fault #${index}</div>
@@ -143,29 +135,29 @@ function createFaultHtml(index) {
     <button class="btn deleteBtn">Delete</button>
   </div>
 </div>`;
-}
+        }
 
-function addFault() {
-  const nextIndex = $("#faultContainer .fault").length + 1;
-  $("#faultContainer").append(createFaultHtml(nextIndex));
-  faultCount = $("#faultContainer .fault").length;
-}
+        function addFault() {
+            const nextIndex = $("#faultContainer .fault").length + 1;
+            $("#faultContainer").append(createFaultHtml(nextIndex));
+            faultCount = $("#faultContainer .fault").length;
+        }
 
-addFault();
-$("#addFault").click(addFault);
+        addFault();
+        $("#addFault").click(addFault);
 
-$(document).on("click", ".deleteBtn", function () {
-  $(this).closest('.fault').remove();
-  updateFaultIndices();
-  faultCount = $("#faultContainer .fault").length;
-});
+        $(document).on("click", ".deleteBtn", function () {
+            $(this).closest('.fault').remove();
+            updateFaultIndices();
+            faultCount = $("#faultContainer .fault").length;
+        });
 
-$(document).on("click", ".fault-header", function () {
-  $(this).next(".fault-body").slideToggle();
-});
+        $(document).on("click", ".fault-header", function () {
+            $(this).next(".fault-body").slideToggle();
+        });
 
         $("#photos").on("change", function () {
-        
+
             $("#preview").empty();
             $("#count").html(this.files.length + " uploaded successfully");
             [...this.files].forEach(file => {
@@ -177,67 +169,67 @@ $(document).on("click", ".fault-header", function () {
     </script>
 
     <script>
-$(function () {
+        $(function () {
 
-    const $txt = $("textarea");
-    const lineHeight = 22;
-    const maxLines = 4;
-    const maxHeight = lineHeight * maxLines;
+            const $txt = $("textarea");
+            const lineHeight = 22;
+            const maxLines = 4;
+            const maxHeight = lineHeight * maxLines;
 
-    let previousValue = "";
+            let previousValue = "";
 
-    $txt.on("input", function () {
+            $txt.on("input", function () {
 
-        this.style.height = "auto";
-        this.style.height = this.scrollHeight + "px";
+                this.style.height = "auto";
+                this.style.height = this.scrollHeight + "px";
 
-        // If content exceeds 3 visual lines
-        if (this.scrollHeight > maxHeight + 2) {
-            $(this).val(previousValue);
+                // If content exceeds 3 visual lines
+                if (this.scrollHeight > maxHeight + 2) {
+                    $(this).val(previousValue);
 
-            this.style.height = "auto";
-            this.style.height =
-                Math.min(this.scrollHeight, maxHeight) + "px";
+                    this.style.height = "auto";
+                    this.style.height =
+                        Math.min(this.scrollHeight, maxHeight) + "px";
 
-            return;
-        }
+                    return;
+                }
 
-        previousValue = $(this).val();
+                previousValue = $(this).val();
 
-        this.style.height =
-            Math.min(this.scrollHeight, maxHeight) + "px";
-    });
+                this.style.height =
+                    Math.min(this.scrollHeight, maxHeight) + "px";
+            });
 
-});
+        });
 
-$("#uploadBtn").click(function(){
-    $("#photoUpload").click();
-});
+        $("#uploadBtn").click(function () {
+            $("#photoUpload").click();
+        });
 
-$("#photoUpload").change(function(){
+        $("#photoUpload").change(function () {
 
-    let files = this.files;
+            let files = this.files;
 
-    if(files.length > 4){
-        alert("Maximum 4 images allowed");
-        $(this).val('');
-        return;
-    }
+            if (files.length > 4) {
+                alert("Maximum 4 images allowed");
+                $(this).val('');
+                return;
+            }
 
-    let html = '<div class="preview-images">';
+            let html = '<div class="preview-images">';
 
-    $.each(files,function(index,file){
+            $.each(files, function (index, file) {
 
-        let imageUrl = URL.createObjectURL(file);
+                let imageUrl = URL.createObjectURL(file);
 
-        html += `
+                html += `
             <img src="${imageUrl}">
         `;
-    });
+            });
 
-    html += '</div>';
+            html += '</div>';
 
-    html += `
+            html += `
         <div class="upload-status">
             ${files.length}
             ${files.length === 1 ? 'image' : 'images'}
@@ -245,9 +237,9 @@ $("#photoUpload").change(function(){
         </div>
     `;
 
-    $("#previewContainer").html(html);
-});
-</script>
+            $("#previewContainer").html(html);
+        });
+    </script>
 </body>
 
 </html>
