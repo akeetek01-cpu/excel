@@ -7,8 +7,8 @@
     <title>Excel Lead Capture</title>
     <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600&display=swap" rel="stylesheet">
-<link href="css/style.css" rel="stylesheet">
-   
+    <link href="css/style.css" rel="stylesheet">
+
 </head>
 
 <body>
@@ -43,63 +43,55 @@
         <div class="section-title">SECTION 3: Estimates & Photos</div>
         <div class="section-box">
             <div class="two-section">
-            <div class="row technician-container"><label>No. of Technicians</label><input type="number"></div>
-            <div class="row hours-container"><label>Hrs. Req.</label><input type="number"></div>
-             <div class="clear"></div>
-</div>
-<div class="two-section">
-            <div class="row apprentice-container">
-                <label>Apprentice Req.</label>
-                <label class="switch"><input type="checkbox"><span class="slider"></span></label>
+                <div class="row technician-container"><label>No. of Technicians</label><input type="number"></div>
+                <div class="row hours-container"><label>Hrs. Req.</label><input type="number"></div>
+                <div class="clear"></div>
             </div>
-            
+            <div class="two-section">
+                <div class="row apprentice-container">
+                    <label>Apprentice Req.</label>
+                    <label class="switch"><input type="checkbox"><span class="slider"></span></label>
+                </div>
 
-            <div class="row afterhrs-container">
-                <label class="after-label">After Hrs.</label>
-                <label class="switch"><input type="checkbox"><span class="slider"></span></label>
-            </div>
-             <div class="clear"></div>
-            </div>
 
-             <div class="row align-items-center">
-
-            <div class="col-md-4 field-label">
-                Upload Photos
+                <div class="row afterhrs-container">
+                    <label class="after-label">After Hrs.</label>
+                    <label class="switch"><input type="checkbox"><span class="slider"></span></label>
+                </div>
+                <div class="clear"></div>
             </div>
 
-            <div class="col-md-3">
+            <div class="row align-items-center">
 
-                <input
-                    type="file"
-                    id="photoUpload"
-                    multiple
-                    accept="image/*"
-                    hidden>
+                <div class="col-md-4 field-label">
+                    Upload Photos
+                </div>
 
-                <button
-                    type="button"
-                    class="upload-btn"
-                    id="uploadBtn">
+                <div class="col-md-3">
 
-                    Upload Photo ↑
+                    <input type="file" id="photoUpload" multiple accept="image/*" hidden>
 
-                </button>
+                    <button type="button" class="upload-btn" id="uploadBtn">
 
-            </div>
+                        Upload Photo ↑
 
-            <div class="col-md-4">
+                    </button>
 
-                <div class="upload-preview" id="previewContainer">
+                </div>
 
-                    <div class="upload-status">
-                        No images uploaded
+                <div class="col-md-4">
+
+                    <div class="upload-preview" id="previewContainer">
+
+                        <div class="upload-status">
+                            No images uploaded
+                        </div>
+
                     </div>
 
                 </div>
 
             </div>
-
-        </div>
         </div>
 
         <div class="section-title">SECTION 4: Verify & Submit</div>
@@ -118,122 +110,191 @@
     </div>
 
     <script>
-        let faultCount = 0;
+(function(){
+  let faultCount = 0;
+  let currentImageUrls = [];
 
-        function addFault() {
-            faultCount++;
-            $("#faultContainer").append(`
+  function updateFaultIndices() {
+    $("#faultContainer .fault").each(function(idx){
+      const num = idx + 1;
+      $(this).find('.circle').text(num);
+      $(this).find('.fault-header > div:first-child').html(`<span class="circle">${num}</span>Fault #${num}`);
+    });
+  }
+
+  function createFaultHtml(index) {
+    // initially expanded, caret shows ▲
+    return `
 <div class="fault">
-<div class="fault-header">
-<div><span class="circle">${faultCount}</span>Fault #${faultCount}</div>
-<div><span class="badge">✨ AI pre-filled please verify</span> ▼</div>
-</div>
-<div class="fault-body">
-<div class="row"><label>Fault Description</label><textarea rows="1" placeholder="Enter"></textarea></div>
-<div class="row"><label>Work Required</label><input placeholder="AI Recommended / Enter"></div>
-<div class="row"><label>Parts & Material</label><input placeholder="AI Recommended / Enter"></div>
-<div class="row"><label>Special Equipment</label><input placeholder="AI Recommended / Enter"></div>
-<button class="btn deleteBtn">Delete</button>
-</div>
-</div>`);
-        }
+  <div class="fault-header">
+    <div><span class="circle">${index}</span>Fault #${index}</div>
+    <div><span class="badge">✨ AI pre-filled please verify</span> <span class="caret">▲</span></div>
+  </div>
+  <div class="fault-body" style="display:block;">
+    <div class="row"><label>Fault Description</label><textarea rows="1" placeholder="Enter"></textarea></div>
+    <div class="row"><label>Work Required</label><input placeholder="AI Recommended / Enter"></div>
+    <div class="row"><label>Parts & Material</label><input placeholder="AI Recommended / Enter"></div>
+    <div class="row"><label>Special Equipment</label><input placeholder="AI Recommended / Enter"></div>
+    <button class="btn deleteBtn">Delete</button>
+  </div>
+</div>`;
+  }
 
-        addFault();
+  function addFault() {
+    const nextIndex = $("#faultContainer .fault").length + 1;
+    $("#faultContainer").append(createFaultHtml(nextIndex));
+    faultCount = $("#faultContainer .fault").length;
+  }
 
-        $("#addFault").click(addFault);
+  // init
+  addFault();
+  $("#addFault").click(addFault);
 
-        $(document).on("click", ".deleteBtn", function () {
-            $(this).closest(".fault").remove();
-        });
+  // delete
+  $(document).on("click", ".deleteBtn", function(e){
+    e.stopPropagation();
+    $(this).closest('.fault').remove();
+    updateFaultIndices();
+    faultCount = $("#faultContainer .fault").length;
+  });
 
-        $(document).on("click", ".fault-header", function () {
-            $(this).next(".fault-body").slideToggle();
-        });
-
-        $("#photos").on("change", function () {
-        
-            $("#preview").empty();
-            $("#count").html(this.files.length + " uploaded successfully");
-            [...this.files].forEach(file => {
-                let r = new FileReader();
-                r.onload = e => $("#preview").append('<img src="' + e.target.result + '">');
-                r.readAsDataURL(file);
-            });
-        });
-    </script>
-
-    <script>
-$(function () {
-
-    const $txt = $("textarea");
-    const lineHeight = 22;
-    const maxLines = 4;
-    const maxHeight = lineHeight * maxLines;
-
-    let previousValue = "";
-
-    $txt.on("input", function () {
-
-        this.style.height = "auto";
-        this.style.height = this.scrollHeight + "px";
-
-        // If content exceeds 3 visual lines
-        if (this.scrollHeight > maxHeight + 2) {
-            $(this).val(previousValue);
-
-            this.style.height = "auto";
-            this.style.height =
-                Math.min(this.scrollHeight, maxHeight) + "px";
-
-            return;
-        }
-
-        previousValue = $(this).val();
-
-        this.style.height =
-            Math.min(this.scrollHeight, maxHeight) + "px";
+  // toggle body + caret
+  $(document).on("click", ".fault-header", function(e){
+    if ($(e.target).closest('button,input,textarea,.btn').length) return;
+    const $header = $(this);
+    const $body = $header.next('.fault-body');
+    const $caret = $header.find('.caret');
+    $body.slideToggle(200, function(){
+      $caret.text($body.is(':visible') ? '▲' : '▼');
     });
+  });
 
-});
-
-$("#uploadBtn").click(function(){
-    $("#photoUpload").click();
-});
-
-$("#photoUpload").change(function(){
-
-    let files = this.files;
-
-    if(files.length > 4){
-        alert("Maximum 4 images allowed");
-        $(this).val('');
-        return;
-    }
-
-    let html = '<div class="preview-images">';
-
-    $.each(files,function(index,file){
-
-        let imageUrl = URL.createObjectURL(file);
-
-        html += `
-            <img src="${imageUrl}">
-        `;
-    });
-
-    html += '</div>';
-
-    html += `
-        <div class="upload-status">
-            ${files.length}
-            ${files.length === 1 ? 'image' : 'images'}
-            uploaded successfully
-        </div>
-    `;
-
-    $("#previewContainer").html(html);
-});
+  
+})();
 </script>
+
+        <script>
+            $(function () {
+    
+                const $txt = $("textarea");
+                const lineHeight = 22;
+                const maxLines = 4;
+                const maxHeight = lineHeight * maxLines;
+    
+                let previousValue = "";
+    
+                $txt.on("input", function () {
+    
+                    this.style.height = "auto";
+                    this.style.height = this.scrollHeight + "px";
+    
+                    // If content exceeds 3 visual lines
+                    if (this.scrollHeight > maxHeight + 2) {
+                        $(this).val(previousValue);
+    
+                        this.style.height = "auto";
+                        this.style.height =
+                            Math.min(this.scrollHeight, maxHeight) + "px";
+    
+                        return;
+                    }
+    
+                    previousValue = $(this).val();
+    
+                    this.style.height =
+                        Math.min(this.scrollHeight, maxHeight) + "px";
+                });
+    
+            });
+    
+            $("#uploadBtn").click(function () {
+                $("#photoUpload").click();
+            });
+    
+            // ...existing code...
+            // replaced photo upload handling to append images up to a max of 4
+            (function(){
+                const MAX_IMAGES = 4;
+                let selectedFiles = []; // stores File objects
+    
+                const $input = $("#photoUpload");
+                const $preview = $("#previewContainer");
+    
+                function renderPreviews() {
+                    if (selectedFiles.length === 0) {
+                        $preview.html(`<div class="upload-status">No images uploaded</div>`);
+                        return;
+                    }
+    
+                    let html = `<div class="preview-images">`;
+                    selectedFiles.forEach((file, idx) => {
+                        const url = URL.createObjectURL(file);
+                        html += `
+                            <div class="preview-item" data-index="${idx}" style="display:inline-block; position:relative; margin-right:4px;">
+                                <img src="${url}" style="width:22px; height:22px; object-fit:cover; border:1px solid #ccc;">
+                                <button type="button" class="remove-img" data-index="${idx}" style="position:absolute; top:0px; right:0px; background:#f00; color:#fff; border:none; border-radius:50%; width:15px; height:15px; cursor:pointer; font-size: 11px;">×</button>
+                            </div>
+                        `;
+                    });
+                    html += `</div>`;
+    
+                    html += `
+                        <div class="upload-status">
+                            ${selectedFiles.length}
+                            ${selectedFiles.length === 1 ? 'image' : 'images'}
+                            uploaded successfully
+                        </div>
+                    `;
+    
+                    $preview.html(html);
+                }
+    
+                $input.change(function () {
+                    let files = Array.from(this.files || []);
+    
+                    if (files.length === 0) {
+                        $(this).val('');
+                        return;
+                    }
+    
+                    // If adding these would exceed MAX_IMAGES, trim and alert
+                    if (selectedFiles.length + files.length > MAX_IMAGES) {
+                        const allowed = MAX_IMAGES - selectedFiles.length;
+                        if (allowed <= 0) {
+                            alert(`Maximum ${MAX_IMAGES} images allowed`);
+                            $(this).val('');
+                            return;
+                        }
+                        alert(`Only ${allowed} more image(s) can be added. Excess files will be ignored.`);
+                        files = files.slice(0, allowed);
+                    }
+    
+                    files.forEach(f => {
+                        // optionally: validate file type/size here
+                        selectedFiles.push(f);
+                    });
+    
+                    renderPreviews();
+    
+                    // clear input so same file can be selected again if needed
+                    $(this).val('');
+                });
+    
+                // remove single image
+                $(document).on('click', '.remove-img', function (e) {
+                    e.stopPropagation();
+                    const idx = Number($(this).data('index'));
+                    if (!isNaN(idx)) {
+                        selectedFiles.splice(idx, 1);
+                        renderPreviews();
+                    }
+                });
+    
+                // initial render
+                renderPreviews();
+            })();
+            // ...existing code...
+        </script>
 </body>
 
 </html>
