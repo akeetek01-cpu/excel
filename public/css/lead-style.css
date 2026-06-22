@@ -1,0 +1,270 @@
+:root {
+    --purple: #7C6CEB;
+    --light: #f6f6f8;
+    --muted: #9aa0b0;
+}
+:root {
+    --primary: #8B7CF6;
+    --light: #F3F0FF;
+    --border: #E5E5E5;
+    --success: #198754;
+    --bg: #FAFAFA;
+}
+
+.wizard-card {
+    max-width: 900px
+}
+
+.rounded-12 {
+    border-radius: 12px
+}
+
+.rounded-8 {
+    border-radius: 8px
+}
+
+.card {
+    box-shadow: 0 6px 18px rgba(124, 108, 235, 0.08);
+    border: none
+}
+
+.stepper {
+    align-items: center
+}
+
+.step {
+    flex: 1;
+    text-align: center;
+    padding: 8px 6px;
+    cursor: pointer
+}
+
+.step .icon {
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    background: #eee;
+    color: var(--muted)
+}
+
+.step.active .icon {
+    background: var(--purple);
+    color: #fff
+}
+
+.step.completed .icon {
+    background: #e9e6ff;
+    color: var(--purple)
+}
+
+.step .label {
+    font-size: 10px;
+    margin-top: 6px;
+    color: var(--muted)
+}
+
+.step.active .label {
+    color: var(--purple);
+    font-weight: 600
+}
+
+.divider {
+    height: 2px;
+    background: var(--border);
+    flex-basis: 20px;
+    margin: 0 6px;
+    margin-bottom: 13px;
+}
+
+.section-title {
+    font-weight: 600;
+    margin-bottom: 10px;
+    color: #333
+}
+
+.btn-purple {
+    background: var(--purple);
+    color: #fff;
+    border: none
+}
+
+.btn-outline-purple {
+    background: transparent;
+    border: 1px dashed rgba(124, 108, 235, 0.4);
+    color: var(--purple)
+}
+
+.rounded-8 {
+    border-radius: 8px
+}
+
+.auto-resize {
+    overflow: hidden
+}
+
+.footer-nav {
+    /* position: sticky; */
+    bottom: 0;
+    background: #fff;
+    padding: 10px;
+    border-radius: 8px;
+    margin-top: 10px;
+    box-shadow: 0 -6px 18px rgba(0, 0, 0, 0.03)
+}
+
+.stat-card {
+    flex: 1;
+    background: #f6f5ed;
+    padding: 12px;
+    border-radius: 8px;
+    text-align: center
+}
+
+.stat-card .title {
+    font-size: 13px;
+    color: var(--muted)
+}
+
+.stat-card .value {
+    font-weight: 600;
+    font-size: 16px;
+    color: #333
+}
+
+.drop-zone {
+    background: #f6f5ed;
+    border: 1px dashed #e6e6ea;
+    border-radius: 8px;
+    cursor: pointer
+}
+.remove-photo{
+        font-size: 11px;
+    width: 20px;
+    height: 20px;
+}
+
+.preview-thumb {
+    width: 50px;
+    height: 50px;
+    object-fit: cover;
+    border-radius: 6px;
+    border: 1px solid #eee
+}
+.upload-img-status{
+        font-size: 11px;
+    text-align: center;
+    color: #12c8c0;
+    display: none;
+}
+.afterhrs-container{
+        padding-top: 30px;
+    padding-left: 50px;
+}
+.alert-purple {
+    background: linear-gradient(90deg, rgba(124, 108, 235, 0.08), rgba(124, 108, 235, 0.02));
+    border: 1px solid rgba(124, 108, 235, 0.12);
+    color: var(--purple)
+}
+
+.summary-card {
+    background: #fff;
+    border-radius: 8px;
+    border: 1px solid #f1f1f2
+}
+
+.fault-card {
+    background: #fbfbfd;
+    border: 1px solid #f1efff;
+    padding: 12px;
+    border-radius: 8px;
+    margin-bottom: 8px
+}
+
+.fault-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 8px;
+    font-weight: bold;
+}
+
+.fault-badge {
+        background: var(--purple);
+    color: #ffffff;
+    padding: 6px;
+    border-radius: 25px;
+    font-size: 13px;
+    width: 25px;
+    height: 25px;
+}
+.delete-button{
+        padding: 4px 12px;
+    border-radius: 6pc;
+    border: 1px solid var(--purple);
+}
+
+.remove-fault {
+    border: 1px solid rgba(0, 0, 0, 0.06);
+    background: #fff
+}
+#form-customer label{
+    min-width: 150px !important;
+}
+
+.form-text input{
+        min-width: auto;
+}
+
+.footer-nav .btn{
+    width: auto;
+    display: inline-flex;
+}
+.btn:hover {
+    background: var(--purple);
+    color: #fff;
+}
+.divider-1{
+    border-bottom:1px solid var(--border);
+    height: 1px;
+        margin-bottom: 0.5rem;
+            margin-top: 0;
+            margin-left: 0;
+            margin-right: 0;
+}
+.image-for-label{
+    width: 20px;
+    height: 20px;
+    object-fit: cover;
+    margin-bottom: 4px;
+    margin-right: 4px;
+}
+.form-text span {
+  font-size: 11px;
+    padding-left: 4px;
+}
+.form-text{
+    align-items: center;
+    display: flex;
+}
+@media(min-width:768px) {
+    .wizard-card {
+        margin-top: 20px
+    }
+}
+
+@media(max-width:576px) {
+    .step .label {
+        display: none
+    }
+
+    .footer-nav {
+        /* position: fixed; */
+        left: 0;
+        right: 0;
+        bottom: 0;
+        padding: 12px
+    }
+}
