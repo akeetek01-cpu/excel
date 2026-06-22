@@ -27,13 +27,32 @@ $(function(){
     $(`.step-pane[data-step-pane='${idx}']`).removeClass('d-none');
     // buttons
     if(idx===0){$('#backBtn').prop('disabled',true);} else {$('#backBtn').prop('disabled',false);} 
-    $('#nextBtn').text(idx===3? 'Submit' : 'Next →');
-    $('#createNewBtn').toggle(idx === 3);
+    if(idx === 2){
+      $('#nextBtn').html('Submit');
+    } else {
+      $('#nextBtn').html('<i class="fa-solid fa-arrow-right"></i>');
+    }
+    $('#createNewBtn').toggle(idx === 2);
   }
 
   function resetWizard(){
     $('#form-customer')[0].reset();
     $('#faultList').empty();
+    $('#assetDescriptionSelect').val('');
+    $('#assetLocation').val('');
+    $('#assetDescriptionInput')
+      .val('')
+      .addClass('d-none')
+      .removeClass('is-invalid');
+    $('#assetLocationInput')
+      .val('')
+      .addClass('d-none')
+      .removeClass('is-invalid');
+    $('#assetDescriptionError, #assetDescriptionInputError, #assetLocationError, #assetLocationInputError').text('');
+    $('#technicians').val(1);
+    $('#hours').val(0);
+    $('#apprentice').val(0);
+    $('#afterHours').prop('checked', false);
     jobData.customer = {};
     jobData.asset = {description:'',location:''};
     jobData.faults = [];
@@ -432,6 +451,13 @@ $(function(){
 
 
   // Faults
+  function updateAiLabelState($card){
+    const hasAutoFilled = $card.find('.work-req').val().trim() !== '' ||
+      $card.find('.parts').val().trim() !== '' ||
+      $card.find('.equipment').val().trim() !== '';
+    $card.find('.ai-pre-fill').toggleClass('is-filled', hasAutoFilled);
+  }
+
   function renderFaults(){
     const $list = $('#faultList').empty();
     jobData.faults.forEach((f,idx)=>{
@@ -441,10 +467,7 @@ $(function(){
           <div class="fault-header">
             <div><span class="badge fault-badge">${num}</span> Fault #${num}</div>
             <div>
-            <img class="image-for-label" src="images/ai_icon.png"
-                                        alt="lable">
-              <label class="ai-pre-fill auto-fill me-2">AI pre-filled — verify</label>
-              ${jobData.faults.length>1?'<button id="deleteFaultBtn" type="button" class="delete-button">Delete</button>':''}
+              ${jobData.faults.length>1?'<button id="deleteFaultBtn" type="button" class="delete-icon-btn" aria-label="Delete fault"><i class="fa-solid fa-trash"></i></button>':''}
             </div>
           </div>
  <div class="mb-2">
@@ -456,7 +479,14 @@ $(function(){
 
           <div class="row-1 g-2">
            <div class="mb-2">
-                                <label class="form-label">Work required</label>
+                                <div class="d-flex justify-content-between align-items-center mb-1">
+                                    <label class="form-label mb-0">Work required</label>
+                                    <div>
+            <img class="image-for-label" src="images/ai_icon.png" alt="lable">
+             <span class="ai-pre-fill auto-fill small">AI pre-filled — verify</span>
+            </div>
+                                    
+                                </div>
                                 <input maxlength="150" class="form-control work-req" placeholder="AI recommended / enter" value="${f.work||''}">
                                 <div class="invalid-feedback work-req-error"></div>
                             </div>
@@ -478,6 +508,7 @@ $(function(){
         </div>
       `);
       $list.append($card);
+      updateAiLabelState($card);
     });
   }
 
@@ -516,6 +547,7 @@ $(function(){
         $card.find('.parts').val(autoParts);
         $card.find('.equipment').val(autoEquipment);
 
+        updateAiLabelState($card);
         $card.find('.fault-desc').trigger('input');
       }
     }
@@ -541,14 +573,17 @@ $(function(){
   $(document).on('input','.work-req',function(){
     const idx = Number($(this).closest('.fault-card').data('idx'));
     if(!isNaN(idx)) jobData.faults[idx].work = $(this).val();
+    updateAiLabelState($(this).closest('.fault-card'));
   });
   $(document).on('input','.parts',function(){
     const idx = Number($(this).closest('.fault-card').data('idx'));
     if(!isNaN(idx)) jobData.faults[idx].parts = $(this).val();
+    updateAiLabelState($(this).closest('.fault-card'));
   });
   $(document).on('input','.equipment',function(){
     const idx = Number($(this).closest('.fault-card').data('idx'));
     if(!isNaN(idx)) jobData.faults[idx].equipment = $(this).val();
+    updateAiLabelState($(this).closest('.fault-card'));
   });
 
   $('#addFaultBtn').click(function(){addFault();});
@@ -656,14 +691,13 @@ $(function(){
 
   // Navigation
   $('#nextBtn').on('click', function(e){
-    if(currentStep < 3){
+    if(currentStep < 2){
       if(!validateStep(currentStep)){
         e.preventDefault();
         return false;
       }
       saveStepData(currentStep);
       showStep(currentStep + 1);
-      if(currentStep === 3) renderReview();
     } else {
       if(!validateStep(2)) return;
       saveStepData(2);

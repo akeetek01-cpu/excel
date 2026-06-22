@@ -41,11 +41,6 @@
                     <div class="icon"> <i class="fa-solid fa-calculator"></i> </div>
                     <div class="label">Estimates</div>
                 </div>
-                <div class="divider"></div>
-                <div class="step" data-step="3">
-                    <div class="icon"> <i class="fa-solid fa-check"></i> </div>
-                    <div class="label">Review</div>
-                </div>
             </div>
 
             <!-- Steps Container -->
@@ -301,61 +296,19 @@
                         </div>
                     </div>
 
-                    <!-- STEP 4 -->
-                    <div class="step-pane d-none" data-step-pane="3">
-                        <div class="card p-3 mb-3 rounded-12">
-                            <div class="alert alert-purple d-flex align-items-center mb-3">
-                                <i class="fa-solid fa-info-circle me-2"></i>
-                                <div>
-                                    <strong>Ready to submit</strong>
-                                    <div class="small">Please review all details before submitting</div>
-                                </div>
-                            </div>
-
-                            <div class="summary-card p-3 rounded-8 bg-white">
-                                <div class="row">
-                                    <div class="col-6 text-muted">Job number</div>
-                                    <div class="col-6 text-end" id="revJob">#JB-2024-001</div>
-                                </div>
-                                <div class="row mt-2">
-                                    <div class="col-6 text-muted">Customer</div>
-                                    <div class="col-6 text-end" id="revCustomer">-</div>
-                                </div>
-                                <div class="row mt-2">
-                                    <div class="col-6 text-muted">Asset</div>
-                                    <div class="col-6 text-end" id="revAsset">-</div>
-                                </div>
-                                <div class="row mt-2">
-                                    <div class="col-6 text-muted">Faults logged</div>
-                                    <div class="col-6 text-end" id="revFaults">0 faults</div>
-                                </div>
-                                <div class="row mt-2">
-                                    <div class="col-6 text-muted">Technicians</div>
-                                    <div class="col-6 text-end" id="revTech">-</div>
-                                </div>
-                                <div class="row mt-2">
-                                    <div class="col-6 text-muted">Estimated hours</div>
-                                    <div class="col-6 text-end" id="revHours">-</div>
-                                </div>
-                                <div class="row mt-2">
-                                    <div class="col-6 text-muted">Total man-hours</div>
-                                    <div class="col-6 text-end" id="revMan">-</div>
-                                </div>
-                            </div>
-
-                        </div>
-                    </div>
-
                 </div>
 
                 <!-- Sticky Footer Nav -->
                 <div class="footer-nav d-flex justify-content-between align-items-center p-2">
-                    <button class="btn btn-outline-secondary btn-sm" id="backBtn"><i class="fa-solid fa-arrow-left"></i>
-                        Back</button>
+                    <button class="btn btn-outline-secondary btn-sm" id="backBtn" aria-label="Back">
+                        <i class="fa-solid fa-arrow-left"></i>
+                    </button>
                     <div class="d-flex align-items-center gap-2">
                         <button style="display: none;" type="button" class="btn btn-outline-purple btn-sm" id="createNewBtn">+ Create New</button>
-                        <button class="btn btn-outline-secondary btn-sm" id="saveDraft">Save</button>
-                        <button class="btn btn-purple btn-sm" id="nextBtn">Next →</button>
+                        <!-- <button class="btn btn-outline-secondary btn-sm" id="saveDraft">Save</button> -->
+                        <button class="btn btn-purple btn-sm" id="nextBtn" aria-label="Next">
+                            <i class="fa-solid fa-arrow-right"></i>
+                        </button>
                     </div>
                 </div>
 
