@@ -191,6 +191,14 @@
     font-weight: bold;
 }
 
+.ai-pre-fill {
+    color: var(--purple);
+}
+
+.ai-pre-fill.is-filled {
+    color: #111;
+}
+
 .fault-badge {
         background: var(--purple);
     color: #ffffff;
@@ -200,10 +208,17 @@
     width: 25px;
     height: 25px;
 }
-.delete-button{
-        padding: 4px 12px;
-    border-radius: 6pc;
-    border: 1px solid var(--purple);
+.delete-icon-btn {
+    background: transparent;
+    border: none;
+    color: #dc3545;
+    font-size: 1rem;
+    padding: 0;
+    line-height: 1;
+}
+
+.delete-icon-btn:hover {
+    color: #b02a37;
 }
 
 .remove-fault {

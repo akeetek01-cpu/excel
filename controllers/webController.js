@@ -23,3 +23,6 @@ exports.leadForm = (req, res) => {
     res.sendFile("lead-capture-v1.html", { root: "./public" });
 };
 
+exports.leadForm1 = (req, res) => {
+    res.sendFile("lead-capture-new.html", { root: "./public" });
+};

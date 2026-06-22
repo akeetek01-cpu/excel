@@ -8,5 +8,6 @@ router.get("/login", controller.login);
 router.get("/register", controller.register);
 router.get("/forgotPassword", controller.forgotPassword);
 router.get("/lead-form", controller.leadForm);
+router.get("/lead-form-v1", controller.leadForm1);
 
 module.exports = router;
