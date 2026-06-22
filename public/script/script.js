@@ -494,20 +494,32 @@ $(function(){
     }
   });
 
-    $(document).on("input", ".fault-desc", function () {
-    const text = $(this).val();
+  $(document).on('input', '.fault-desc', function () {
+    const text = $(this).val().trim().toLowerCase();
 
-    if (text.length >= 5 && text == "leak ") {
-        const idx = Number($(this).closest('.fault-card').data('idx'));
-      if(!isNaN(idx)){
-        jobData.faults[idx].description = 'Leak from valve causing water ingress.';
-        jobData.faults[idx].work = 'Replace valve and test system.';
-        jobData.faults[idx].parts = 'Valve assembly, sealant';
-        jobData.faults[idx].equipment = 'Socket set, pressure tester';
-        renderFaults();
+    if (text === 'leak') {
+      const idx = Number($(this).closest('.fault-card').data('idx'));
+      if (!isNaN(idx)) {
+        const autoDescription = 'Leak from valve causing water ingress.';
+        const autoWork = 'Replace valve and test system.';
+        const autoParts = 'Valve assembly, sealant';
+        const autoEquipment = 'Socket set, pressure tester';
+
+        jobData.faults[idx].description = autoDescription;
+        jobData.faults[idx].work = autoWork;
+        jobData.faults[idx].parts = autoParts;
+        jobData.faults[idx].equipment = autoEquipment;
+
+        const $card = $(this).closest('.fault-card');
+        $card.find('.fault-desc').val(autoDescription);
+        $card.find('.work-req').val(autoWork);
+        $card.find('.parts').val(autoParts);
+        $card.find('.equipment').val(autoEquipment);
+
+        $card.find('.fault-desc').trigger('input');
       }
     }
-});
+  });
 
 
   // $(document).on('click','.auto-fill',function(){
