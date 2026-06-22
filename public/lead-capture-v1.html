@@ -1,0 +1,396 @@
+<!doctype html>
+<html lang="en">
+
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Job Wizard - Field Service</title>
+
+    <!-- Bootstrap 5 -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+    <!-- Font Awesome -->
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="css/style.css">
+        <link rel="stylesheet" href="css/lead-style.css">
+
+</head>
+
+<body>
+
+    <div class="lead-capture container py-4">
+          <div class="logo">
+            <img src="images/excel_log.png" alt="Excel Logo">
+        </div>
+        <div class="wizard-card mx-auto">
+
+            <!-- Top Stepper -->
+            <div class="stepper d-flex justify-content-between mb-3" id="stepper">
+                <div class="step" data-step="0">
+                    <div class="icon"> <i class="fa-solid fa-user"></i> </div>
+                    <div class="label">Customer</div>
+                </div>
+                <div class="divider"></div>
+                <div class="step" data-step="1">
+                    <div class="icon"> <i class="fa-solid fa-wrench"></i> </div>
+                    <div class="label">Asset & Faults</div>
+                </div>
+                <div class="divider"></div>
+                <div class="step" data-step="2">
+                    <div class="icon"> <i class="fa-solid fa-calculator"></i> </div>
+                    <div class="label">Estimates</div>
+                </div>
+                <div class="divider"></div>
+                <div class="step" data-step="3">
+                    <div class="icon"> <i class="fa-solid fa-check"></i> </div>
+                    <div class="label">Review</div>
+                </div>
+            </div>
+
+            <!-- Steps Container -->
+            <div class="steps">
+
+                <!-- STEP 1 -->
+                <div class="step-pane" data-step-pane="0">
+                    <div class="card p-3 mb-3 rounded-12">
+                        <div class="section-title">Customer Details & Notes</div>
+
+                        <form id="form-customer" novalidate>
+                            <div class="d-flex align-items-start">
+                                <label class="form-label me-2 mb-0" style="min-width:100px">
+                                    # Job number
+                                </label>
+
+                                <div class="flex-grow-1">
+                                    <input type="number" id="jobNumber" class="form-control"
+                                        placeholder="Enter job number" disabled>
+
+                                    <div id="jobNumberError" class="invalid-feedback"></div>
+                                </div>
+                            </div>
+                            <div class="mb-2 d-flex align-items-center">
+                                <label class="form-label me-2 mb-0" style="min-width:100px"></label>
+                                <div class="form-text"><input type="checkbox" id="autoJob"><span> Job Number? Auto
+                                        Generate a Job Number</span></div>
+                            </div>
+                            <div class="divider divider-1"></div>
+                            <div class="mb-2 d-flex align-items-start">
+                                <label class="form-label me-2 mb-0" style="min-width:100px">
+                                    <img class="image-for-label" src="images/customer.png" alt="label">
+                                    Customer name
+                                </label>
+
+                                <div class="flex-grow-1">
+                                    <input type="text" id="customerName" maxlength="100" class="form-control"
+                                        placeholder="Auto populate / enter">
+
+                                    <div id="customerNameError" class="invalid-feedback"></div>
+                                </div>
+                            </div>
+                            <div class="divider divider-1"></div>
+
+                            <div class="mb-2 d-flex align-items-start">
+                                <label class="form-label me-2 mb-0" style="min-width:100px">
+                                    <img class="image-for-label" src="images/phone.png" alt="label">
+                                    Phone
+                                </label>
+
+                                <div class="flex-grow-1">
+                                    <input type="tel" id="customerPhone" class="form-control"
+                                        placeholder="Auto populate / enter" maxlength="12">
+
+                                    <div id="customerPhoneError" class="invalid-feedback">
+                                        Please enter a valid phone number.
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="divider divider-1"></div>
+
+                            <div class="mb-2 d-flex align-items-start">
+                                <label class="form-label me-2 mb-0" style="min-width:100px">
+                                    <img class="image-for-label" src="images/email_black.png" alt="label">
+                                    Email
+                                </label>
+
+                                <div class="flex-grow-1">
+                                    <input type="email" id="customerEmail" class="form-control"
+                                        placeholder="Auto populate / enter">
+
+                                    <div id="customerEmailError" class="invalid-feedback"></div>
+                                </div>
+                            </div>
+                            <div class="divider divider-1"></div>
+
+                            <div class="mb-2 d-flex align-items-start">
+                                <label class="form-label me-2 mb-0" style="min-width:100px">
+                                    <img class="image-for-label" src="images/shop.png" alt="label">
+                                    Tenancy / shop
+                                </label>
+
+                                <div class="flex-grow-1">
+                                    <input type="text" id="customerTenancy" class="form-control"
+                                        placeholder="Auto populate / enter">
+
+                                    <div id="customerTenancyError" class="invalid-feedback"></div>
+                                </div>
+                            </div>
+                            <div class="divider divider-1"></div>
+
+                            <div class="mb-2">
+                                <label class="form-label"><img class="image-for-label" src="images/note.png"
+                                        alt="lable">Notes</label>
+                                <textarea id="customerNotes" class="form-control auto-resize" rows="2"  maxlength="150"
+                                    placeholder="Additional notes"></textarea>
+                            </div>
+
+                        </form>
+
+                    </div>
+                </div>
+
+                <!-- STEP 2 -->
+                <div class="step-pane d-none" data-step-pane="1">
+                    <div class="card p-3 mb-3 rounded-12">
+                        <div class="section-title">Asset & Fault Details</div>
+
+                        <div class="fault-card">
+                            <div class="mb-2 d-flex align-items-start">
+                                <label class="form-label me-2 mb-0" style="min-width:100px">
+                                    <img class="image-for-label" src="images/asset-computer.png" alt="label">
+                                    Asset description
+                                </label>
+
+                                <div class="flex-grow-1">
+                                    <select id="assetDescriptionSelect" class="form-select"
+                                        aria-label="Asset description">
+                                        <option value="">Select / enter</option>
+                                        <option value="Air Conditioner">Air Conditioner</option>
+                                        <option value="Fridge">Fridge</option>
+                                        <option value="Oven">Oven</option>
+                                        <option value="Generator">Generator</option>
+                                        <option value="other">Other (enter below)</option>
+                                    </select>
+                                    <div id="assetDescriptionError" class="invalid-feedback"></div>
+
+                                    <!-- <input type="text" id="assetDescriptionInput" class="form-control mt-2 d-none"
+                                        placeholder="Enter asset description"> -->
+                                        <textarea id="assetDescriptionInput" class="form-control auto-resize d-none"" rows="2"  maxlength="150"
+                                    placeholder="Enter asset description"></textarea>
+                                    <div id="assetDescriptionInputError" class="invalid-feedback"></div>
+                                </div>
+
+                            </div>
+                            <div class="divider divider-1"></div>
+                            <div class="mb-2 d-flex align-items-start">
+                                <label class="form-label me-2 mb-0" style="min-width:100px">
+                                    <img class="image-for-label" src="images/location.png" alt="lable">Asset
+                                    location</label>
+                                <div class="flex-grow-1">
+                                    <select id="assetLocation" class="form-select" aria-label="Asset description">
+                                        <option value="">Select / enter</option>
+                                        <option>Kitchen</option>
+                                        <option>Store Room</option>
+                                        <option>Roof</option>
+                                        <option value="other">Other (enter below)</option>
+                                    </select>
+                                    <div id="assetLocationError" class="invalid-feedback"></div>
+
+                                    <!-- <input type="text" id="assetLocationInput" class="form-control mt-2 d-none"
+                                        placeholder="Enter asset location" required> -->
+                                        <textarea id="assetLocationInput" class="form-control auto-resize d-none"" rows="2"  maxlength="150"
+                                    placeholder="Enter asset location"></textarea>
+                                    <div id="assetLocationInputError" class="invalid-feedback"></div>
+
+                                </div>
+                                <!-- <div class="mb-3 d-flex gap-2 flex-column flex-sm-row">
+                                
+                                <select id="assetDescription" class="form-select flex-grow-1"
+                                    aria-label="Asset description">
+                                    <option value="">Select / enter</option>
+                                    <option>Air Conditioner</option>
+                                    <option>Fridge</option>
+                                    <option>Oven</option>
+                                </select>
+
+                                <select id="assetLocation" class="form-select flex-grow-1" aria-label="Asset location">
+                                    <option value="">Select / enter</option>
+                                    <option>Kitchen</option>
+                                    <option>Store Room</option>
+                                    <option>Roof</option>
+                                </select>
+                            </div> -->
+                            </div>
+                            </div>
+                            <div id="faultList"></div>
+
+                            <div class="d-grid mt-2">
+                                <button type="button" id="addFaultBtn" class="btn btn-outline-purple">+ Add another
+                                    fault</button>
+                            </div>
+
+                        </div>
+                    </div>
+                    </div>
+
+                    <!-- STEP 3 -->
+                    <div class="step-pane d-none" data-step-pane="2">
+                        <div class="card p-3 mb-3 rounded-12">
+                            <div class="section-title">Estimates & Photos</div>
+
+                            <div class="row g-2 align-items-start">
+                                <div class="col-6">
+                                    <label class="form-label">No. of technicians</label>
+                                    <input type="number" id="technicians" class="form-control" min="1" max="10" step="1"
+                                        value="1">
+                                    <div id="techniciansError" class="invalid-feedback"></div>
+
+                                </div>
+                                <div class="col-6">
+                                    <label class="form-label">Hours required</label>
+                                    <input type="number" id="hours" class="form-control" min="0" step="0.5" value="0">
+                                    <div id="hoursError" class="invalid-feedback"></div>
+                                </div>
+                            </div>
+
+                            <div class="row mt-2 g-2">
+                                <div class="col-6">
+
+                                    <label class="form-label">Apprentice required</label>
+                                    <input type="number" id="apprentice" class="form-control" min="0" max="10" step="1"
+                                        value="0">
+
+                                </div>
+                                <div class="col-6 d-flex align-items-center afterhrs-container">
+                                    <label class="me-2 mb-0">After hours</label>
+                                    <div class="form-check form-switch">
+                                        <input class="form-check-input" type="checkbox" id="afterHours">
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="cards-row d-flex gap-2 mt-3">
+                                <div class="stat-card">
+                                    <div class="title">Technicians</div>
+                                    <div id="statTech" class="value">-</div>
+                                </div>
+                                <div class="stat-card">
+                                    <div class="title">Total hrs</div>
+                                    <div id="statHours" class="value">-</div>
+                                </div>
+                                <div class="stat-card">
+                                    <div class="title">Man-hours</div>
+                                    <div id="statManHours" class="value">-</div>
+                                </div>
+                            </div>
+
+                            <div class="mt-3">
+                                <label class="form-label-1">Upload job photos</label>
+                                <div id="dropZone" class="drop-zone p-3 text-center rounded-8">
+                                    <div class="dz-content"> <i class="fa-regular fa-image fa-2x"></i>
+                                        <div>Tap to browse or drag & drop — JPG, PNG, HEIC</div>
+                                        <div class="small text-muted">Max 10 images</div>
+                                    </div>
+                                    <input type="file" id="photoInput" accept="image/*" multiple hidden>
+                                </div>
+
+                                <div id="previewGrid" class="mt-2 d-flex flex-wrap gap-2"></div>
+                                <div id="uploadStatus" class="upload-img-status">1 image uploaded successfully</div>
+                            </div>
+
+                        </div>
+                    </div>
+
+                    <!-- STEP 4 -->
+                    <div class="step-pane d-none" data-step-pane="3">
+                        <div class="card p-3 mb-3 rounded-12">
+                            <div class="alert alert-purple d-flex align-items-center mb-3">
+                                <i class="fa-solid fa-info-circle me-2"></i>
+                                <div>
+                                    <strong>Ready to submit</strong>
+                                    <div class="small">Please review all details before submitting</div>
+                                </div>
+                            </div>
+
+                            <div class="summary-card p-3 rounded-8 bg-white">
+                                <div class="row">
+                                    <div class="col-6 text-muted">Job number</div>
+                                    <div class="col-6 text-end" id="revJob">#JB-2024-001</div>
+                                </div>
+                                <div class="row mt-2">
+                                    <div class="col-6 text-muted">Customer</div>
+                                    <div class="col-6 text-end" id="revCustomer">-</div>
+                                </div>
+                                <div class="row mt-2">
+                                    <div class="col-6 text-muted">Asset</div>
+                                    <div class="col-6 text-end" id="revAsset">-</div>
+                                </div>
+                                <div class="row mt-2">
+                                    <div class="col-6 text-muted">Faults logged</div>
+                                    <div class="col-6 text-end" id="revFaults">0 faults</div>
+                                </div>
+                                <div class="row mt-2">
+                                    <div class="col-6 text-muted">Technicians</div>
+                                    <div class="col-6 text-end" id="revTech">-</div>
+                                </div>
+                                <div class="row mt-2">
+                                    <div class="col-6 text-muted">Estimated hours</div>
+                                    <div class="col-6 text-end" id="revHours">-</div>
+                                </div>
+                                <div class="row mt-2">
+                                    <div class="col-6 text-muted">Total man-hours</div>
+                                    <div class="col-6 text-end" id="revMan">-</div>
+                                </div>
+                            </div>
+
+                        </div>
+                    </div>
+
+                </div>
+
+                <!-- Sticky Footer Nav -->
+                <div class="footer-nav d-flex justify-content-between align-items-center p-2">
+                    <button class="btn btn-outline-secondary btn-sm" id="backBtn"><i class="fa-solid fa-arrow-left"></i>
+                        Back</button>
+                    <div class="d-flex align-items-center gap-2">
+                        <button type="button" class="btn btn-outline-purple btn-sm" id="createNewBtn">+ Create New</button>
+                        <button class="btn btn-outline-secondary btn-sm" id="saveDraft">Save</button>
+                        <button class="btn btn-purple btn-sm" id="nextBtn">Next →</button>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+
+        <!-- Submit Modal -->
+        <div class="modal fade" id="submitModal" tabindex="-1">
+            <div class="modal-dialog modal-lg modal-dialog-centered">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title">Job Submitted Successfully</h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                    </div>
+                    <div class="modal-body">
+                        <p>Job <strong id="modalJobNum"></strong> for <strong id="modalCustomer"></strong> submitted at
+                            <span id="modalTime"></span>
+                        </p>
+                        <pre id="jsonOutput" class="p-2 bg-light rounded-2"
+                            style="max-height:400px; overflow:auto;"></pre>
+                    </div>
+                    <div class="modal-footer">
+                        <button class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                        <button class="btn btn-success" id="downloadJson">Download JSON</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Scripts -->
+        <script src="https://code.jquery.com/jquery-4.0.0.min.js"></script>
+        <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+        <script src="script/script.js"></script>
+        <script src="script/validation.js"></script>
+       
+</body>
+
+</html>
