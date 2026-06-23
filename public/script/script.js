@@ -462,48 +462,53 @@ $(function(){
     const $list = $('#faultList').empty();
     jobData.faults.forEach((f,idx)=>{
       const num = idx+1;
+      const expanded = f.expanded !== false;
       const $card = $(`
-        <div class="fault-card" data-idx="${idx}">
-          <div class="fault-header">
-            <div><span class="badge fault-badge">${num}</span> Fault #${num}</div>
+        <div class="fault-card ${expanded ? 'expanded' : 'collapsed'}" data-idx="${idx}">
+          <div class="fault-header" role="button" tabindex="0" aria-expanded="${expanded}">
             <div>
+              <span class="badge fault-badge">${num}</span>
+              Fault #${num}
+            </div>
+            <div class="d-flex align-items-center gap-2">
+              <span class="collapse-indicator">${expanded ? '▾' : '▸'}</span>
               ${jobData.faults.length>1?'<button id="deleteFaultBtn" type="button" class="delete-icon-btn" aria-label="Delete fault"><i class="fa-solid fa-trash"></i></button>':''}
             </div>
           </div>
- <div class="mb-2">
-                                <label class="form-label">Fault description</label>
-                                <textarea class="form-control auto-resize fault-desc" rows="3" maxlength="150"
-                                    placeholder="Describe the fault">${f.description||''}</textarea>
-                                     <div class="invalid-feedback fault-desc-error"></div>
-                            </div>
-
-          <div class="row-1 g-2">
-           <div class="mb-2">
-                                <div class="d-flex justify-content-between align-items-center mb-1">
-                                    <label class="form-label mb-0">Work required</label>
-                                    <div>
-            <img class="image-for-label" src="images/ai_icon.png" alt="lable">
-             <span class="ai-pre-fill auto-fill small">AI pre-filled — verify</span>
+          <div class="fault-body" ${expanded ? '' : 'style="display:none;"'}>
+            <div class="mb-2">
+              <label class="form-label">Fault description</label>
+              <textarea class="form-control auto-resize fault-desc" rows="3" maxlength="150"
+                placeholder="Describe the fault">${f.description||''}</textarea>
+              <div class="invalid-feedback fault-desc-error"></div>
             </div>
-                                    
-                                </div>
-                                <input maxlength="150" class="form-control work-req" placeholder="AI recommended / enter" value="${f.work||''}">
-                                <div class="invalid-feedback work-req-error"></div>
-                            </div>
 
-                            <div class="row">
-                            <div class="col-6 mb-2">
-                                <label class="form-label">Parts & material</label>
-                                <input maxlength="150" class="form-control parts" placeholder="AI recommended" value="${f.parts||''}">
-                                <div class="invalid-feedback parts-error"></div>
-                            </div>
-                            <div class="col-6 mb-2">
-                                <label class="form-label">Special equipment</label>
-                                <input maxlength="150" class="form-control equipment" placeholder="AI recommended" value="${f.equipment||''}">
-                                <div class="invalid-feedback equipment-error"></div>
-                            </div>
-                            </div>
-        
+            <div class="row-1 g-2">
+              <div class="mb-2">
+                <div class="d-flex justify-content-between align-items-center mb-1">
+                  <label class="form-label mb-0">Work required</label>
+                  <div>
+                    <img class="image-for-label" src="images/ai_icon.png" alt="lable">
+                    <span class="ai-pre-fill auto-fill small">AI pre-filled — verify</span>
+                  </div>
+                </div>
+                <input maxlength="150" class="form-control work-req" placeholder="AI recommended / enter" value="${f.work||''}">
+                <div class="invalid-feedback work-req-error"></div>
+              </div>
+
+              <div class="row">
+                <div class="col-6 mb-2">
+                  <label class="form-label">Parts & material</label>
+                  <input maxlength="150" class="form-control parts" placeholder="AI recommended" value="${f.parts||''}">
+                  <div class="invalid-feedback parts-error"></div>
+                </div>
+                <div class="col-6 mb-2">
+                  <label class="form-label">Special equipment</label>
+                  <input maxlength="150" class="form-control equipment" placeholder="AI recommended" value="${f.equipment||''}">
+                  <div class="invalid-feedback equipment-error"></div>
+                </div>
+              </div>
+            </div>
           </div>
         </div>
       `);
@@ -513,7 +518,8 @@ $(function(){
   }
 
   function addFault(autos=false){
-    jobData.faults.push({description:'',work:'',parts:'',equipment:''});
+    jobData.faults.forEach(f => f.expanded = false);
+    jobData.faults.push({description:'',work:'',parts:'',equipment:'',expanded:true});
     renderFaults();
   }
 
@@ -521,6 +527,19 @@ $(function(){
     const idx = Number($(this).closest('.fault-card').data('idx'));
     if(!isNaN(idx)){
       jobData.faults.splice(idx,1);
+      renderFaults();
+    }
+  });
+
+  $(document).on('click', '.fault-header', function(e){
+    if ($(e.target).closest('button,input,textarea,select,textarea,button,svg,i').length) return;
+    const $card = $(this).closest('.fault-card');
+    const idx = Number($card.data('idx'));
+
+    if (!isNaN(idx)) {
+      jobData.faults.forEach((fault, faultIdx) => {
+        fault.expanded = faultIdx === idx ? !fault.expanded : false;
+      });
       renderFaults();
     }
   });

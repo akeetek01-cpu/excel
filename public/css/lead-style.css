@@ -180,7 +180,11 @@
     border: 1px solid #f1efff;
     padding: 12px;
     border-radius: 8px;
-    margin-bottom: 8px
+    margin-bottom: 8px;
+}
+
+.fault-card.collapsed {
+    opacity: .95;
 }
 
 .fault-header {
@@ -189,6 +193,16 @@
     align-items: center;
     margin-bottom: 8px;
     font-weight: bold;
+    cursor: pointer;
+}
+
+.fault-header .collapse-indicator {
+    font-size: 1.1rem;
+    line-height: 1;
+}
+
+.fault-card.collapsed .fault-body {
+    display: none;
 }
 
 .ai-pre-fill {
