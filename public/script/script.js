@@ -632,27 +632,42 @@ $(function(){
   let photoFiles = [];
   function renderPreviews(){
     const $grid = $('#previewGrid').empty();
+    $('#photoCount').text(`${photoFiles.length} / ${MAX_PHOTOS}`);
+
     if(photoFiles.length===0){
-      $("#uploadStatus").text("");
-      $("#uploadStatus").hide();
-      //$grid.html('<div class="text-muted small">No images uploaded</div>')
-      ;return
-    } else {
-      $("#uploadStatus").text(`${photoFiles.length} image(s) uploaded successfully`);
-      $("#uploadStatus").show();
+      $('#dropZone').show();
+      $('#previewGrid').hide();
+      $('#uploadStatus').hide().text('');
+      return;
     }
+
+    $('#dropZone').hide();
+    $('#previewGrid').show();
+    $('#uploadStatus').text(`${photoFiles.length} image${photoFiles.length===1 ? '' : 's'} uploaded successfully`).show();
+
     photoFiles.forEach((f,idx)=>{
       const url = URL.createObjectURL(f);
-      const $item = $(`<div class="position-relative">
-        <img src="${url}" class="preview-thumb">
-        <button type="button" class="btn-sm btn-danger remove-photo" data-idx="${idx}" style="position:absolute;top:-6px;right:-6px;border-radius:50%">&times;</button>
-      </div>`);
+      const $item = $(
+        `<div class="photo-thumb-card position-relative">
+          <img src="${url}" class="preview-thumb" alt="Uploaded photo ${idx+1}">
+          <button type="button" class="remove-photo" data-idx="${idx}" aria-label="Remove photo">&times;</button>
+          <span class="photo-thumb-check"><i class="fa-solid fa-circle-check"></i></span>
+        </div>`
+      );
       $grid.append($item);
     });
+
+    if(photoFiles.length < MAX_PHOTOS){
+      const $add = $(
+        `<div class="photo-thumb-card add-photo-tile d-flex justify-content-center align-items-center text-muted" role="button" tabindex="0" aria-label="Add photo">
+          <span class="photo-add-icon">+</span>
+        </div>`
+      );
+      $grid.append($add);
+    }
   }
 
  $('#dropZone').on('click', function (e) {
-    //if (e.target !== this) return;
     $('#photoInput').trigger('click');
   });
 
@@ -662,7 +677,6 @@ $(function(){
   $('#photoInput').on('change', function (e) {
     const files = Array.from(e.target.files || []);
     const clearInput = () => { 
-
       try { this.value = ''; } catch (_) { $(this).val(''); } 
     };
 
@@ -684,6 +698,10 @@ $(function(){
     jobData.photos = photoFiles.slice();
     renderPreviews();
     clearInput();
+  });
+
+  $(document).on('click', '.add-photo-tile', function(){
+    $('#photoInput').trigger('click');
   });
 
   // drag drop

@@ -134,30 +134,115 @@
     color: #333
 }
 
-.drop-zone {
-    background: #f6f5ed;
-    border: 1px dashed #e6e6ea;
-    border-radius: 8px;
-    cursor: pointer
-}
-.remove-photo{
-        font-size: 11px;
-    width: 20px;
-    height: 20px;
+.photo-upload-card {
+    background: #fff;
+    border: 1px solid #e6e6ea;
+    border-radius: 18px;
 }
 
-.preview-thumb {
-    width: 50px;
-    height: 50px;
-    object-fit: cover;
-    border-radius: 6px;
-    border: 1px solid #eee
+.photo-upload-header .form-label-1 {
+    font-weight: 600;
 }
-.upload-img-status{
-        font-size: 11px;
-    text-align: center;
-    color: #12c8c0;
+
+.photo-upload-count {
+    font-weight: 700;
+    color: #4b4b4b;
+}
+
+.photo-upload-dropzone {
+    background: #f8f9fb;
+    border: 1px dashed #c7d2db;
+    border-radius: 16px;
+    cursor: pointer;
+    min-height: 160px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: border-color .2s ease, background .2s ease;
+}
+
+.photo-upload-dropzone.dragover {
+    background: #eef5ff;
+    border-color: #7d9cff;
+}
+
+.photo-upload-dropzone .dz-content {
+    color: #5b6571;
+}
+
+.photo-preview-grid {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+}
+
+.photo-thumb-card {
+    width: 76px;
+    height: 76px;
+    border: 1px solid #e6e6ea;
+    border-radius: 16px;
+    overflow: hidden;
+    position: relative;
+    background: #fff;
+}
+
+.photo-thumb-card img.preview-thumb {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    display: block;
+}
+
+.photo-thumb-card .remove-photo {
+    position: absolute;
+    top: 6px;
+    right: 6px;
+    width: 20px;
+    height: 20px;
+    padding: 0;
+    border: none;
+    border-radius: 50%;
+    background: rgba(255,255,255,0.92);
+    color: #333;
+    font-size: 14px;
+    line-height: 1;
+    cursor: pointer;
+}
+
+.photo-thumb-card .photo-thumb-check {
+    position: absolute;
+    bottom: 6px;
+    left: 6px;
+    width: 20px;
+    height: 20px;
+    border-radius: 50%;
+    background: #fff;
+    color: #0f7cff;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 12px;
+    box-shadow: 0 0 0 1px rgba(15,124,255,.12);
+}
+
+.add-photo-tile {
+    border: 2px dashed #c7d2db;
+    color: #7b8594;
+    justify-content: center;
+    align-items: center;
+    cursor: pointer;
+}
+
+.add-photo-tile .photo-add-icon {
+    font-size: 32px;
+    line-height: 1;
+}
+
+.photo-status {
+    font-size: 12px;
+    color: #1f8a56;
     display: none;
+    font-weight: 600;
 }
 .afterhrs-container{
         padding-top: 30px;
