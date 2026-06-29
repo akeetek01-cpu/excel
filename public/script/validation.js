@@ -32,15 +32,25 @@ $(function(){
 
 
   // generate job number
-  $('#autoJob').on('change', function () {
-    if ($(this).is(':checked')) {
-      $('#jobNumber').prop('disabled', true).val(generateJobNumber());
-    } else { $('#jobNumber').prop('disabled', true).val(''); }
-  });
   function generateJobNumber() {
     var num = Math.floor(100000 + Math.random() * 900000).toString();
     return num;
   }
+
+  $('#autoJobBtn').on('click', function () {
+    const checked = !$('#autoJob').is(':checked');
+    $('#autoJob').prop('checked', checked).trigger('change');
+  });
+
+  $('#autoJob').on('change', function () {
+    const checked = $(this).is(':checked');
+    $('#autoJobBtn').attr('aria-pressed', checked ? 'true' : 'false').toggleClass('active', checked);
+    if (checked) {
+      $('#jobNumber').prop('disabled', true).val(generateJobNumber());
+    } else {
+      $('#jobNumber').prop('disabled', true).val('');
+    }
+  });
 
   $('#assetDescriptionSelect').on('change', function(){
     const val = $(this).val();

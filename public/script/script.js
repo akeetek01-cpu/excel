@@ -16,12 +16,56 @@ $(function () {
   let currentStep = 0;
   const MAX_PHOTOS = 10;
 
+  function generateJobNumber() {
+    return String(Math.floor(100000 + Math.random() * 900000));
+  }
+
+  function setAutoJobState(enabled) {
+    $("#autoJob").prop("checked", enabled);
+    $("#autoJobBtn")
+      .attr("aria-pressed", enabled ? "true" : "false")
+      .toggleClass("active", enabled);
+
+    if (enabled) {
+      $("#jobNumber").prop("disabled", true).val(generateJobNumber());
+      clearError("#jobNumber", "#jobNumberError");
+    } else {
+      $("#jobNumber").prop("disabled", true).val("");
+      if ($("#jobNumber").val().trim() === "") {
+        showError("#jobNumber", "#jobNumberError", "Job Number is required.");
+      }
+    }
+  }
+
+  // store original icons for each step so we can swap them when completed
+  $(".step").each(function () {
+    const $iconI = $(this).find(".icon i");
+    if ($iconI.length) {
+      $(this).data("orig-icon", $iconI.attr("class"));
+    } else {
+      $(this).data("orig-icon", "");
+    }
+  });
+
   // Stepper render
   function renderStepper() {
     $(".step").each(function (i) {
       $(this).removeClass("active completed");
-      if (i < currentStep) $(this).addClass("completed");
-      if (i === currentStep) $(this).addClass("active");
+      // restore original icon by default
+      const orig = $(this).data("orig-icon");
+      const $icon = $(this).find(".icon");
+      if (orig) $icon.html(`<i class="${orig}"></i>`);
+
+      if (i < currentStep) {
+        $(this).addClass("completed");
+        // show check icon when completed
+        $icon.html('<i class="fa-solid fa-check"></i>');
+      }
+      if (i === currentStep) {
+        $(this).addClass("active");
+        // show original icon for active (keeps context)
+        if (orig) $icon.html(`<i class="${orig}"></i>`);
+      }
     });
   }
 
@@ -355,8 +399,17 @@ $(function () {
     }
   });
 
+  $("#autoJobBtn").on("click", function () {
+    setAutoJobState(!$("#autoJob").is(":checked"));
+  });
+
   $("#autoJob").on("change", function () {
-    if ($(this).is(":checked")) {
+    const checked = $(this).is(":checked");
+    $("#autoJobBtn")
+      .attr("aria-pressed", checked ? "true" : "false")
+      .toggleClass("active", checked);
+
+    if (checked) {
       clearError("#jobNumber", "#jobNumberError");
     } else {
       const value = $("#jobNumber").val().trim();
@@ -793,17 +846,68 @@ $(function () {
     const apprentice = Number($("#apprentice").val() || 0);
     const tech = technicians + apprentice;
     const hrs = Number($("#hours").val() || 0);
-    const man = (tech * hrs).toFixed(2);
-    const totalTech = tech + apprentice;
+    const faults = jobData.faults.length || 0;
+    
+    $("#statFaults").text(faults || "-");
     $("#statTech").text(tech || "-");
     $("#statHours").text(hrs || "-");
-    $("#statManHours").text(isNaN(man) ? "-" : man);
+    
     jobData.estimates.technicians = tech;
     jobData.estimates.hours = hrs;
-    jobData.estimates.apprentice = $("#apprentice").is(":checked");
+    jobData.estimates.apprentice = Number($("#apprentice").val() || 0);
     jobData.estimates.afterHours = $("#afterHours").is(":checked");
   }
-  $("#technicians,#hours,#apprentice,#afterHours").on(
+  
+  // Spinner button handlers
+  $("#techniciansMinus").on("click", function(e) {
+    e.preventDefault();
+    const current = Number($("#technicians").val() || 1);
+    if (current > 1) {
+      $("#technicians").val(current - 1).trigger("change");
+    }
+  });
+  
+  $("#techniciansPlus").on("click", function(e) {
+    e.preventDefault();
+    const current = Number($("#technicians").val() || 1);
+    if (current < 10) {
+      $("#technicians").val(current + 1).trigger("change");
+    }
+  });
+  
+  $("#apprenticeMinus").on("click", function(e) {
+    e.preventDefault();
+    const current = Number($("#apprentice").val() || 0);
+    if (current > 0) {
+      $("#apprentice").val(current - 1).trigger("change");
+    }
+  });
+  
+  $("#apprenticePlus").on("click", function(e) {
+    e.preventDefault();
+    const current = Number($("#apprentice").val() || 0);
+    if (current < 10) {
+      $("#apprentice").val(current + 1).trigger("change");
+    }
+  });
+  
+  $("#hoursMinus").on("click", function(e) {
+    e.preventDefault();
+    const current = Number($("#hours").val() || 0);
+    if (current > 0) {
+      $("#hours").val(Math.max(0, current - 0.5)).trigger("change");
+    }
+  });
+  
+  $("#hoursPlus").on("click", function(e) {
+    e.preventDefault();
+    const current = Number($("#hours").val() || 0);
+    if (current < 24) {
+      $("#hours").val(Math.min(24, current + 0.5)).trigger("change");
+    }
+  });
+
+    $("#technicians,#hours,#apprentice,#afterHours").on(
     "input change",
     calculate,
   );
