@@ -49,14 +49,13 @@
                 <!-- STEP 1 -->
                 <div class="step-pane" data-step-pane="0">
                     <div class="card p-3 mb-3 rounded-12">
-                        <div class="section-title">Customer Details & Notes</div>
 
                         <form id="form-customer" novalidate>
-                            <div class="d-flex align-items-start">
-                                <label class="form-label me-2 mb-0" style="min-width:100px">
-                                    # Job number
-                                </label>
+                            <div class="row">
 
+                            
+                            <div class="col align-items-start">
+                                <label class="form-label me-2 mb-0" style="min-width:100px">Job number</label>
                                 <div class="flex-grow-1">
                                     <input type="number" id="jobNumber" class="form-control"
                                         placeholder="Enter job number" disabled>
@@ -64,15 +63,16 @@
                                     <div id="jobNumberError" class="invalid-feedback"></div>
                                 </div>
                             </div>
-                            <div class="mb-2 d-flex align-items-center">
+                            <div class="col mb-2  align-items-center">
                                 <label class="form-label me-2 mb-0" style="min-width:100px"></label>
                                 <div class="form-text"><input type="checkbox" id="autoJob"><span> Job Number? Auto
                                         Generate a Job Number</span></div>
                             </div>
-                            <div class="divider divider-1"></div>
-                            <div class="mb-2 d-flex align-items-start">
+                            </div>
+                            
+                              <div class="row">
+                            <div class="col mb-2 align-items-start">
                                 <label class="form-label me-2 mb-0" style="min-width:100px">
-                                    <img class="image-for-label" src="images/customer.png" alt="label">
                                     Customer name
                                 </label>
 
@@ -83,11 +83,10 @@
                                     <div id="customerNameError" class="invalid-feedback"></div>
                                 </div>
                             </div>
-                            <div class="divider divider-1"></div>
+                            
 
-                            <div class="mb-2 d-flex align-items-start">
+                            <div class="col mb-2 align-items-start">
                                 <label class="form-label me-2 mb-0" style="min-width:100px">
-                                    <img class="image-for-label" src="images/phone.png" alt="label">
                                     Phone
                                 </label>
 
@@ -100,11 +99,10 @@
                                     </div>
                                 </div>
                             </div>
-                            <div class="divider divider-1"></div>
-
-                            <div class="mb-2 d-flex align-items-start">
+                            </div>
+                            <div class="row">
+                            <div class="col mb-2 align-items-start">
                                 <label class="form-label me-2 mb-0" style="min-width:100px">
-                                    <img class="image-for-label" src="images/email_black.png" alt="label">
                                     Email
                                 </label>
 
@@ -115,11 +113,10 @@
                                     <div id="customerEmailError" class="invalid-feedback"></div>
                                 </div>
                             </div>
-                            <div class="divider divider-1"></div>
+                            
 
-                            <div class="mb-2 d-flex align-items-start">
+                            <div class="col mb-2 align-items-start">
                                 <label class="form-label me-2 mb-0" style="min-width:100px">
-                                    <img class="image-for-label" src="images/shop.png" alt="label">
                                     Tenancy / shop
                                 </label>
 
@@ -130,11 +127,10 @@
                                     <div id="customerTenancyError" class="invalid-feedback"></div>
                                 </div>
                             </div>
-                            <div class="divider divider-1"></div>
+                            </div>
 
                             <div class="mb-2">
-                                <label class="form-label"><img class="image-for-label" src="images/note.png"
-                                        alt="lable">Notes</label>
+                                <label class="form-label">Notes</label>
                                 <textarea id="customerNotes" class="form-control auto-resize" rows="2"  maxlength="150"
                                     placeholder="Additional notes"></textarea>
                             </div>
@@ -147,12 +143,10 @@
                 <!-- STEP 2 -->
                 <div class="step-pane d-none" data-step-pane="1">
                     <div class="card p-3 mb-3 rounded-12">
-                        <div class="section-title">Asset & Fault Details</div>
 
                         <div class="fault-card">
-                            <div class="mb-2 d-flex align-items-start">
+                            <div class="mb-2 align-items-start">
                                 <label class="form-label me-2 mb-0" style="min-width:100px">
-                                    <img class="image-for-label" src="images/assets_2.png" alt="label">
                                     Asset description
                                 </label>
 
@@ -176,11 +170,10 @@
                                 </div>
 
                             </div>
-                            <div class="divider divider-1"></div>
-                            <div class="mb-2 d-flex align-items-start">
+                            
+                            <div class="mb-2 align-items-start">
                                 <label class="form-label me-2 mb-0" style="min-width:100px">
-                                    <img class="image-for-label" src="images/location.png" alt="lable">Asset
-                                    location</label>
+                                    Asset location</label>
                                 <div class="flex-grow-1">
                                     <select id="assetLocation" class="form-select" aria-label="Asset description">
                                         <option value="">Select / enter</option>
@@ -231,7 +224,6 @@
                     <!-- STEP 3 -->
                     <div class="step-pane d-none" data-step-pane="2">
                         <div class="card p-3 mb-3 rounded-12">
-                            <div class="section-title">Estimates & Photos</div>
 
                             <div class="row g-2 align-items-start">
                                 <div class="col-6">
@@ -307,18 +299,20 @@
                 </div>
 
                 <!-- Sticky Footer Nav -->
-                <div class="footer-nav d-flex justify-content-between align-items-center p-2">
+                <!-- <div class="footer-nav d-flex justify-content-between align-items-center p-2">
                     <button class="btn btn-outline-secondary btn-sm" id="backBtn" aria-label="Back">
                         <i class="fa-solid fa-arrow-left"></i>
                     </button>
                     <div class="d-flex align-items-center gap-2">
                         <button style="display: none;" type="button" class="btn btn-outline-purple btn-sm" id="createNewBtn">+ Create New</button>
-                        <!-- <button class="btn btn-outline-secondary btn-sm" id="saveDraft">Save</button> -->
                         <button class="btn btn-purple btn-sm" id="nextBtn" aria-label="Next">
                             <i class="fa-solid fa-arrow-right"></i>
                         </button>
                     </div>
-                </div>
+                </div> -->
+                <div class="d-flex justify-content-center align-items-center">
+                <button id="nextBtn" type="button" class="customer-next-btn btn btn-primary">Next -> Asset & Fault</button>
+</div>
 
             </div>
         </div>

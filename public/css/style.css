@@ -77,7 +77,7 @@ h2 {
 
 /* Card input */
 .card {
-    background: #ffffff;
+    background: #0f2d53;
     border-radius: 14px;
     overflow: hidden;
     margin-bottom: 20px;
@@ -313,7 +313,7 @@ h2 {
 .form-label {
     width: 150px;
     font-size: 14px;
-    color: #000000;
+    color: #FFFFFF;
 }
 
 .form-control {
@@ -626,6 +626,12 @@ textarea {
     width: 70px !important;
 }
 
+.step-pane .row{
+    margin-bottom: 20px;
+}
+.customer-next-btn{
+    width: auto;
+}
 /* Responsive */
 @media(max-width: 480px) {
     .container {
