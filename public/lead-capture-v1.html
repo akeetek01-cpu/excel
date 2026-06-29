@@ -13,15 +13,18 @@
     <!-- Google Fonts -->
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="css/style.css">
-        <link rel="stylesheet" href="css/lead-style.css">
+    <link rel="stylesheet" href="css/lead-style.css">
 
 </head>
 
 <body>
 
     <div class="lead-capture container py-4">
-          <div class="logo">
+        <div class="logo">
             <img src="images/excel_log.png" alt="Excel Logo">
+            <label class="create-lead-label" style="min-width:100px">
+                                        Create Lead
+                                    </label>
         </div>
         <div class="wizard-card mx-auto">
 
@@ -29,17 +32,17 @@
             <div class="stepper d-flex justify-content-between mb-3" id="stepper">
                 <div class="step" data-step="0">
                     <div class="icon"> <i class="fa-solid fa-user"></i> </div>
-                    <div class="label">Customer</div>
+                    <div class="label">1. Customer Details</div>
                 </div>
                 <div class="divider"></div>
                 <div class="step" data-step="1">
                     <div class="icon"> <i class="fa-solid fa-wrench"></i> </div>
-                    <div class="label">Asset & Faults</div>
+                    <div class="label">2. Asset & Faults</div>
                 </div>
                 <div class="divider"></div>
                 <div class="step" data-step="2">
                     <div class="icon"> <i class="fa-solid fa-calculator"></i> </div>
-                    <div class="label">Estimates</div>
+                    <div class="label">3. Estimates</div>
                 </div>
             </div>
 
@@ -49,93 +52,94 @@
                 <!-- STEP 1 -->
                 <div class="step-pane" data-step-pane="0">
                     <div class="card p-3 mb-3 rounded-12">
-                        <div class="section-title">Customer Details & Notes</div>
 
                         <form id="form-customer" novalidate>
-                            <div class="d-flex align-items-start">
-                                <label class="form-label me-2 mb-0" style="min-width:100px">
-                                    # Job number
-                                </label>
+                            <div class="row">
 
-                                <div class="flex-grow-1">
-                                    <input type="number" id="jobNumber" class="form-control"
-                                        placeholder="Enter job number" disabled>
 
-                                    <div id="jobNumberError" class="invalid-feedback"></div>
+                                <div class="col align-items-start">
+                                    <label class="form-label me-2 mb-0" style="min-width:100px">Job number</label>
+                                    <div class="flex-grow-1">
+                                        <input type="number" id="jobNumber" class="form-control"
+                                            placeholder="Enter job number" disabled>
+
+                                        <div id="jobNumberError" class="invalid-feedback"></div>
+                                    </div>
                                 </div>
-                            </div>
-                            <div class="mb-2 d-flex align-items-center">
-                                <label class="form-label me-2 mb-0" style="min-width:100px"></label>
-                                <div class="form-text"><input type="checkbox" id="autoJob"><span> Job Number? Auto
-                                        Generate a Job Number</span></div>
-                            </div>
-                            <div class="divider divider-1"></div>
-                            <div class="mb-2 d-flex align-items-start">
-                                <label class="form-label me-2 mb-0" style="min-width:100px">
-                                    <img class="image-for-label" src="images/customer.png" alt="label">
-                                    Customer name
-                                </label>
 
-                                <div class="flex-grow-1">
-                                    <input type="text" id="customerName" maxlength="100" class="form-control"
-                                        placeholder="Auto populate / enter">
-
-                                    <div id="customerNameError" class="invalid-feedback"></div>
+                                <div class="col align-items-start">
+                                    <label class="form-label me-2 mb-0" style="min-width:100px">No Job number?</label>
+                                    <div class="flex-grow-1">
+                                        <button type="button" id="autoJobBtn" class="btn btn-primary" aria-pressed="false">
+                                            Click & Generate Job Number
+                                        </button>
+                                    </div>
                                 </div>
+                                
                             </div>
-                            <div class="divider divider-1"></div>
 
-                            <div class="mb-2 d-flex align-items-start">
-                                <label class="form-label me-2 mb-0" style="min-width:100px">
-                                    <img class="image-for-label" src="images/phone.png" alt="label">
-                                    Phone
-                                </label>
+                            <div class="row">
+                                <div class="col mb-2 align-items-start">
+                                    <label class="form-label me-2 mb-0" style="min-width:100px">
+                                        Customer name
+                                    </label>
 
-                                <div class="flex-grow-1">
-                                    <input type="tel" id="customerPhone" class="form-control"
-                                        placeholder="Auto populate / enter" maxlength="12">
+                                    <div class="flex-grow-1">
+                                        <input type="text" id="customerName" maxlength="100" class="form-control"
+                                            placeholder="Auto populate / enter">
 
-                                    <div id="customerPhoneError" class="invalid-feedback">
-                                        Please enter a valid phone number.
+                                        <div id="customerNameError" class="invalid-feedback"></div>
+                                    </div>
+                                </div>
+
+
+                                <div class="col mb-2 align-items-start">
+                                    <label class="form-label me-2 mb-0" style="min-width:100px">
+                                        Phone
+                                    </label>
+
+                                    <div class="flex-grow-1">
+                                        <input type="tel" id="customerPhone" class="form-control"
+                                            placeholder="Auto populate / enter" maxlength="12">
+
+                                        <div id="customerPhoneError" class="invalid-feedback">
+                                            Please enter a valid phone number.
+                                        </div>
                                     </div>
                                 </div>
                             </div>
-                            <div class="divider divider-1"></div>
+                            <div class="row">
+                                <div class="col mb-2 align-items-start">
+                                    <label class="form-label me-2 mb-0" style="min-width:100px">
+                                        Email
+                                    </label>
 
-                            <div class="mb-2 d-flex align-items-start">
-                                <label class="form-label me-2 mb-0" style="min-width:100px">
-                                    <img class="image-for-label" src="images/email_black.png" alt="label">
-                                    Email
-                                </label>
+                                    <div class="flex-grow-1">
+                                        <input type="email" id="customerEmail" class="form-control"
+                                            placeholder="Auto populate / enter">
 
-                                <div class="flex-grow-1">
-                                    <input type="email" id="customerEmail" class="form-control"
-                                        placeholder="Auto populate / enter">
+                                        <div id="customerEmailError" class="invalid-feedback"></div>
+                                    </div>
+                                </div>
 
-                                    <div id="customerEmailError" class="invalid-feedback"></div>
+
+                                <div class="col mb-2 align-items-start">
+                                    <label class="form-label me-2 mb-0" style="min-width:100px">
+                                        Tenancy / shop
+                                    </label>
+
+                                    <div class="flex-grow-1">
+                                        <input type="text" id="customerTenancy" class="form-control"
+                                            placeholder="Auto populate / enter">
+
+                                        <div id="customerTenancyError" class="invalid-feedback"></div>
+                                    </div>
                                 </div>
                             </div>
-                            <div class="divider divider-1"></div>
-
-                            <div class="mb-2 d-flex align-items-start">
-                                <label class="form-label me-2 mb-0" style="min-width:100px">
-                                    <img class="image-for-label" src="images/shop.png" alt="label">
-                                    Tenancy / shop
-                                </label>
-
-                                <div class="flex-grow-1">
-                                    <input type="text" id="customerTenancy" class="form-control"
-                                        placeholder="Auto populate / enter">
-
-                                    <div id="customerTenancyError" class="invalid-feedback"></div>
-                                </div>
-                            </div>
-                            <div class="divider divider-1"></div>
 
                             <div class="mb-2">
-                                <label class="form-label"><img class="image-for-label" src="images/note.png"
-                                        alt="lable">Notes</label>
-                                <textarea id="customerNotes" class="form-control auto-resize" rows="2"  maxlength="150"
+                                <label class="form-label">Notes</label>
+                                <textarea id="customerNotes" class="form-control auto-resize" rows="2" maxlength="150"
                                     placeholder="Additional notes"></textarea>
                             </div>
 
@@ -147,12 +151,10 @@
                 <!-- STEP 2 -->
                 <div class="step-pane d-none" data-step-pane="1">
                     <div class="card p-3 mb-3 rounded-12">
-                        <div class="section-title">Asset & Fault Details</div>
 
                         <div class="fault-card">
-                            <div class="mb-2 d-flex align-items-start">
+                            <div class="mb-2 align-items-start">
                                 <label class="form-label me-2 mb-0" style="min-width:100px">
-                                    <img class="image-for-label" src="images/assets_2.png" alt="label">
                                     Asset description
                                 </label>
 
@@ -170,17 +172,16 @@
 
                                     <!-- <input type="text" id="assetDescriptionInput" class="form-control mt-2 d-none"
                                         placeholder="Enter asset description"> -->
-                                        <textarea id="assetDescriptionInput" class="form-control auto-resize d-none"" rows="2"  maxlength="150"
-                                    placeholder="Enter asset description"></textarea>
+                                    <textarea id="assetDescriptionInput" class="form-control auto-resize d-none"" rows="
+                                        2" maxlength="150" placeholder="Enter asset description"></textarea>
                                     <div id="assetDescriptionInputError" class="invalid-feedback"></div>
                                 </div>
 
                             </div>
-                            <div class="divider divider-1"></div>
-                            <div class="mb-2 d-flex align-items-start">
+
+                            <div class="mb-2 align-items-start">
                                 <label class="form-label me-2 mb-0" style="min-width:100px">
-                                    <img class="image-for-label" src="images/location.png" alt="lable">Asset
-                                    location</label>
+                                    Asset location</label>
                                 <div class="flex-grow-1">
                                     <select id="assetLocation" class="form-select" aria-label="Asset description">
                                         <option value="">Select / enter</option>
@@ -193,8 +194,8 @@
 
                                     <!-- <input type="text" id="assetLocationInput" class="form-control mt-2 d-none"
                                         placeholder="Enter asset location" required> -->
-                                        <textarea id="assetLocationInput" class="form-control auto-resize d-none"" rows="2"  maxlength="150"
-                                    placeholder="Enter asset location"></textarea>
+                                    <textarea id="assetLocationInput" class="form-control auto-resize d-none"" rows=" 2"
+                                        maxlength="150" placeholder="Enter asset location"></textarea>
                                     <div id="assetLocationInputError" class="invalid-feedback"></div>
 
                                 </div>
@@ -216,134 +217,158 @@
                                 </select>
                             </div> -->
                             </div>
-                            </div>
-                            <div id="faultList"></div>
+                        </div>
+                        <div id="faultList"></div>
 
-                            <div class="d-grid mt-2">
-                                <button type="button" id="addFaultBtn" class="btn btn-outline-purple">+ Add another
-                                    fault</button>
-                            </div>
+                        <div class="d-grid mt-2">
+                            <button type="button" id="addFaultBtn" class="btn btn-outline-purple">+ Add another
+                                fault</button>
+                        </div>
 
+                    </div>
+                </div>
+            </div>
+
+            <!-- STEP 3 -->
+            <div class="step-pane d-none" data-step-pane="2">
+                <div class="card p-3 mb-3 rounded-12">
+
+                    <div class="row g-2 align-items-start">
+                        <div class="col-6">
+                            <label class="form-label">Technicians Required</label>
+                            <div class="spinner-control">
+                                <button type="button" class="spinner-btn spinner-minus" id="techniciansMinus">−</button>
+                                <input type="number" id="technicians" class="form-control spinner-input" min="1"
+                                    max="10" value="1">
+                                <button type="button" class="spinner-btn spinner-plus" id="techniciansPlus">+</button>
+                            </div>
+                            <div id="techniciansError" class="invalid-feedback"></div>
+                        </div>
+                        <div class="col-6">
+                            <label class="form-label">Apprentice Required</label>
+                            <div class="spinner-control">
+                                <button type="button" class="spinner-btn spinner-minus" id="apprenticeMinus">−</button>
+                                <input type="number" id="apprentice" class="form-control spinner-input" min="0" max="10"
+                                    value="0">
+                                <button type="button" class="spinner-btn spinner-plus" id="apprenticePlus">+</button>
+                            </div>
+                            <div id="apprenticeError" class="invalid-feedback"></div>
                         </div>
                     </div>
+
+                    <div class="row mt-3 g-2">
+                        <div class="col-6">
+                            <label class="form-label">Hours Required</label>
+                            <div class="spinner-control">
+                                <button type="button" class="spinner-btn spinner-minus" id="hoursMinus">−</button>
+                                <input type="number" id="hours" class="form-control spinner-input" min="0" step="0.5"
+                                    value="0">
+                                <button type="button" class="spinner-btn spinner-plus" id="hoursPlus">+</button>
+                            </div>
+                            <div id="hoursError" class="invalid-feedback"></div>
+                        </div>
+                        <div class="col-6 d-flex align-items-end afterhrs-container">
+                            <label class="after-hours-label me-2 mb-2">After Hours?</label>
+                            <div class="form-check form-switch">
+                                <!-- <input class="form-check-input" type="checkbox" id="afterHours"> -->
+                                <label class="switch">
+                                    <input type="checkbox" id="afterHours">
+                                    <span class="slider round"></span>
+                                </label>
+                            </div>
+                        </div>
                     </div>
 
-                    <!-- STEP 3 -->
-                    <div class="step-pane d-none" data-step-pane="2">
-                        <div class="card p-3 mb-3 rounded-12">
-                            <div class="section-title">Estimates & Photos</div>
-
-                            <div class="row g-2 align-items-start">
-                                <div class="col-6">
-                                    <label class="form-label">No. of technicians</label>
-                                    <input type="number" id="technicians" class="form-control" min="1" max="10" step="1"
-                                        value="1">
-                                    <div id="techniciansError" class="invalid-feedback"></div>
-
-                                </div>
-                                <div class="col-6">
-                                    <label class="form-label">Hours required</label>
-                                    <input type="number" id="hours" class="form-control" min="0" step="0.5" value="0">
-                                    <div id="hoursError" class="invalid-feedback"></div>
-                                </div>
-                            </div>
-
-                            <div class="row mt-2 g-2">
-                                <div class="col-6">
-
-                                    <label class="form-label">Apprentice required</label>
-                                    <input type="number" id="apprentice" class="form-control" min="0" max="10" step="1"
-                                        value="0">
-
-                                </div>
-                                <div class="col-6 d-flex align-items-center afterhrs-container">
-                                    <label class="me-2 mb-0">After hours</label>
-                                    <div class="form-check form-switch">
-                                        <input class="form-check-input" type="checkbox" id="afterHours">
-                                    </div>
-                                </div>
-                            </div>
-
-                            <div class="cards-row d-flex gap-2 mt-3">
-                                <div class="stat-card">
-                                    <div class="title">Technicians</div>
-                                    <div id="statTech" class="value">-</div>
-                                </div>
-                                <div class="stat-card">
-                                    <div class="title">Total hrs</div>
-                                    <div id="statHours" class="value">-</div>
-                                </div>
-                                <div class="stat-card">
-                                    <div class="title">Man-hours</div>
-                                    <div id="statManHours" class="value">-</div>
-                                </div>
-                            </div>
-
-                            <div class="mt-3">
-                                <label class="form-label-1">Upload job photos</label>
-                                <div id="dropZone" class="drop-zone p-3 text-center rounded-8">
-                                    <div class="dz-content"> <i class="fa-regular fa-image fa-2x"></i>
-                                        <div>Tap to browse or drag & drop — JPG, PNG, HEIC</div>
-                                        <div class="small text-muted">Max 10 images</div>
-                                    </div>
-                                    <input type="file" id="photoInput" accept="image/*" multiple hidden>
-                                </div>
-
-                                <div id="previewGrid" class="mt-2 d-flex flex-wrap gap-2"></div>
-                                <div id="uploadStatus" class="upload-img-status">1 image uploaded successfully</div>
-                            </div>
-
+                    <div class="summary-estimates cards-row d-flex gap-2 mt-4">
+                        <div class="stat-card">
+                            <div class="title">Total Faults</div>
+                            <div id="statFaults" class="value">-</div>
                         </div>
+                        <div class="stat-card">
+                            <div class="title">Total Technicians</div>
+                            <div id="statTech" class="value">-</div>
+                        </div>
+                        <div class="stat-card">
+                            <div class="title">Total Hours</div>
+                            <div id="statHours" class="value">-</div>
+                        </div>
+                    </div>
+
+                    <div class="mt-3 photo-upload-card p-3 rounded-12">
+                        <div class="photo-upload-header d-flex justify-content-between align-items-start mb-3">
+                            <div>
+                                <label class="form-label-1 mb-1">Upload job photos</label>
+                                <!-- <div class="text-muted small">Tap to browse or drag & drop</div> -->
+                            </div>
+                            <div id="photoCount" class="photo-upload-count">0 / 10</div>
+                        </div>
+
+                        <div id="dropZone" class="photo-upload-dropzone p-4 text-center rounded-8">
+                            <div class="dz-content">
+                                <i class="fa-regular fa-image fa-2x mb-2"></i>
+                                <div class="fw-bold">Tap to browse or drag & drop</div>
+                                <div class="small text-muted">JPG, PNG, HEIC · max 10 images</div>
+                            </div>
+                            <input type="file" id="photoInput" accept="image/*" multiple hidden>
+                        </div>
+
+                        <div id="previewGrid" class="photo-preview-grid mt-3 d-flex flex-wrap gap-2"
+                            style="display:none;"></div>
+                        <div id="uploadStatus" class="photo-status mt-2" style="display:none;"></div>
                     </div>
 
                 </div>
+            </div>
 
-                <!-- Sticky Footer Nav -->
-                <div class="footer-nav d-flex justify-content-between align-items-center p-2">
+        </div>
+
+        <!-- Sticky Footer Nav -->
+        <!-- <div class="footer-nav d-flex justify-content-between align-items-center p-2">
                     <button class="btn btn-outline-secondary btn-sm" id="backBtn" aria-label="Back">
                         <i class="fa-solid fa-arrow-left"></i>
                     </button>
                     <div class="d-flex align-items-center gap-2">
                         <button style="display: none;" type="button" class="btn btn-outline-purple btn-sm" id="createNewBtn">+ Create New</button>
-                        <!-- <button class="btn btn-outline-secondary btn-sm" id="saveDraft">Save</button> -->
                         <button class="btn btn-purple btn-sm" id="nextBtn" aria-label="Next">
                             <i class="fa-solid fa-arrow-right"></i>
                         </button>
                     </div>
-                </div>
-
-            </div>
+                </div> -->
+        <div class="d-flex justify-content-center align-items-center">
+            <button id="nextBtn" type="button" class="customer-next-btn btn btn-primary">Next -> Asset & Fault</button>
         </div>
 
-        <!-- Submit Modal -->
-        <div class="modal fade" id="submitModal" tabindex="-1">
-            <div class="modal-dialog modal-lg modal-dialog-centered">
-                <div class="modal-content">
-                    <div class="modal-header">
-                        <h5 class="modal-title">Job Submitted Successfully</h5>
-                        <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
-                    </div>
-                    <div class="modal-body">
-                        <p>Job <strong id="modalJobNum"></strong> for <strong id="modalCustomer"></strong> submitted at
-                            <span id="modalTime"></span>
-                        </p>
-                        <pre id="jsonOutput" class="p-2 bg-light rounded-2"
-                            style="max-height:400px; overflow:auto;"></pre>
-                    </div>
-                    <div class="modal-footer">
-                        <button class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
-                        <button class="btn btn-success" id="downloadJson">Download JSON</button>
-                    </div>
+    </div>
+    </div>
+
+    <!-- Submit Modal -->
+    <div class="modal fade" id="submitModal" tabindex="-1">
+        <div class="modal-dialog modal-lg modal-dialog-centered">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">Job Submitted Successfully</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
+                    <p>Job <strong id="modalJobNum"></strong> for <strong id="modalCustomer"></strong> submitted at
+                        <span id="modalTime"></span>
+                    </p>
+                    <pre id="jsonOutput" class="p-2 bg-light rounded-2" style="max-height:400px; overflow:auto;"></pre>
+                </div>
+                <div class="modal-footer">
+                    <button class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                    <button class="btn btn-success" id="downloadJson">Download JSON</button>
                 </div>
             </div>
         </div>
+    </div>
 
-        <!-- Scripts -->
-        <script src="https://code.jquery.com/jquery-4.0.0.min.js"></script>
-        <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
-        <script src="script/script.js"></script>
-        <script src="script/validation.js"></script>
-       
+    <!-- Scripts -->
+    <script src="https://code.jquery.com/jquery-4.0.0.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="script/script.js"></script>
+    <script src="script/validation.js"></script>
+
 </body>
 
 </html>
