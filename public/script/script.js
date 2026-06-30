@@ -707,7 +707,7 @@ $("#nextBtn").html('Next <span><i class="fa-solid fa-angle-right"></i></span>&nb
 
             <div class="row-1 g-2">
               <div class="mb-2">
-                <div class="d-flex justify-content-between align-items-center mb-1">
+                <div class="d-flex justify-content-between align-items-center">
                   <label class="form-label mb-0">Work Required</label>
                 </div>
                 <input maxlength="150" class="form-control work-req" placeholder="AI Recommended / Enter" value="${f.work || ""}">
