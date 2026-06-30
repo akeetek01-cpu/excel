@@ -736,6 +736,7 @@ input:checked + .slider:before {
         border-bottom: 1px solid #ccc;
     margin: 1rem;
 }
+
 /* Responsive */
 @media(max-width: 480px) {
     .container {

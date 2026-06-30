@@ -126,15 +126,8 @@
   overflow: hidden;
 }
 
-.footer-nav {
-  /* position: sticky; */
-  bottom: 0;
-  background: #fff;
-  padding: 10px;
-  border-radius: 8px;
-  margin-top: 10px;
-  box-shadow: 0 -6px 18px rgba(0, 0, 0, 0.03);
-}
+
+
 
 .stat-card {
   flex: 1;
@@ -475,6 +468,18 @@
   font-size: 12px;
   margin-top: 5px;
 }
+#backBtn, #createNewBtn{
+        border: 1px solid #12c8c0;
+    background: transparent;
+}
+.modal-content {
+    color: #000 !important;
+}
+.submit-btn {
+    padding-left: 20%;
+    margin: 0 4%;
+    padding-right: 20%;
+}
 @media (min-width: 768px) {
   .wizard-card {
     margin-top: 20px;
@@ -486,13 +491,6 @@
     display: none;
   }
 
-  .footer-nav {
-    /* position: fixed; */
-    left: 0;
-    right: 0;
-    bottom: 0;
-    padding: 12px;
-  }
 }
 /* Spinner Control Styles */
 .spinner-control {

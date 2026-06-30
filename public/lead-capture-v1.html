@@ -312,7 +312,8 @@
                             <div class="dz-content">
                                 <i class="fa-regular fa-image fa-2x mb-2"></i>
                                 <div class="fw-bold" style="color: var(--teal);">Tap to browse or drag & drop</div>
-                                <div class="small text-muted" style="color: var(--teal);">JPG, PNG, HEIC · max 10 images</div>
+                                <div class="small text-muted" style="color: var(--teal);">JPG, PNG, HEIC · max 10 images
+                                </div>
                             </div>
                             <input type="file" id="photoInput" accept="image/*" multiple hidden>
                         </div>
@@ -328,20 +329,23 @@
         </div>
 
         <!-- Sticky Footer Nav -->
-        <!-- <div class="footer-nav d-flex justify-content-between align-items-center p-2">
-                    <button class="btn btn-outline-secondary btn-sm" id="backBtn" aria-label="Back">
-                        <i class="fa-solid fa-arrow-left"></i>
-                    </button>
-                    <div class="d-flex align-items-center gap-2">
-                        <button style="display: none;" type="button" class="btn btn-outline-purple btn-sm" id="createNewBtn">+ Create New</button>
-                        <button class="btn btn-purple btn-sm" id="nextBtn" aria-label="Next">
-                            <i class="fa-solid fa-arrow-right"></i>
-                        </button>
-                    </div>
-                </div> -->
-        <div class="d-flex justify-content-center align-items-center">
-            <button id="nextBtn" type="button" class="customer-next-btn btn btn-primary">Next -> Asset & Fault</button>
+        <div class="footer-nav d-flex justify-content-between align-items-center p-2">
+            <button class="btn btn-outline-secondary btn-sm" id="backBtn" aria-label="Back">
+                <i class="fa-solid fa-arrow-left"></i>Back
+            </button>
+            <div id="nextButtonContainer" class="d-flex justify-content-center align-items-center">
+                <button id="nextBtn" type="button" class="customer-next-btn btn btn-primary">Next -> Asset &
+                    Fault</button>
+
+                <button style="display: none;" type="button" class="btn btn-outline-secondary btn-sm"
+                    id="createNewBtn">+ Create New</button>
+
+            </div>
+
         </div>
+        <!-- <div class="d-flex justify-content-center align-items-center">
+            <button id="nextBtn" type="button" class="customer-next-btn btn btn-primary">Next -> Asset & Fault</button>
+        </div> -->
 
     </div>
     </div>

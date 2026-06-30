@@ -76,16 +76,24 @@ $(function () {
     $(`.step-pane[data-step-pane='${idx}']`).removeClass("d-none");
     // buttons
     if (idx === 0) {
-      $("#backBtn").prop("disabled", true);
+      $("#backBtn").hide().prop("disabled", true);
+      $("#nextButtonContainer").width("100%")
+    } else if (idx === 1) {
+       $("#backBtn").show().prop("disabled", false);
+      $("#nextButtonContainer").width("auto")
     } else {
-      $("#backBtn").prop("disabled", false);
+      $("#backBtn").show().prop("disabled", false);
+      $("#nextButtonContainer").width("100%")
     }
     if (idx === 1) {
+       $("#nextBtn").removeClass("submit-btn");
       $("#nextBtn").html("Next -> Estimates");
     }
     else if (idx === 2) {
+      $("#nextBtn").addClass("submit-btn");
       $("#nextBtn").html("Submit");
     } else {
+             $("#nextBtn").removeClass("submit-btn");
       $("#nextBtn").html("Next -> Asset & Fault");
     }
     $("#createNewBtn").toggle(idx === 2);
