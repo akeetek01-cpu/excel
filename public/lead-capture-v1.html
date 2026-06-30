@@ -23,8 +23,8 @@
         <div class="logo">
             <img src="images/excel_log.png" alt="Excel Logo">
             <label class="create-lead-label" style="min-width:100px">
-                                        Create Lead
-                                    </label>
+                Create Lead
+            </label>
         </div>
         <div class="wizard-card mx-auto">
 
@@ -34,12 +34,12 @@
                     <div class="icon"> <i class="fa-solid fa-user"></i> </div>
                     <div class="label">1. Customer Details</div>
                 </div>
-                <div class="divider"></div>
+                <!-- <div class="divider"></div> -->
                 <div class="step" data-step="1">
                     <div class="icon"> <i class="fa-solid fa-wrench"></i> </div>
                     <div class="label">2. Asset & Faults</div>
                 </div>
-                <div class="divider"></div>
+                <!-- <div class="divider"></div> -->
                 <div class="step" data-step="2">
                     <div class="icon"> <i class="fa-solid fa-calculator"></i> </div>
                     <div class="label">3. Estimates</div>
@@ -58,57 +58,75 @@
 
 
                                 <div class="col align-items-start">
-                                    <label class="form-label me-2 mb-0" style="min-width:100px">Job number</label>
+                                    <label class="form-label me-2 mb-0" style="min-width:100px">Job Number</label>
                                     <div class="flex-grow-1">
                                         <input type="number" id="jobNumber" class="form-control"
-                                            placeholder="Enter job number" disabled>
+                                            placeholder="Enter Job Number" disabled>
 
                                         <div id="jobNumberError" class="invalid-feedback"></div>
                                     </div>
                                 </div>
 
                                 <div class="col align-items-start">
-                                    <label class="form-label me-2 mb-0" style="min-width:100px">No Job number?</label>
+                                    <label class="form-label me-2 mb-0" style="min-width:100px">No Job Number?</label>
                                     <div class="flex-grow-1">
-                                        <button type="button" id="autoJobBtn" class="btn btn-primary" aria-pressed="false">
+                                        <button type="button" id="autoJobBtn" class="btn btn-primary"
+                                            aria-pressed="false">
                                             Click & Generate Job Number
                                         </button>
                                     </div>
                                 </div>
-                                
+
                             </div>
 
                             <div class="row">
+
                                 <div class="col mb-2 align-items-start">
                                     <label class="form-label me-2 mb-0" style="min-width:100px">
-                                        Customer name
+                                        Tenancy / Shop
+                                    </label>
+
+                                    <div class="flex-grow-1">
+                                        <input type="text" id="customerTenancy" class="form-control"
+                                            style="text-transform: capitalize;" placeholder="Enter">
+
+                                        <div id="customerTenancyError" class="invalid-feedback"></div>
+                                    </div>
+                                </div>
+                                <div class="col mb-2 align-items-start">
+                                    <label class="form-label me-2 mb-0" style="min-width:100px">
+                                        Customer Name
                                     </label>
 
                                     <div class="flex-grow-1">
                                         <input type="text" id="customerName" maxlength="100" class="form-control"
-                                            placeholder="Auto populate / enter">
+                                            style="text-transform: capitalize;" placeholder="Enter Customer Name">
 
                                         <div id="customerNameError" class="invalid-feedback"></div>
                                     </div>
                                 </div>
 
 
+
+                            </div>
+
+
+                            <div class="row">
                                 <div class="col mb-2 align-items-start">
                                     <label class="form-label me-2 mb-0" style="min-width:100px">
                                         Phone
                                     </label>
 
                                     <div class="flex-grow-1">
-                                        <input type="tel" id="customerPhone" class="form-control"
-                                            placeholder="Auto populate / enter" maxlength="12">
+                                        <input type="tel" id="customerPhone" class="form-control 
+" placeholder="8-10 digits number" maxlength="12">
 
                                         <div id="customerPhoneError" class="invalid-feedback">
                                             Please enter a valid phone number.
                                         </div>
                                     </div>
                                 </div>
-                            </div>
-                            <div class="row">
+
                                 <div class="col mb-2 align-items-start">
                                     <label class="form-label me-2 mb-0" style="min-width:100px">
                                         Email
@@ -116,31 +134,18 @@
 
                                     <div class="flex-grow-1">
                                         <input type="email" id="customerEmail" class="form-control"
-                                            placeholder="Auto populate / enter">
+                                            placeholder="abc@abc.com">
 
                                         <div id="customerEmailError" class="invalid-feedback"></div>
                                     </div>
                                 </div>
 
-
-                                <div class="col mb-2 align-items-start">
-                                    <label class="form-label me-2 mb-0" style="min-width:100px">
-                                        Tenancy / shop
-                                    </label>
-
-                                    <div class="flex-grow-1">
-                                        <input type="text" id="customerTenancy" class="form-control"
-                                            placeholder="Auto populate / enter">
-
-                                        <div id="customerTenancyError" class="invalid-feedback"></div>
-                                    </div>
-                                </div>
                             </div>
 
                             <div class="mb-2">
                                 <label class="form-label">Notes</label>
                                 <textarea id="customerNotes" class="form-control auto-resize" rows="2" maxlength="150"
-                                    placeholder="Additional notes"></textarea>
+                                    placeholder="Enter notes"></textarea>
                             </div>
 
                         </form>
@@ -155,13 +160,13 @@
                         <div class="fault-card">
                             <div class="mb-2 align-items-start">
                                 <label class="form-label me-2 mb-0" style="min-width:100px">
-                                    Asset description
+                                    Asset Description
                                 </label>
 
                                 <div class="flex-grow-1">
                                     <select id="assetDescriptionSelect" class="form-select"
                                         aria-label="Asset description">
-                                        <option value="">Select / enter</option>
+                                        <option value="">Select / Enter</option>
                                         <option value="Air Conditioner">Air Conditioner</option>
                                         <option value="Fridge">Fridge</option>
                                         <option value="Oven">Oven</option>
@@ -181,10 +186,10 @@
 
                             <div class="mb-2 align-items-start">
                                 <label class="form-label me-2 mb-0" style="min-width:100px">
-                                    Asset location</label>
+                                    Asset Location</label>
                                 <div class="flex-grow-1">
                                     <select id="assetLocation" class="form-select" aria-label="Asset description">
-                                        <option value="">Select / enter</option>
+                                        <option value="">Select / Enter</option>
                                         <option>Kitchen</option>
                                         <option>Store Room</option>
                                         <option>Roof</option>
@@ -221,8 +226,8 @@
                         <div id="faultList"></div>
 
                         <div class="d-grid mt-2">
-                            <button type="button" id="addFaultBtn" class="btn btn-outline-purple">+ Add another
-                                fault</button>
+                            <button type="button" id="addFaultBtn" class="btn btn-outline-purple">+ Add Another
+                                Fault</button>
                         </div>
 
                     </div>
@@ -233,7 +238,7 @@
             <div class="step-pane d-none" data-step-pane="2">
                 <div class="card p-3 mb-3 rounded-12">
 
-                    <div class="row g-2 align-items-start">
+                    <div class="row g-5 align-items-start">
                         <div class="col-6">
                             <label class="form-label">Technicians Required</label>
                             <div class="spinner-control">
@@ -297,17 +302,17 @@
                     <div class="mt-3 photo-upload-card p-3 rounded-12">
                         <div class="photo-upload-header d-flex justify-content-between align-items-start mb-3">
                             <div>
-                                <label class="form-label-1 mb-1">Upload job photos</label>
+                                <label class="form-label-1 mb-1">Upload Job Photos</label>
                                 <!-- <div class="text-muted small">Tap to browse or drag & drop</div> -->
                             </div>
-                            <div id="photoCount" class="photo-upload-count">0 / 10</div>
+                            <div id="photoCount" class="photo-upload-count" style="color: var(--teal);">0 / 10</div>
                         </div>
 
                         <div id="dropZone" class="photo-upload-dropzone p-4 text-center rounded-8">
                             <div class="dz-content">
                                 <i class="fa-regular fa-image fa-2x mb-2"></i>
-                                <div class="fw-bold">Tap to browse or drag & drop</div>
-                                <div class="small text-muted">JPG, PNG, HEIC · max 10 images</div>
+                                <div class="fw-bold" style="color: var(--teal);">Tap to browse or drag & drop</div>
+                                <div class="small text-muted" style="color: var(--teal);">JPG, PNG, HEIC · max 10 images</div>
                             </div>
                             <input type="file" id="photoInput" accept="image/*" multiple hidden>
                         </div>

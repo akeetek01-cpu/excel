@@ -11,7 +11,7 @@ body {
     display: flex;
     justify-content: center;
     align-items: center;
-    background: #0f2d53;
+    /* background: #0f2d53; */
     color: #fff;
     background-image:
         linear-gradient(rgba(255, 255, 255, .04) 1px, transparent 1px),
@@ -42,6 +42,7 @@ body {
 .lead-capture{
      background: #0f2d53;
      box-shadow: 0 6px 18px rgba(124, 108, 235, 0.08);
+     border-radius: 10px;
 }
 .pre-login.container {
     text-align: center;
@@ -74,6 +75,8 @@ h2 {
 
 .lead-capture .logo label {
    float: right;
+    font-size: 14px;
+    font-weight: 600;
 }
 .create-lead-label{
     color: var(--teal);;
@@ -116,6 +119,16 @@ h2 {
     justify-content: center;
     align-items: center;
     position: relative;
+}
+
+::placeholder {
+  color: #cccccc;
+  font-size: 13px;
+  text-transform: capitalize;
+}
+
+textarea {
+  text-transform: capitalize;
 }
 
 .welcome {
@@ -324,7 +337,7 @@ h2 {
 }
 
 .form-label {
-    width: 150px;
+    /* width: 150px; */
     font-size: 14px;
     color: #FFFFFF;
 }
@@ -649,13 +662,14 @@ textarea {
 }
 .customer-next-btn{
     width: auto;
+    font-weight: 600;
 }
 .after-hours-label{
         color: #ffffff;
         margin-bottom: 12px !important;
 }
 .summary-estimates{
-        background: #f6f5ed;
+        background: White;
     border-radius: 8px;
 }
 .switch {

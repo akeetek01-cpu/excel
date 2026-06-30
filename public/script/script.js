@@ -683,49 +683,50 @@ $(function () {
           <div class="fault-header" role="button" tabindex="0" aria-expanded="${expanded}">
             <div>
               <span class="badge fault-badge">${num}</span>
-              Fault #${num}
+              Fault
             </div>
             <div class="d-flex align-items-center gap-2">
-              <span class="collapse-indicator">${expanded ? "▾" : "▸"}</span>
-              ${jobData.faults.length > 1 ? '<button id="deleteFaultBtn" type="button" class="delete-icon-btn" aria-label="Delete fault"><i class="fa-solid fa-trash"></i></button>' : ""}
+              <span class="collapse-indicator">${expanded ? "▴" : "▾"}</span>
             </div>
           </div>
           <div class="fault-body" ${expanded ? "" : 'style="display:none;"'}>
             <div class="mb-2">
-              <label class="form-label">Fault description</label>
+              <label class="form-label">Fault Description</label>
               <textarea class="form-control auto-resize fault-desc" rows="3" maxlength="150"
-                placeholder="Describe the fault">${f.description || ""}</textarea>
+                placeholder="Describe the Fault">${f.description || ""}</textarea>
               <div class="invalid-feedback fault-desc-error"></div>
             </div>
 
             <div class="row-1 g-2">
               <div class="mb-2">
                 <div class="d-flex justify-content-between align-items-center mb-1">
-                  <label class="form-label mb-0">Work required</label>
+                  <label class="form-label mb-0">Work Required</label>
                 </div>
-                <input maxlength="150" class="form-control work-req" placeholder="AI recommended / enter" value="${f.work || ""}">
+                <input maxlength="150" class="form-control work-req" placeholder="AI Recommended / Enter" value="${f.work || ""}">
                 <div class="invalid-feedback work-req-error"></div>
               </div>
 
               <div class="row">
                 <div class="col-12 mb-2">
-                  <label class="form-label">Parts & material</label>
-                  <input maxlength="150" class="form-control parts" placeholder="AI recommended" value="${f.parts || ""}">
+                  <label class="form-label">Parts & Material Required</label>
+                  <input maxlength="150" class="form-control parts" placeholder="AI Recommended / Enter" value="${f.parts || ""}">
                   <div class="invalid-feedback parts-error"></div>
                 </div>
                 <div class="col-12 mb-2">
-                  <label class="form-label">Special equipment</label>
-                  <input maxlength="150" class="form-control equipment" placeholder="AI recommended" value="${f.equipment || ""}">
+                  <label class="form-label">Special Equipment Required</label>
+                  <input maxlength="150" class="form-control equipment" placeholder="AI Recommended / Enter" value="${f.equipment || ""}">
                   <div class="invalid-feedback equipment-error"></div>
                 </div>
 
                 <div class="col-12 mb-2">
+                  <div class="fault-inline-actions">
                     <label class="ai-pre-fill-label">
-                      <img class="image-for-label" src="images/ai_icon.png" alt="lable">
+                      <img class="image-for-label" src="images/ai_icon.png" alt="label">
                       <span class="ai-pre-fill auto-fill small">AI pre-filled please verify</span>
                     </label>
-                  
+                    ${jobData.faults.length > 1 ? '<button id="deleteFaultBtn" type="button" class="delete-icon-btn" aria-label="Delete fault" style="margin-left: 5px; color:white">Delete<i class="fa-solid fa-trash" style="margin-left: 10px; color:red;"></i></button>' : ""}
                   </div>
+                </div>
               </div>
             </div>
           </div>
