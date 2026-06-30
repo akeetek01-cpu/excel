@@ -121,10 +121,10 @@ h2 {
     position: relative;
 }
 
-::placeholder {
+::placeholder, select,option {
   color: #cccccc;
   font-size: 13px;
-  text-transform: capitalize;
+  /* text-transform: capitalize; */
 }
 
 textarea {
@@ -337,6 +337,8 @@ textarea {
 }
 
 .form-label {
+    margin-bottom: 0px;
+
     /* width: 150px; */
     font-size: 14px;
     color: #FFFFFF;
@@ -464,7 +466,7 @@ textarea {
     background: #12c8c0;
     color: #fff;
     border: none;
-    padding: 10px 18px;
+    padding: 5px 15px;
     border-radius: 25px;
     cursor: pointer;
     gap: 5px;
@@ -654,9 +656,9 @@ textarea {
     width: 70px !important;
 }
 
-.step-pane .row{
+/* .step-pane .row{
     margin-bottom: 20px;
-}
+} */
 .fault-card .row{
     margin-bottom: 0px;
 }

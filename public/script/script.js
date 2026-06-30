@@ -87,15 +87,15 @@ $(function () {
     }
     if (idx === 1) {
        $("#nextBtn").removeClass("submit-btn");
-      $("#nextBtn").html("Next -> Estimates");
+      $("#nextBtn").html('Next <span><i class="fa-solid fa-angle-right"></i></span>&nbsp;&nbsp;Estimates');
     }
     else if (idx === 2) {
       $("#nextBtn").addClass("submit-btn");
       $("#nextBtn").html("Submit");
     } else {
              $("#nextBtn").removeClass("submit-btn");
-      $("#nextBtn").html("Next -> Asset & Fault");
-    }
+// $("#nextBtn").html("Next <span><i class=\"fa-solid fa-angle-right\"></i> </span>   Asset & Fault");    }
+$("#nextBtn").html('Next <span><i class="fa-solid fa-angle-right"></i></span>&nbsp;&nbsp;Asset & Fault');}
     $("#createNewBtn").toggle(idx === 2);
   }
 
