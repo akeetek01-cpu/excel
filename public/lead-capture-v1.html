@@ -57,17 +57,17 @@
                             <div class="row">
 
 
-                                <div class="col align-items-start">
+                                <div class="col mb-3 align-items-start">
                                     <label class="form-label me-2 mb-0" style="min-width:100px">Job Number</label>
                                     <div class="flex-grow-1">
-                                        <input type="number" id="jobNumber" class="form-control"
-                                            placeholder="Enter Job Number" disabled>
+                                        <input type="text" id="jobNumber" class="form-control"
+                                            placeholder="Enter Job Number" maxlength="6" required inputmode="numeric" pattern="[0-9]*">
 
                                         <div id="jobNumberError" class="invalid-feedback"></div>
                                     </div>
                                 </div>
 
-                                <div class="col align-items-start">
+                                <div class="col mb-3 align-items-start">
                                     <label class="form-label me-2 mb-0" style="min-width:100px">No Job Number?</label>
                                     <div class="flex-grow-1">
                                         <button type="button" id="autoJobBtn" class="btn btn-primary"
@@ -81,19 +81,21 @@
 
                             <div class="row">
 
-                                <div class="col mb-2 align-items-start">
+                                <div class="col-12 mb-3 align-items-start">
                                     <label class="form-label me-2 mb-0" style="min-width:100px">
-                                        Tenancy / Shop
+                                        Site
                                     </label>
 
                                     <div class="flex-grow-1">
-                                        <input type="text" id="customerTenancy" class="form-control"
-                                            style="text-transform: capitalize;" placeholder="Enter">
+                                        <select id="customerTenancy" class="form-select" aria-label="Site">
+                                            <option value="">Select Site</option>
+                                            <option value="Other">Other</option>
+                                        </select>
 
                                         <div id="customerTenancyError" class="invalid-feedback"></div>
                                     </div>
                                 </div>
-                                <div class="col mb-2 align-items-start">
+                                <div class="col mb-3 align-items-start">
                                     <label class="form-label me-2 mb-0" style="min-width:100px">
                                         Customer Name
                                     </label>
@@ -112,7 +114,7 @@
 
 
                             <div class="row">
-                                <div class="col mb-2 align-items-start">
+                                <div class="col-12 mb-3 align-items-start">
                                     <label class="form-label me-2 mb-0" style="min-width:100px">
                                         Phone
                                     </label>
@@ -127,7 +129,7 @@
                                     </div>
                                 </div>
 
-                                <div class="col mb-2 align-items-start">
+                                <div class="col mb-3 align-items-start">
                                     <label class="form-label me-2 mb-0" style="min-width:100px">
                                         Email
                                     </label>
@@ -158,7 +160,7 @@
                     <div class="card p-3 mb-3 rounded-12">
 
                         <div class="fault-card">
-                            <div class="mb-2 align-items-start">
+                            <div class="mb-3 align-items-start">
                                 <label class="form-label me-2 mb-0" style="min-width:100px">
                                     Asset Description
                                 </label>
@@ -167,10 +169,6 @@
                                     <select id="assetDescriptionSelect" class="form-select"
                                         aria-label="Asset description">
                                         <option value="">Select / Enter</option>
-                                        <option value="Air Conditioner">Air Conditioner</option>
-                                        <option value="Fridge">Fridge</option>
-                                        <option value="Oven">Oven</option>
-                                        <option value="Generator">Generator</option>
                                         <option value="other">Other (enter below)</option>
                                     </select>
                                     <div id="assetDescriptionError" class="invalid-feedback"></div>
@@ -184,23 +182,14 @@
 
                             </div>
 
-                            <div class="mb-2 align-items-start">
+                            <div class="mb-3 align-items-start">
                                 <label class="form-label me-2 mb-0" style="min-width:100px">
                                     Asset Location</label>
                                 <div class="flex-grow-1">
-                                    <select id="assetLocation" class="form-select" aria-label="Asset description">
-                                        <option value="">Select / Enter</option>
-                                        <option>Kitchen</option>
-                                        <option>Store Room</option>
-                                        <option>Roof</option>
-                                        <option value="other">Other (enter below)</option>
-                                    </select>
+                                    <textarea id="assetLocation" class="form-control auto-resize" rows="2"
+                                        maxlength="150" placeholder="Enter asset location"></textarea>
                                     <div id="assetLocationError" class="invalid-feedback"></div>
 
-                                    <!-- <input type="text" id="assetLocationInput" class="form-control mt-2 d-none"
-                                        placeholder="Enter asset location" required> -->
-                                    <textarea id="assetLocationInput" class="form-control auto-resize d-none"" rows=" 2"
-                                        maxlength="150" placeholder="Enter asset location"></textarea>
                                     <div id="assetLocationInputError" class="invalid-feedback"></div>
 
                                 </div>
@@ -305,7 +294,7 @@
                                 <label class="form-label-1 mb-1">Upload Job Photos</label>
                                 <!-- <div class="text-muted small">Tap to browse or drag & drop</div> -->
                             </div>
-                            <div id="photoCount" class="photo-upload-count" style="color: var(--teal);">0 / 10</div>
+                            <div id="photoCount" class="photo-upload-count" style="color: var(--teal); font-size: 13px;">0 / 10</div>
                         </div>
 
                         <div id="dropZone" class="photo-upload-dropzone p-4 text-center rounded-8">
@@ -329,7 +318,7 @@
         </div>
 
         <!-- Sticky Footer Nav -->
-        <div class="footer-nav d-flex justify-content-between align-items-center p-2">
+        <div class="footer-nav d-flex justify-content-between align-items-center p-3">
             <button class="btn btn-outline-secondary btn-sm" id="backBtn" aria-label="Back">
                 <i class="fa-solid fa-arrow-left"></i>Back
             </button>
@@ -376,6 +365,8 @@
     <script src="https://code.jquery.com/jquery-4.0.0.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
     <script src="script/script.js"></script>
+    <script src="script/lead-capture-v1.js"></script>
+    <script src="script/job-number-api.js"></script>
     <script src="script/validation.js"></script>
 
 </body>

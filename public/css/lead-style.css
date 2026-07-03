@@ -48,10 +48,10 @@
   justify-content: center;
   background: transparent;
   color: var(--muted);
-  border: 1px solid var(--teal);
+  border: 1px solid var(--muted);
 }
 .step .icon i {
-  color: var(--teal);
+  color: var(--muted);
 }
 
 .step.active .icon i {
@@ -115,9 +115,9 @@
   color: #12c8c0;
   padding: 4px;
 }
-.form-control {
+/* .form-control {
   margin-top: 6px;
-}
+} */
 .rounded-8 {
   border-radius: 8px;
 }
@@ -157,6 +157,7 @@
 .photo-upload-header .form-label-1 {
   font-weight: 500;
   color: var(--teal);
+  font-size: 13px;
 }
 
 .photo-upload-count {
@@ -289,7 +290,7 @@
   display: flex;
   justify-content: space-between;
   align-items: center;
-  margin-bottom: 8px;
+  /* margin-bottom: 8px; */
   font-weight: bold;
   cursor: pointer;
   color: #12c8c0;
@@ -466,7 +467,7 @@
 }
 #autoJobBtn {
   font-size: 12px;
-  margin-top: 5px;
+  /* margin-top: 5px; */
 }
 #backBtn, #createNewBtn{
         border: 1px solid #12c8c0;
@@ -488,7 +489,8 @@
 
 @media (max-width: 576px) {
   .step .label {
-    display: none;
+    /* display: none; */
+    font-size: 10px;
   }
 
 }

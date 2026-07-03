@@ -20,6 +20,28 @@ $(function () {
     return String(Math.floor(100000 + Math.random() * 900000));
   }
 
+  function handleJobNumberComplete(value) {
+    console.log("Job number completed:", value);
+    if (window.handleJobNumberCompleteApi) {
+      window.handleJobNumberCompleteApi(value);
+    }
+  }
+
+  function enforceJobNumberLimit() {
+    const $field = $("#jobNumber");
+    let value = $field.val().toString().replace(/\D/g, "");
+
+    if (value.length > 6) {
+      value = value.slice(0, 6);
+    }
+
+    $field.val(value);
+
+    if (value.length === 6) {
+      handleJobNumberComplete(value);
+    }
+  }
+
   function setAutoJobState(enabled) {
     $("#autoJob").prop("checked", enabled);
     $("#autoJobBtn")
@@ -27,10 +49,10 @@ $(function () {
       .toggleClass("active", enabled);
 
     if (enabled) {
-      $("#jobNumber").prop("disabled", true).val(generateJobNumber());
+      $("#jobNumber").val(generateJobNumber());
       clearError("#jobNumber", "#jobNumberError");
     } else {
-      $("#jobNumber").prop("disabled", true).val("");
+      $("#jobNumber").val("");
       if ($("#jobNumber").val().trim() === "") {
         showError("#jobNumber", "#jobNumberError", "Job Number is required.");
       }
@@ -87,15 +109,15 @@ $(function () {
     }
     if (idx === 1) {
        $("#nextBtn").removeClass("submit-btn");
-      $("#nextBtn").html("Next -> Estimates");
+      $("#nextBtn").html('Next <span><i class="fa-solid fa-angle-right"></i></span>&nbsp;&nbsp;Estimates');
     }
     else if (idx === 2) {
       $("#nextBtn").addClass("submit-btn");
       $("#nextBtn").html("Submit");
     } else {
              $("#nextBtn").removeClass("submit-btn");
-      $("#nextBtn").html("Next -> Asset & Fault");
-    }
+// $("#nextBtn").html("Next <span><i class=\"fa-solid fa-angle-right\"></i> </span>   Asset & Fault");    }
+$("#nextBtn").html('Next <span><i class="fa-solid fa-angle-right"></i></span>&nbsp;&nbsp;Asset & Fault');}
     $("#createNewBtn").toggle(idx === 2);
   }
 
@@ -392,20 +414,25 @@ $(function () {
     return valid;
   }
 
-  $("#jobNumber").on("blur", function () {
-    const value = $(this).val().trim();
-    if (!$("#autoJob").is(":checked") && value === "") {
-      showError("#jobNumber", "#jobNumberError", "Job Number is required.");
-    } else if (!$("#autoJob").is(":checked") && !/^\d{6}$/.test(value)) {
-      showError(
-        "#jobNumber",
-        "#jobNumberError",
-        "Job Number must be exactly 6 digits.",
-      );
-    } else {
-      clearError("#jobNumber", "#jobNumberError");
-    }
-  });
+  $("#jobNumber")
+    .attr("maxlength", "6")
+    .on("input", function () {
+      enforceJobNumberLimit();
+    })
+    .on("blur", function () {
+      const value = $(this).val().trim();
+      if (!$("#autoJob").is(":checked") && value === "") {
+        showError("#jobNumber", "#jobNumberError", "Job Number is required.");
+      } else if (!$("#autoJob").is(":checked") && !/^\d{6}$/.test(value)) {
+        showError(
+          "#jobNumber",
+          "#jobNumberError",
+          "Job Number must be exactly 6 digits.",
+        );
+      } else {
+        clearError("#jobNumber", "#jobNumberError");
+      }
+    });
 
   $("#autoJobBtn").on("click", function () {
     setAutoJobState(!$("#autoJob").is(":checked"));
@@ -707,7 +734,7 @@ $(function () {
 
             <div class="row-1 g-2">
               <div class="mb-2">
-                <div class="d-flex justify-content-between align-items-center mb-1">
+                <div class="d-flex justify-content-between align-items-center">
                   <label class="form-label mb-0">Work Required</label>
                 </div>
                 <input maxlength="150" class="form-control work-req" placeholder="AI Recommended / Enter" value="${f.work || ""}">
