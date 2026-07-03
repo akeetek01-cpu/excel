@@ -1,5 +1,4 @@
 $(function() {
-    const apiUrl = "https://excel.simprocloud.com//api/v1.0/companies/6/customerAssets/?search=any&pageSize=150&page=1&orderby=Name&limit=10";
     const assetDescriptionSelect = $("#assetDescriptionSelect");
     const assetLocationSelect = $("#assetLocation");
     const assetDescriptionInput = $("#assetDescriptionInput");
@@ -7,21 +6,17 @@ $(function() {
 
     let assetResponse = [];
     let assetDescriptions = [];
-    let assetLocationsByType = {};
 
     function mapResponse(data) {
         const descriptions = new Map();
-        const locations = {};
 
         data.forEach(item => {
-            if (!item || !item.AssetType || !item.Site) {
+            if (!item || !item.AssetType) {
                 return;
             }
 
             const typeId = item.AssetType.ID;
             const typeName = item.AssetType.Name;
-            const siteId = item.Site.ID;
-            const siteName = item.Site.Name;
 
             if (!descriptions.has(typeId)) {
                 descriptions.set(typeId, {
@@ -29,22 +24,9 @@ $(function() {
                     name: typeName
                 });
             }
-
-            if (!locations[typeId]) {
-                locations[typeId] = new Map();
-            }
-            if (!locations[typeId].has(siteId)) {
-                locations[typeId].set(siteId, {
-                    id: siteId,
-                    name: siteName
-                });
-            }
         });
 
         assetDescriptions = Array.from(descriptions.values());
-        assetLocationsByType = Object.fromEntries(
-            Object.entries(locations).map(([typeId, siteMap]) => [typeId, Array.from(siteMap.values())])
-        );
     }
 
     function renderAssetDescriptions() {
@@ -59,22 +41,6 @@ $(function() {
         });
     }
 
-    function renderAssetLocations(typeId) {
-        assetLocationSelect.find("option:gt(0)").remove();
-        assetLocationSelect.append(
-            `<option value="other">Other (enter below)</option>`
-        );
-        if (!typeId || !assetLocationsByType[typeId]) {
-            return;
-        }
-
-        assetLocationsByType[typeId].forEach(site => {
-            assetLocationSelect.append(
-                `<option value="${site.id}">${site.name}</option>`
-            );
-        });
-    }
-
     function setOtherMode(selectElem, inputElem) {
         const selectedValue = selectElem.val();
         if (selectedValue === "other") {
@@ -85,20 +51,30 @@ $(function() {
     }
 
     assetDescriptionSelect.on("change", function() {
-        const selectedTypeId = $(this).val();
-        renderAssetLocations(selectedTypeId);
         setOtherMode($(this), assetDescriptionInput);
-        setOtherMode(assetLocationSelect, assetLocationInput);
-        assetLocationSelect.val("");
     });
 
     assetLocationSelect.on("change", function() {
         setOtherMode($(this), assetLocationInput);
     });
 
-    function fetchAssetData() {
+    $("#customerTenancy").on("change", function() {
+        const siteId = $(this).find("option:selected").attr("data-site-id");
+
+        if (!siteId) {
+            assetDescriptionSelect.find("option:gt(0)").remove();
+            assetDescriptionSelect.append(`<option value="other">Other (enter below)</option>`);
+            assetLocationSelect.val("");
+            assetLocationInput.addClass("d-none");
+            return;
+        }
+
+        fetchAssetData(siteId);
+    });
+
+    function fetchAssetData(siteId) {
         $.ajax({
-            url: apiUrl,
+            url: `https://excel.simprocloud.com//api/v1.0/companies/6/sites/${siteId}/assets/?search=any&pageSize=50&page=1&orderby=Name&limit=100`,
             method: "GET",
             timeout: 0,
             headers: {
@@ -113,6 +89,4 @@ $(function() {
             console.error("Failed to load asset data:", textStatus, errorThrown);
         });
     }
-
-    fetchAssetData();
 });

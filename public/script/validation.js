@@ -46,9 +46,9 @@ $(function(){
     const checked = $(this).is(':checked');
     $('#autoJobBtn').attr('aria-pressed', checked ? 'true' : 'false').toggleClass('active', checked);
     if (checked) {
-      $('#jobNumber').prop('disabled', true).val(generateJobNumber());
+      $('#jobNumber').val(generateJobNumber());
     } else {
-      $('#jobNumber').prop('disabled', true).val('');
+      $('#jobNumber').val('');
     }
   });
 

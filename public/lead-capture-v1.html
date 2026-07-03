@@ -60,8 +60,8 @@
                                 <div class="col mb-3 align-items-start">
                                     <label class="form-label me-2 mb-0" style="min-width:100px">Job Number</label>
                                     <div class="flex-grow-1">
-                                        <input type="number" id="jobNumber" class="form-control"
-                                            placeholder="Enter Job Number" disabled>
+                                        <input type="text" id="jobNumber" class="form-control"
+                                            placeholder="Enter Job Number" maxlength="6" required inputmode="numeric" pattern="[0-9]*">
 
                                         <div id="jobNumberError" class="invalid-feedback"></div>
                                     </div>
@@ -83,12 +83,14 @@
 
                                 <div class="col-12 mb-3 align-items-start">
                                     <label class="form-label me-2 mb-0" style="min-width:100px">
-                                        Tenancy / Shop
+                                        Site
                                     </label>
 
                                     <div class="flex-grow-1">
-                                        <input type="text" id="customerTenancy" class="form-control"
-                                            style="text-transform: capitalize;" placeholder="Enter">
+                                        <select id="customerTenancy" class="form-select" aria-label="Site">
+                                            <option value="">Select Site</option>
+                                            <option value="Other">Other</option>
+                                        </select>
 
                                         <div id="customerTenancyError" class="invalid-feedback"></div>
                                     </div>
@@ -184,16 +186,10 @@
                                 <label class="form-label me-2 mb-0" style="min-width:100px">
                                     Asset Location</label>
                                 <div class="flex-grow-1">
-                                    <select id="assetLocation" class="form-select" aria-label="Asset location">
-                                        <option value="">Select / Enter</option>
-                                        <option value="other">Other (enter below)</option>
-                                    </select>
+                                    <textarea id="assetLocation" class="form-control auto-resize" rows="2"
+                                        maxlength="150" placeholder="Enter asset location"></textarea>
                                     <div id="assetLocationError" class="invalid-feedback"></div>
 
-                                    <!-- <input type="text" id="assetLocationInput" class="form-control mt-2 d-none"
-                                        placeholder="Enter asset location" required> -->
-                                    <textarea id="assetLocationInput" class="form-control auto-resize d-none"" rows=" 2"
-                                        maxlength="150" placeholder="Enter asset location"></textarea>
                                     <div id="assetLocationInputError" class="invalid-feedback"></div>
 
                                 </div>
@@ -370,6 +366,7 @@
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
     <script src="script/script.js"></script>
     <script src="script/lead-capture-v1.js"></script>
+    <script src="script/job-number-api.js"></script>
     <script src="script/validation.js"></script>
 
 </body>
