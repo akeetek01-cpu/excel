@@ -7,8 +7,11 @@ $(function () {
     estimates: {
       technicians: 0,
       hours: 0,
+      totalHours: 0,
       apprentice: false,
       afterHours: false,
+      costCenter: "",
+      tags: "",
     },
     photos: [],
   };
@@ -137,6 +140,8 @@ $("#nextBtn").html('Next <span><i class="fa-solid fa-angle-right"></i></span>&nb
     $(
       "#assetDescriptionError, #assetDescriptionInputError, #assetLocationError, #assetLocationInputError",
     ).text("");
+    $("#costCenterSelect").val("");
+    $("#tagsSelect").val("");
     $("#technicians").val(1);
     $("#hours").val(0);
     $("#apprentice").val(0);
@@ -147,8 +152,11 @@ $("#nextBtn").html('Next <span><i class="fa-solid fa-angle-right"></i></span>&nb
     jobData.estimates = {
       technicians: 0,
       hours: 0,
+      totalHours: 0,
       apprentice: false,
       afterHours: false,
+      costCenter: "",
+      tags: "",
     };
     jobData.photos = [];
     photoFiles = [];
@@ -591,6 +599,24 @@ $("#nextBtn").html('Next <span><i class="fa-solid fa-angle-right"></i></span>&nb
     }
   });
 
+  $("#costCenterSelect").on("change blur", function () {
+    const value = $(this).val().trim();
+    if (value === "") {
+      showError("#costCenterSelect", "#costCenterError", "Cost Center is required.");
+    } else {
+      clearError("#costCenterSelect", "#costCenterError");
+    }
+  });
+
+  $("#tagsSelect").on("change blur", function () {
+    const value = $(this).val().trim();
+    if (value === "") {
+      showError("#tagsSelect", "#tagsError", "Tags is required.");
+    } else {
+      clearError("#tagsSelect", "#tagsError");
+    }
+  });
+
   $("#technicians").on("blur", function () {
     const tech = Number($(this).val() || 0);
     if (!Number.isInteger(tech) || tech < 1 || tech > 10) {
@@ -882,14 +908,16 @@ $("#nextBtn").html('Next <span><i class="fa-solid fa-angle-right"></i></span>&nb
     const apprentice = Number($("#apprentice").val() || 0);
     const tech = technicians + apprentice;
     const hrs = Number($("#hours").val() || 0);
+    const totalHours = tech * hrs;
     const faults = jobData.faults.length || 0;
-    
+
     $("#statFaults").text(faults || "-");
     $("#statTech").text(tech || "-");
-    $("#statHours").text(hrs || "-");
-    
+    $("#statHours").text(totalHours || "-");
+
     jobData.estimates.technicians = tech;
     jobData.estimates.hours = hrs;
+    jobData.estimates.totalHours = totalHours;
     jobData.estimates.apprentice = Number($("#apprentice").val() || 0);
     jobData.estimates.afterHours = $("#afterHours").is(":checked");
   }
@@ -1105,7 +1133,23 @@ $("#nextBtn").html('Next <span><i class="fa-solid fa-angle-right"></i></span>&nb
     if (idx === 2) {
       const tech = Number($("#technicians").val() || 0);
       const hrs = Number($("#hours").val() || 0);
+      const costCenter = $("#costCenterSelect").val().trim();
+      const tags = $("#tagsSelect").val().trim();
       let valid = true;
+
+      if (costCenter === "") {
+        showError("#costCenterSelect", "#costCenterError", "Cost Center is required.");
+        valid = false;
+      } else {
+        clearError("#costCenterSelect", "#costCenterError");
+      }
+
+      if (tags === "") {
+        showError("#tagsSelect", "#tagsError", "Tags is required.");
+        valid = false;
+      } else {
+        clearError("#tagsSelect", "#tagsError");
+      }
 
       if (!Number.isInteger(tech) || tech < 1 || tech > 10) {
         showError(
@@ -1157,10 +1201,18 @@ $("#nextBtn").html('Next <span><i class="fa-solid fa-angle-right"></i></span>&nb
       // faults already bound
     }
     if (idx === 2) {
-      jobData.estimates.technicians = Number($("#technicians").val() || 0);
-      jobData.estimates.hours = Number($("#hours").val() || 0);
+      const technicians = Number($("#technicians").val() || 0);
+      const apprentice = Number($("#apprentice").val() || 0);
+      const hours = Number($("#hours").val() || 0);
+      const totalHours = (technicians + apprentice) * hours;
+
+      jobData.estimates.technicians = technicians + apprentice;
+      jobData.estimates.hours = hours;
+      jobData.estimates.totalHours = totalHours;
       jobData.estimates.apprentice = $("#apprentice").is(":checked");
       jobData.estimates.afterHours = $("#afterHours").is(":checked");
+      jobData.estimates.costCenter = $("#costCenterSelect").val().trim();
+      jobData.estimates.tags = $("#tagsSelect").val().trim();
     }
   }
 
@@ -1172,10 +1224,8 @@ $("#nextBtn").html('Next <span><i class="fa-solid fa-angle-right"></i></span>&nb
       `${jobData.faults.length} fault${jobData.faults.length === 1 ? "" : "s"}`,
     );
     $("#revTech").text(jobData.estimates.technicians || "-");
-    $("#revHours").text(jobData.estimates.hours || "-");
-    $("#revMan").text(
-      jobData.estimates.technicians * jobData.estimates.hours || "-",
-    );
+    $("#revHours").text(jobData.estimates.totalHours || "-");
+    $("#revMan").text(jobData.estimates.totalHours || "-");
   }
 
   function submitJob() {

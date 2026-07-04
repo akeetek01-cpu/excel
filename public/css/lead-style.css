@@ -26,6 +26,18 @@
 
 .card {
   border: none;
+  overflow: visible !important;
+}
+
+.step-pane {
+  overflow: visible !important;
+}
+
+.form-select,
+.form-control,
+textarea {
+  position: relative;
+  z-index: 2;
 }
 
 .stepper {
@@ -467,6 +479,9 @@
 }
 #autoJobBtn {
   font-size: 12px;
+  border: 1px dashed #12c8c0 !important;
+    background: transparent;
+    color: gray;
   /* margin-top: 5px; */
 }
 #backBtn, #createNewBtn{
@@ -536,6 +551,7 @@
   font-size: 16px;
   font-weight: 500;
   padding: 10px;
+  appearance: textfield;
   -moz-appearance: textfield;
 }
 

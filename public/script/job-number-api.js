@@ -65,9 +65,9 @@ $(function () {
         const customerName = response?.Customer?.CompanyName || response?.CompanyName || response?.Customer?.Name || response?.Name || "";
         const customerId = response?.Customer?.ID || response?.CustomerID || response?.ID || "";
 
-        // if (customerName) {
-        //   $("#customerName").val(customerName);
-        // }
+        if (customerName) {
+          $("#autoJobBtn").text(customerName);
+        }
 
         console.log("Customer Name:", customerName);
         console.log("CustomerID:", customerId);
