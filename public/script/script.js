@@ -1267,6 +1267,12 @@ $("#nextBtn").html('Next <span><i class="fa-solid fa-angle-right"></i></span>&nb
   }
 
   // initialize
+  if (window.loadCostCenters) {
+    window.loadCostCenters();
+  }
+  if (window.loadTags) {
+    window.loadTags();
+  }
   showStep(0);
   calculate();
 

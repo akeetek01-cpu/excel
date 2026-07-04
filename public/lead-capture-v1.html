@@ -231,9 +231,6 @@
                             <label class="form-label">Cost Center</label>
                             <select id="costCenterSelect" class="form-select" aria-label="Cost Center">
                                 <option value="">Select Cost Center</option>
-                                <option value="CC-101">CC-101</option>
-                                <option value="CC-102">CC-102</option>
-                                <option value="CC-103">CC-103</option>
                             </select>
                             <div id="costCenterError" class="invalid-feedback"></div>
                         </div>
@@ -241,15 +238,12 @@
                             <label class="form-label">Tags</label>
                             <select id="tagsSelect" class="form-select" aria-label="Tags">
                                 <option value="">Select Tags</option>
-                                <option value="Priority">Priority</option>
-                                <option value="Warranty">Warranty</option>
-                                <option value="Routine">Routine</option>
                             </select>
                             <div id="tagsError" class="invalid-feedback"></div>
                         </div>
                     </div>
 
-                    <div class="row g-5 align-items-start">
+                    <div class="row g-3 align-items-start">
                         <div class="col-6">
                             <label class="form-label">Technicians</label>
                             <div class="spinner-control">
@@ -389,6 +383,8 @@
     <script src="script/script.js"></script>
     <script src="script/lead-capture-v1.js"></script>
     <script src="script/job-number-api.js"></script>
+    <script src="script/cost-center-api.js"></script>
+    <script src="script/tags-api.js"></script>
     <script src="script/validation.js"></script>
 
 </body>
