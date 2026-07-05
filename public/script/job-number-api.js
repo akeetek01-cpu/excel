@@ -69,6 +69,11 @@ $(function () {
           $("#autoJobBtn").text(customerName);
         }
 
+        const siteContractName = response?.SiteContact?.GivenName || "";
+        if (siteContractName) {
+          $("#siteContractName").text(siteContractName);
+        }
+
         console.log("Customer Name:", customerName);
         console.log("CustomerID:", customerId);
 

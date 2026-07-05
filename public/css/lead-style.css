@@ -163,7 +163,7 @@ textarea {
 .photo-upload-card {
     background: transparent;
     border: 1px dashed var(--teal);
-    border-radius: 18px;
+    border-radius: 8px;
 }
 
 .photo-upload-header .form-label-1 {
@@ -178,9 +178,6 @@ textarea {
 }
 
 .photo-upload-dropzone {
-  background: #f8f9fb;
-  border: 1px dashed #c7d2db;
-  border-radius: 16px;
   cursor: pointer;
   min-height: 160px;
   display: flex;
@@ -477,7 +474,7 @@ textarea {
   background: #12c8c0;
   color: #fff;
 }
-#autoJobBtn {
+.border-dashed {
   font-size: 12px;
   border: 1px dashed #12c8c0 !important;
     background: transparent;
