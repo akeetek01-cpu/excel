@@ -80,7 +80,7 @@
 
                             </div>
                             <div class="row">
-                                 <div class="col-6 mb-3 align-items-start">
+                                 <div class="col-12 mb-3 align-items-start">
                                     <label class="form-label me-2 mb-0" style="min-width:100px">
                                         Site
                                     </label>
@@ -94,15 +94,15 @@
                                         <div id="customerTenancyError" class="invalid-feedback"></div>
                                     </div>
                                 </div>
-                                <div class="col-6 mb-3 align-items-start">
-                                    <label class="form-label me-2 mb-0" style="min-width:100px">Team</label>
+                                <!-- <div class="col-6 mb-3 align-items-start">
+                                    <label class="form-label me-2 mb-0" style="min-width:100px">Site Contract</label>
                                     <div class="flex-grow-1">
                                         <div id="siteContractName" class="border border-dashed rounded-3 px-3 py-2"
                                             style="min-height: 38px; display: flex; align-items: center;">
                                             Site contract will be auto-filled
                                         </div>
                                     </div>
-                                </div>
+                                </div> -->
                             </div>
                             <div class="row">
 
@@ -325,19 +325,12 @@
                                 </select>
                                 <div id="costCenterError" class="invalid-feedback"></div>
                             </div>
-                            <div class="col-6">
-                                <label class="form-label">Tags</label>
-                                <select id="tagsSelect" class="form-select" aria-label="Tags">
-                                    <option value="">Select Tags</option>
-                                </select>
-                                <div id="tagsError" class="invalid-feedback"></div>
+                             <div class="col-6">
+                                <label class="form-label">Team</label>
+                                <div id="salesTeamId" class="border border-dashed rounded-3 px-3 py-2" style="min-height: 38px; display: flex; align-items: center;"></div>
                             </div>
                         </div>
                         <div class="row g-3 align-items-start ms-2 me-2 mb-2">
-                            <div class="col-6">
-                                <label class="form-label">Sales Person</label>
-                                <div id="salesPerson" class="border border-dashed rounded-3 px-3 py-2" style="min-height: 38px; display: flex; align-items: center;"></div>
-                            </div>
                             <div class="col-6">
                                 <label class="form-label">Service Manager</label>
                                 <select id="serviceManagerSelect" class="form-select" aria-label="Service Manager">
@@ -345,20 +338,7 @@
                                 </select>
                                 <div id="serviceManagerError" class="invalid-feedback"></div>
                             </div>
-                        </div>
-                        <div class="row g-3 align-items-start ms-2 me-2 mb-2">
-                            <div class="col-6">
-                                <label class="form-label me-2 mb-0" style="min-width:100px">Site Contract</label>
-                                    <div class="flex-grow-1">
-                                         <select id="salesTeamId" class="form-select" aria-label="Site">
-                                            <option value="">Select Site</option>
-                                            <option value="Other">Other</option>
-                                        </select>
-
-                                        <div id="salesTeamIdError" class="invalid-feedback"></div>
-                                    </div>
-                            </div>
-                            <div class="col-6 d-flex align-items-end afterhrs-container">
+ <div class="col-6 d-flex align-items-end afterhrs-container">
                             <label class="after-hours-label me-2 mb-2">After Hours?</label>
                             <div class="form-check form-switch">
                                 <!-- <input class="form-check-input" type="checkbox" id="afterHours"> -->
@@ -369,6 +349,7 @@
                             </div>
                         </div>
                         </div>
+                    
                     </div>
 
                     
@@ -429,8 +410,8 @@
     <script src="script/lead-capture-v1.js"></script>
     <script src="script/job-number-api.js"></script>
     <script src="script/cost-center-api.js"></script>
-    <script src="script/tags-api.js"></script>
     <script src="script/validation.js"></script>
+    <script src="script/service-managers.js"></script>
 
 </body>
 

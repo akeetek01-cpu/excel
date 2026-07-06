@@ -45,22 +45,22 @@ $(function () {
     }
   }
 
-  function setAutoJobState(enabled) {
-    $("#autoJob").prop("checked", enabled);
-    $("#autoJobBtn")
-      .attr("aria-pressed", enabled ? "true" : "false")
-      .toggleClass("active", enabled);
+  // function setAutoJobState(enabled) {
+  //   $("#autoJob").prop("checked", enabled);
+  //   $("#autoJobBtn")
+  //     .attr("aria-pressed", enabled ? "true" : "false")
+  //     .toggleClass("active", enabled);
 
-    if (enabled) {
-      $("#jobNumber").val(generateJobNumber());
-      clearError("#jobNumber", "#jobNumberError");
-    } else {
-      $("#jobNumber").val("");
-      if ($("#jobNumber").val().trim() === "") {
-        showError("#jobNumber", "#jobNumberError", "Job Number is required.");
-      }
-    }
-  }
+  //   if (enabled) {
+  //     $("#jobNumber").val(generateJobNumber());
+  //     clearError("#jobNumber", "#jobNumberError");
+  //   } else {
+  //     $("#jobNumber").val("");
+  //     if ($("#jobNumber").val().trim() === "") {
+  //       showError("#jobNumber", "#jobNumberError", "Job Number is required.");
+  //     }
+  //   }
+  // }
 
   // store original icons for each step so we can swap them when completed
   $(".step").each(function () {
@@ -442,33 +442,33 @@ $("#nextBtn").html('Next <span><i class="fa-solid fa-angle-right"></i></span>&nb
       }
     });
 
-  $("#autoJobBtn").on("click", function () {
-    setAutoJobState(!$("#autoJob").is(":checked"));
-  });
+  // $("#autoJobBtn").on("click", function () {
+  //   setAutoJobState(!$("#autoJob").is(":checked"));
+  // });
 
-  $("#autoJob").on("change", function () {
-    const checked = $(this).is(":checked");
-    $("#autoJobBtn")
-      .attr("aria-pressed", checked ? "true" : "false")
-      .toggleClass("active", checked);
+  // $("#autoJob").on("change", function () {
+  //   const checked = $(this).is(":checked");
+  //   $("#autoJobBtn")
+  //     .attr("aria-pressed", checked ? "true" : "false")
+  //     .toggleClass("active", checked);
 
-    if (checked) {
-      clearError("#jobNumber", "#jobNumberError");
-    } else {
-      const value = $("#jobNumber").val().trim();
-      if (value === "") {
-        showError("#jobNumber", "#jobNumberError", "Job Number is required.");
-      } else if (!/^\d{6}$/.test(value)) {
-        showError(
-          "#jobNumber",
-          "#jobNumberError",
-          "Job Number must be exactly 6 digits.",
-        );
-      } else {
-        clearError("#jobNumber", "#jobNumberError");
-      }
-    }
-  });
+  //   if (checked) {
+  //     clearError("#jobNumber", "#jobNumberError");
+  //   } else {
+  //     const value = $("#jobNumber").val().trim();
+  //     if (value === "") {
+  //       showError("#jobNumber", "#jobNumberError", "Job Number is required.");
+  //     } else if (!/^\d{6}$/.test(value)) {
+  //       showError(
+  //         "#jobNumber",
+  //         "#jobNumberError",
+  //         "Job Number must be exactly 6 digits.",
+  //       );
+  //     } else {
+  //       clearError("#jobNumber", "#jobNumberError");
+  //     }
+  //   }
+  // });
 
   $("#customerName").on("blur", function () {
     const value = $(this).val().trim();

@@ -16,7 +16,7 @@ exports.registerUser = async (req, res) => {
     }
     const userId = Date.now();
     try {
-        await set(ref(db, `users/${userId}`), { name, email, password, phone });
+        await set(ref(db, `employees/${userId}`), { name, email, password, phone });
         res.json({ message: "User registered successfully" });
     } catch (err) {
         res.status(500).json({ error: "Error registering user" });
@@ -26,14 +26,14 @@ exports.registerUser = async (req, res) => {
 exports.getUsers = async (req, res) => {
     const dbRef = ref(db);
     try {
-        const snapshot = await get(child(dbRef, 'users'));
+        const snapshot = await get(child(dbRef, 'employees'));
         if (snapshot.exists()) {
             res.json(snapshot.val());
         } else {
             res.json({});
         }
     } catch (err) {
-        res.status(500).json({ error: "Error fetching users" });
+        res.status(500).json({ error: "Error fetching employees" });
     }
 };
 
@@ -44,13 +44,13 @@ exports.loginUser = async (req, res) => {
     }
     const dbRef = ref(db);
     try {
-        const snapshot = await get(child(dbRef, 'users'));
+        const snapshot = await get(child(dbRef, 'employees'));
         if (snapshot.exists()) {
             let found = false;
             let currentUser = null;
             snapshot.forEach(childSnap => {
                 const user = childSnap.val();
-                if (user.email === email && user.password === password) {
+                if (user.Email === email && user.Password === password) {
                     found = true;
                     currentUser = user;
                 }
@@ -79,7 +79,7 @@ exports.changePassword = async (req, res) => {
 
     try {
         const dbRef = ref(db);
-        const snapshot = await get(child(dbRef, "users"));
+        const snapshot = await get(child(dbRef, "employees"));
 
         if (!snapshot.exists()) {
             return res.status(404).json({
@@ -93,8 +93,8 @@ exports.changePassword = async (req, res) => {
             const user = childSnap.val();
 
             if (
-                user.email === email &&
-                user.password === oldPassword
+                user.Email === email &&
+                user.Password === oldPassword
             ) {
                 userKey = childSnap.key;
             }
@@ -106,7 +106,7 @@ exports.changePassword = async (req, res) => {
             });
         }
 
-        await update(ref(db, `users/${userKey}`), {
+        await update(ref(db, `employees/${userKey}`), {
             password: newPassword
         });
 

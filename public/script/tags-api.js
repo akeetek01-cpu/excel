@@ -36,6 +36,6 @@ $(function () {
       });
   }
 
-  window.loadTags = loadTags;
-  loadTags();
+  //window.loadTags = loadTags;
+  //loadTags();
 });

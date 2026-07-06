@@ -18,7 +18,20 @@ $(function () {
 
         $select.find("option:not(:first)").remove();
 
-        items.forEach(function (item) {
+        const sortedItems = [...items].sort(function (a, b) {
+          const nameA = (a && a.Name) || "";
+          const nameB = (b && b.Name) || "";
+          const priorityA = /^(air conditioning service|refrigeration service)$/i.test(nameA.trim()) ? 0 : 1;
+          const priorityB = /^(air conditioning service|refrigeration service)$/i.test(nameB.trim()) ? 0 : 1;
+
+          if (priorityA !== priorityB) {
+            return priorityA - priorityB;
+          }
+
+          return nameA.localeCompare(nameB);
+        });
+
+        sortedItems.forEach(function (item) {
           const id = item && item.ID;
           const name = item && item.Name;
           if (!name) return;
