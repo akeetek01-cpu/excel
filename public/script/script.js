@@ -727,10 +727,10 @@ $("#nextBtn").html('Next <span><i class="fa-solid fa-angle-right"></i></span>&nb
 
   // Faults
   function updateAiLabelState($card) {
-    const hasAutoFilled =
-      $card.find(".work-req").val().trim() !== "" ||
-      $card.find(".parts").val().trim() !== "" ||
-      $card.find(".equipment").val().trim() !== "";
+    const workVal = ($card.find(".work-req").val() || "").trim();
+    const partsVal = ($card.find(".parts").val() || $card.find('.parts-select').val() || "").trim();
+    const equipmentVal = ($card.find(".equipment").val() || $card.find('.equipment-select').val() || "").trim();
+    const hasAutoFilled = workVal !== "" || partsVal !== "" || equipmentVal !== "";
     $card.find(".ai-pre-fill").toggleClass("is-filled", hasAutoFilled);
   }
 
@@ -770,13 +770,75 @@ $("#nextBtn").html('Next <span><i class="fa-solid fa-angle-right"></i></span>&nb
               <div class="row">
                 <div class="col-12 mb-2">
                   <label class="form-label">Parts & Material Required</label>
-                  <input maxlength="150" class="form-control parts" placeholder="AI Recommended / Enter" value="${f.parts || ""}">
+                  <div class="d-flex align-items-center gap-2 mb-2">
+                    <select class="form-select parts-select" aria-label="Select part">
+                      <option value="">Select part</option>
+                      <option value="Filter">Filter</option>
+                      <option value="Coil">Coil</option>
+                      <option value="Compressor">Compressor</option>
+                      <option value="Capacitor">Capacitor</option>
+                      <option value="Valve">Valve</option>
+                      <option value="Fuse">Fuse</option>
+                    </select>
+                    <input type="number" min="1" class="form-control parts-qty" value="1" style="max-width:90px;">
+                    <button type="button" class="btn btn-outline-primary add-part-btn">Add</button>
+                  </div>
+                  <div class="parts-list list-group mb-2" aria-live="polite">
+                    ${Array.isArray(f.partsItems) && f.partsItems.length ? f.partsItems.map(item => `
+                      <div class="list-group-item d-flex justify-content-between align-items-center added-item" data-name="${item.name}" data-qty="${item.qty}">
+                        <div>${item.name} <small class="text-muted">× ${item.qty}</small></div>
+                        <label class="btn-sm remove-added-item" aria-label="Remove item" title="Remove item">x</label>
+                      </div>
+                    `).join('') : ''}
+                  </div>
                   <div class="invalid-feedback parts-error"></div>
                 </div>
                 <div class="col-12 mb-2">
                   <label class="form-label">Special Equipment Required</label>
-                  <input maxlength="150" class="form-control equipment" placeholder="AI Recommended / Enter" value="${f.equipment || ""}">
+                  <div class="d-flex align-items-center gap-2 mb-2">
+                    <select class="form-select equipment-select" aria-label="Select equipment">
+                      <option value="">Select equipment</option>
+                      <option value="Manifold Gauge">Manifold Gauge</option>
+                      <option value="Vacuum Pump">Vacuum Pump</option>
+                      <option value="Multimeter">Multimeter</option>
+                      <option value="Pressure Tester">Pressure Tester</option>
+                      <option value="Ladder">Ladder</option>
+                    </select>
+                    <input type="number" min="1" class="form-control equipment-qty" value="1" style="max-width:90px;">
+                    <button type="button" class="btn btn-outline-primary add-equipment-btn">Add</button>
+                  </div>
+                  <div class="equipment-list list-group mb-2">
+                    ${Array.isArray(f.equipmentItems) && f.equipmentItems.length ? f.equipmentItems.map(item => `
+                      <div class="list-group-item d-flex justify-content-between align-items-center added-item" data-name="${item.name}" data-qty="${item.qty}">
+                        <div>${item.name} <small class="text-muted">× ${item.qty}</small></div>
+                        <label class="btn-sm remove-added-item" aria-label="Remove item" title="Remove item">x</label>
+                      </div>
+                    `).join('') : ''}
+                  </div>
                   <div class="invalid-feedback equipment-error"></div>
+                </div>
+                <div class="col-12 mb-2">
+                  <label class="form-label">Consumables</label>
+                  <div class="d-flex align-items-center gap-2 mb-2">
+                    <select class="form-select consumables-select" aria-label="Select consumable">
+                      <option value="">Select consumable</option>
+                      <option value="Sealant">Sealant</option>
+                      <option value="Lubricant">Lubricant</option>
+                      <option value="Insulation Tape">Insulation Tape</option>
+                      <option value="O-Ring">O-Ring</option>
+                      <option value="Cleaner">Cleaner</option>
+                    </select>
+                    <input type="number" min="1" class="form-control consumables-qty" value="1" style="max-width:90px;">
+                    <button type="button" class="btn btn-outline-primary add-consumable-btn">Add</button>
+                  </div>
+                  <div class="consumables-list list-group mb-2">
+                    ${Array.isArray(f.consumablesItems) && f.consumablesItems.length ? f.consumablesItems.map(item => `
+                      <div class="list-group-item d-flex justify-content-between align-items-center added-item" data-name="${item.name}" data-qty="${item.qty}">
+                        <div>${item.name} <small class="text-muted">× ${item.qty}</small></div>
+                        <label class="btn-sm remove-added-item" aria-label="Remove item" title="Remove item">x</label>
+                      </div>
+                    `).join('') : ''}
+                  </div>
                 </div>
 
                 <div class="col-12 mb-2">
@@ -805,6 +867,9 @@ $("#nextBtn").html('Next <span><i class="fa-solid fa-angle-right"></i></span>&nb
       work: "",
       parts: "",
       equipment: "",
+      partsItems: [],
+      equipmentItems: [],
+      consumablesItems: [],
       expanded: true,
     });
     renderFaults();
@@ -893,6 +958,74 @@ $("#nextBtn").html('Next <span><i class="fa-solid fa-angle-right"></i></span>&nb
     const idx = Number($(this).closest(".fault-card").data("idx"));
     if (!isNaN(idx)) jobData.faults[idx].equipment = $(this).val();
     updateAiLabelState($(this).closest(".fault-card"));
+  });
+
+  // Add item handlers for parts, equipment, consumables
+  $(document).on('click', '.add-part-btn', function () {
+    const $card = $(this).closest('.fault-card');
+    const idx = Number($card.data('idx'));
+    if (isNaN(idx)) return;
+    const name = $card.find('.parts-select').val().trim();
+    const qty = Math.max(1, Number($card.find('.parts-qty').val() || 1));
+    if (!name) return;
+    const item = { name, qty };
+    jobData.faults[idx].partsItems = jobData.faults[idx].partsItems || [];
+    jobData.faults[idx].partsItems.push(item);
+    const $list = $card.find('.parts-list');
+    $list.append(`<div class="list-group-item d-flex justify-content-between align-items-center added-item" data-name="${name}" data-qty="${qty}"><div>${name} <small class="text-muted">× ${qty}</small></div><label class="btn-sm btn-outline-danger remove-added-item" aria-label="Remove item" title="Remove item">x</label></div>`);
+    $card.find('.parts-select').val('');
+    $card.find('.parts-qty').val(1);
+  });
+
+  $(document).on('click', '.add-equipment-btn', function () {
+    const $card = $(this).closest('.fault-card');
+    const idx = Number($card.data('idx'));
+    if (isNaN(idx)) return;
+    const name = $card.find('.equipment-select').val().trim();
+    const qty = Math.max(1, Number($card.find('.equipment-qty').val() || 1));
+    if (!name) return;
+    const item = { name, qty };
+    jobData.faults[idx].equipmentItems = jobData.faults[idx].equipmentItems || [];
+    jobData.faults[idx].equipmentItems.push(item);
+    const $list = $card.find('.equipment-list');
+    $list.append(`<div class="list-group-item d-flex justify-content-between align-items-center added-item" data-name="${name}" data-qty="${qty}"><div>${name} <small class="text-muted">× ${qty}</small></div><label class="btn-sm btn-outline-danger remove-added-item" aria-label="Remove item" title="Remove item">x</label></div>`);
+    $card.find('.equipment-select').val('');
+    $card.find('.equipment-qty').val(1);
+  });
+
+  $(document).on('click', '.add-consumable-btn', function () {
+    const $card = $(this).closest('.fault-card');
+    const idx = Number($card.data('idx'));
+    if (isNaN(idx)) return;
+    const name = $card.find('.consumables-select').val().trim();
+    const qty = Math.max(1, Number($card.find('.consumables-qty').val() || 1));
+    if (!name) return;
+    const item = { name, qty };
+    jobData.faults[idx].consumablesItems = jobData.faults[idx].consumablesItems || [];
+    jobData.faults[idx].consumablesItems.push(item);
+    const $list = $card.find('.consumables-list');
+    $list.append(`<div class="list-group-item d-flex justify-content-between align-items-center added-item" data-name="${name}" data-qty="${qty}"><div>${name} <small class="text-muted">× ${qty}</small></div><label class="btn-sm btn-outline-danger remove-added-item" aria-label="Remove item" title="Remove item">x</label></div>`);
+    $card.find('.consumables-select').val('');
+    $card.find('.consumables-qty').val(1);
+  });
+
+  // remove added item
+  $(document).on('click', '.remove-added-item', function () {
+    const $item = $(this).closest('.added-item');
+    const $card = $(this).closest('.fault-card');
+    const idx = Number($card.data('idx'));
+    if (isNaN(idx)) return;
+    const name = $item.data('name');
+    const qty = Number($item.data('qty'));
+    // determine which list
+    if ($item.closest('.parts-list').length) {
+      jobData.faults[idx].partsItems = (jobData.faults[idx].partsItems || []).filter(i => !(i.name === name && Number(i.qty) === qty));
+    } else if ($item.closest('.equipment-list').length) {
+      jobData.faults[idx].equipmentItems = (jobData.faults[idx].equipmentItems || []).filter(i => !(i.name === name && Number(i.qty) === qty));
+    } else if ($item.closest('.consumables-list').length) {
+      jobData.faults[idx].consumablesItems = (jobData.faults[idx].consumablesItems || []).filter(i => !(i.name === name && Number(i.qty) === qty));
+    }
+    $item.remove();
   });
 
   $("#addFaultBtn").click(function () {
