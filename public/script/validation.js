@@ -37,20 +37,21 @@ $(function(){
     return num;
   }
 
-  $('#autoJobBtn').on('click', function () {
-    const checked = !$('#autoJob').is(':checked');
-    $('#autoJob').prop('checked', checked).trigger('change');
-  });
+  // $('#autoJobBtn').on('click', function () {
+  //   const checked = !$('#autoJob').is(':checked');
+  //   $('#autoJob').prop('checked', checked).trigger('change');
+  // });
 
-  $('#autoJob').on('change', function () {
-    const checked = $(this).is(':checked');
-    $('#autoJobBtn').attr('aria-pressed', checked ? 'true' : 'false').toggleClass('active', checked);
-    if (checked) {
-      $('#jobNumber').val(generateJobNumber());
-    } else {
-      $('#jobNumber').val('');
-    }
-  });
+  // $('#autoJob').on('change', function () {
+  //   const checked = $(this).is(':checked');
+  //   $('#autoJobBtn').attr('aria-pressed', checked ? 'true' : 'false').toggleClass('active', checked);
+  //   if (checked) {
+  //     $('#jobNumber').val(generateJobNumber());
+  //   } else {
+  //     $('#jobNumber').val('');
+  //   }
+  // });
+
 
   $('#assetDescriptionSelect').on('change', function(){
     const val = $(this).val();

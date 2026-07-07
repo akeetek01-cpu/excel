@@ -89,4 +89,7 @@ $(function() {
             console.error("Failed to load asset data:", textStatus, errorThrown);
         });
     }
+
+    // expose fetchAssetData globally so other page scripts can invoke it
+    window.fetchAssetData = fetchAssetData;
 });

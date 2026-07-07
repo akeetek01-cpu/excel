@@ -344,6 +344,10 @@ textarea {
     color: #FFFFFF;
 }
 
+.summary-estimates .form-label {
+    color: #000000;
+}
+
 .form-control {
     flex: 1;
 }
@@ -667,7 +671,7 @@ textarea {
     font-weight: 600;
 }
 .after-hours-label{
-        color: #ffffff;
+        color: #000000;
         margin-bottom: 12px !important;
 }
 .summary-estimates{
