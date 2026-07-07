@@ -212,7 +212,7 @@ $("#nextBtn").html('Next <span><i class="fa-solid fa-angle-right"></i></span>&nb
       showError(
         "#customerName",
         "#customerNameError",
-        "Customer Name is required.",
+        "Customer Contract Name is required.",
       );
       valid = false;
     } else if (customerName.length < 2) {
@@ -278,7 +278,7 @@ $("#nextBtn").html('Next <span><i class="fa-solid fa-angle-right"></i></span>&nb
       showError(
         "#customerTenancy",
         "#customerTenancyError",
-        "Tenancy / Shop is required.",
+        "Site is required.",
       );
       valid = false;
     } else {
@@ -438,7 +438,7 @@ $("#nextBtn").html('Next <span><i class="fa-solid fa-angle-right"></i></span>&nb
       showError(
         "#customerName",
         "#customerNameError",
-        "Customer Name is required.",
+        "Customer Contract Name is required.",
       );
     } else if (value.length < 2) {
       showError(
@@ -503,7 +503,7 @@ $("#nextBtn").html('Next <span><i class="fa-solid fa-angle-right"></i></span>&nb
       showError(
         "#customerTenancy",
         "#customerTenancyError",
-        "Tenancy / Shop is required.",
+        "Site is required.",
       );
     } else {
       clearError("#customerTenancy", "#customerTenancyError");
@@ -579,16 +579,39 @@ $("#nextBtn").html('Next <span><i class="fa-solid fa-angle-right"></i></span>&nb
     }
   });
 
-  $("#technicians").on("blur", function () {
+  $("#technicians").on("input", function () {
+    const value = Number($(this).val() || 0);
+    if (!Number.isNaN(value) && value > 0) {
+      $(this).val(Math.min(1000, Math.floor(value)));
+    }
+  }).on("blur", function () {
     const tech = Number($(this).val() || 0);
-    if (!Number.isInteger(tech) || tech < 1 || tech > 10) {
+    if (!Number.isInteger(tech) || tech < 1) {
       showError(
         "#technicians",
         "#techniciansError",
-        "No. of technicians must be between 1 and 10.",
+        "No. of technicians must be a positive whole number.",
       );
     } else {
       clearError("#technicians", "#techniciansError");
+    }
+  });
+
+  $("#apprentice").on("input", function () {
+    const value = Number($(this).val() || 0);
+    if (!Number.isNaN(value) && value >= 0) {
+      $(this).val(Math.min(1000, Math.floor(value)));
+    }
+  }).on("blur", function () {
+    const apprentice = Number($(this).val() || 0);
+    if (!Number.isInteger(apprentice) || apprentice < 0) {
+      showError(
+        "#apprentice",
+        "#apprenticeError",
+        "No. of apprentices must be a whole number greater than or equal to 0.",
+      );
+    } else {
+      clearError("#apprentice", "#apprenticeError");
     }
   });
 
@@ -742,7 +765,7 @@ $("#nextBtn").html('Next <span><i class="fa-solid fa-angle-right"></i></span>&nb
                       <option value="Valve">Valve</option>
                       <option value="Fuse">Fuse</option>
                     </select>
-                    <input type="number" min="1" class="form-control parts-qty" value="1" style="max-width:90px;">
+                    <input type="number" min="1" class="form-control parts-qty" value="1" style="max-width:65px;">
                     <button type="button" class="btn btn-outline-primary add-part-btn">Add</button>
                   </div>
                   <div class="parts-list mb-2" aria-live="polite">
@@ -771,7 +794,7 @@ $("#nextBtn").html('Next <span><i class="fa-solid fa-angle-right"></i></span>&nb
                       <option value="Pressure Tester">Pressure Tester</option>
                       <option value="Ladder">Ladder</option>
                     </select>
-                    <input type="number" min="1" class="form-control equipment-qty" value="1" style="max-width:90px;">
+                    <input type="number" min="1" class="form-control equipment-qty" value="1" style="max-width:65px;">
                     <button type="button" class="btn btn-outline-primary add-equipment-btn">Add</button>
                   </div>
                   <div class="equipment-list mb-2">
@@ -800,7 +823,7 @@ $("#nextBtn").html('Next <span><i class="fa-solid fa-angle-right"></i></span>&nb
                       <option value="O-Ring">O-Ring</option>
                       <option value="Cleaner">Cleaner</option>
                     </select>
-                    <input type="number" min="1" class="form-control consumables-qty" value="1" style="max-width:90px;">
+                    <input type="number" min="1" class="form-control consumables-qty" value="1" style="max-width:65px;">
                     <button type="button" class="btn btn-outline-primary add-consumable-btn">Add</button>
                   </div>
                   <div class="consumables-list mb-2">
@@ -1044,9 +1067,7 @@ $("#nextBtn").html('Next <span><i class="fa-solid fa-angle-right"></i></span>&nb
   $("#techniciansPlus").on("click", function(e) {
     e.preventDefault();
     const current = Number($("#technicians").val() || 1);
-    if (current < 10) {
-      $("#technicians").val(current + 1).trigger("change");
-    }
+    $("#technicians").val(Math.min(1000, current + 1)).trigger("change");
   });
   
   $("#apprenticeMinus").on("click", function(e) {
@@ -1060,9 +1081,7 @@ $("#nextBtn").html('Next <span><i class="fa-solid fa-angle-right"></i></span>&nb
   $("#apprenticePlus").on("click", function(e) {
     e.preventDefault();
     const current = Number($("#apprentice").val() || 0);
-    if (current < 10) {
-      $("#apprentice").val(current + 1).trigger("change");
-    }
+    $("#apprentice").val(Math.min(1000, current + 1)).trigger("change");
   });
   
   $("#hoursMinus").on("click", function(e) {
@@ -1261,11 +1280,11 @@ $("#nextBtn").html('Next <span><i class="fa-solid fa-angle-right"></i></span>&nb
         clearError("#tagsSelect", "#tagsError");
       }
 
-      if (!Number.isInteger(tech) || tech < 1 || tech > 10) {
+      if (!Number.isInteger(tech) || tech < 1) {
         showError(
           "#technicians",
           "#techniciansError",
-          "No. of technicians must be between 1 and 10.",
+          "No. of technicians must be a positive whole number.",
         );
         valid = false;
       } else {
