@@ -377,45 +377,7 @@ $("#nextBtn").html('Next <span><i class="fa-solid fa-angle-right"></i></span>&nb
           clearError($work, $workError);
         }
 
-        const $parts = $card.find(".parts");
-        const $partsError = $card.find(".parts-error");
-        const parts = $parts.val().trim();
 
-        if (parts === "") {
-          showError($parts, $partsError, "Parts & material is required.");
-          valid = false;
-        } else if (parts.length > 150) {
-          showError(
-            $parts,
-            $partsError,
-            "Parts & material cannot exceed 150 characters.",
-          );
-          valid = false;
-        } else {
-          clearError($parts, $partsError);
-        }
-
-        const $equipment = $card.find(".equipment");
-        const $equipmentError = $card.find(".equipment-error");
-        const equipment = $equipment.val().trim();
-
-        if (equipment === "") {
-          showError(
-            $equipment,
-            $equipmentError,
-            "Special equipment is required.",
-          );
-          valid = false;
-        } else if (equipment.length > 150) {
-          showError(
-            $equipment,
-            $equipmentError,
-            "Special equipment cannot exceed 150 characters.",
-          );
-          valid = false;
-        } else {
-          clearError($equipment, $equipmentError);
-        }
       });
     }
 
@@ -770,7 +732,7 @@ $("#nextBtn").html('Next <span><i class="fa-solid fa-angle-right"></i></span>&nb
               <div class="row">
                 <div class="col-12 mb-2">
                   <label class="form-label">Parts & Material Required</label>
-                  <div class="d-flex align-items-center gap-2 mb-2">
+                  <div class="d-flex align-items-center gap-2">
                     <select class="form-select parts-select" aria-label="Select part">
                       <option value="">Select part</option>
                       <option value="Filter">Filter</option>
@@ -783,19 +745,24 @@ $("#nextBtn").html('Next <span><i class="fa-solid fa-angle-right"></i></span>&nb
                     <input type="number" min="1" class="form-control parts-qty" value="1" style="max-width:90px;">
                     <button type="button" class="btn btn-outline-primary add-part-btn">Add</button>
                   </div>
-                  <div class="parts-list list-group mb-2" aria-live="polite">
+                  <div class="parts-list mb-2" aria-live="polite">
                     ${Array.isArray(f.partsItems) && f.partsItems.length ? f.partsItems.map(item => `
-                      <div class="list-group-item d-flex justify-content-between align-items-center added-item" data-name="${item.name}" data-qty="${item.qty}">
-                        <div>${item.name} <small class="text-muted">× ${item.qty}</small></div>
-                        <label class="btn-sm remove-added-item" aria-label="Remove item" title="Remove item">x</label>
-                      </div>
+                      <label class="list-group-item d-flex justify-content-between align-items-center added-item" data-name="${item.name}" data-qty="${item.qty}">
+                        <span class="d-flex align-items-center gap-2">
+                          <span class="item-label">${item.name}</span>
+                          <small class="text-muted">× ${item.qty}</small>
+                        </span>
+                        <button type="button" class="btn close remove-added-item" aria-label="Close" title="Remove item">
+                          <span aria-hidden="true">×</span>
+                        </button>
+                      </label>
                     `).join('') : ''}
                   </div>
                   <div class="invalid-feedback parts-error"></div>
                 </div>
                 <div class="col-12 mb-2">
                   <label class="form-label">Special Equipment Required</label>
-                  <div class="d-flex align-items-center gap-2 mb-2">
+                  <div class="d-flex align-items-center gap-2">
                     <select class="form-select equipment-select" aria-label="Select equipment">
                       <option value="">Select equipment</option>
                       <option value="Manifold Gauge">Manifold Gauge</option>
@@ -807,19 +774,24 @@ $("#nextBtn").html('Next <span><i class="fa-solid fa-angle-right"></i></span>&nb
                     <input type="number" min="1" class="form-control equipment-qty" value="1" style="max-width:90px;">
                     <button type="button" class="btn btn-outline-primary add-equipment-btn">Add</button>
                   </div>
-                  <div class="equipment-list list-group mb-2">
+                  <div class="equipment-list mb-2">
                     ${Array.isArray(f.equipmentItems) && f.equipmentItems.length ? f.equipmentItems.map(item => `
-                      <div class="list-group-item d-flex justify-content-between align-items-center added-item" data-name="${item.name}" data-qty="${item.qty}">
-                        <div>${item.name} <small class="text-muted">× ${item.qty}</small></div>
-                        <label class="btn-sm remove-added-item" aria-label="Remove item" title="Remove item">x</label>
-                      </div>
+                      <label class="list-group-item d-flex justify-content-between align-items-center added-item" data-name="${item.name}" data-qty="${item.qty}">
+                        <span class="d-flex align-items-center gap-2">
+                          <span class="item-label">${item.name}</span>
+                          <small class="text-muted">× ${item.qty}</small>
+                        </span>
+                        <button type="button" class="btn close remove-added-item" aria-label="Close" title="Remove item">
+                          <span aria-hidden="true">×</span>
+                        </button>
+                      </label>
                     `).join('') : ''}
                   </div>
                   <div class="invalid-feedback equipment-error"></div>
                 </div>
                 <div class="col-12 mb-2">
                   <label class="form-label">Consumables</label>
-                  <div class="d-flex align-items-center gap-2 mb-2">
+                  <div class="d-flex align-items-center gap-2">
                     <select class="form-select consumables-select" aria-label="Select consumable">
                       <option value="">Select consumable</option>
                       <option value="Sealant">Sealant</option>
@@ -831,12 +803,17 @@ $("#nextBtn").html('Next <span><i class="fa-solid fa-angle-right"></i></span>&nb
                     <input type="number" min="1" class="form-control consumables-qty" value="1" style="max-width:90px;">
                     <button type="button" class="btn btn-outline-primary add-consumable-btn">Add</button>
                   </div>
-                  <div class="consumables-list list-group mb-2">
+                  <div class="consumables-list mb-2">
                     ${Array.isArray(f.consumablesItems) && f.consumablesItems.length ? f.consumablesItems.map(item => `
-                      <div class="list-group-item d-flex justify-content-between align-items-center added-item" data-name="${item.name}" data-qty="${item.qty}">
-                        <div>${item.name} <small class="text-muted">× ${item.qty}</small></div>
-                        <label class="btn-sm remove-added-item" aria-label="Remove item" title="Remove item">x</label>
-                      </div>
+                      <label class="list-group-item d-flex justify-content-between align-items-center added-item" data-name="${item.name}" data-qty="${item.qty}">
+                        <span class="d-flex align-items-center gap-2">
+                          <span class="item-label">${item.name}</span>
+                          <small class="text-muted">× ${item.qty}</small>
+                        </span>
+                        <button type="button" class="btn close remove-added-item" aria-label="Close" title="Remove item">
+                          <span aria-hidden="true">×</span>
+                        </button>
+                      </label>
                     `).join('') : ''}
                   </div>
                 </div>
@@ -972,7 +949,7 @@ $("#nextBtn").html('Next <span><i class="fa-solid fa-angle-right"></i></span>&nb
     jobData.faults[idx].partsItems = jobData.faults[idx].partsItems || [];
     jobData.faults[idx].partsItems.push(item);
     const $list = $card.find('.parts-list');
-    $list.append(`<div class="list-group-item d-flex justify-content-between align-items-center added-item" data-name="${name}" data-qty="${qty}"><div>${name} <small class="text-muted">× ${qty}</small></div><label class="btn-sm btn-outline-danger remove-added-item" aria-label="Remove item" title="Remove item">x</label></div>`);
+    $list.append(`<label class="list-group-item d-flex justify-content-between align-items-center added-item" data-name="${name}" data-qty="${qty}">${name} <small class="text-muted">× ${qty}</small><label class="btn-sm btn-outline-danger remove-added-item" aria-label="Remove item" title="Remove item">x</label></label>`);
     $card.find('.parts-select').val('');
     $card.find('.parts-qty').val(1);
   });
@@ -988,7 +965,7 @@ $("#nextBtn").html('Next <span><i class="fa-solid fa-angle-right"></i></span>&nb
     jobData.faults[idx].equipmentItems = jobData.faults[idx].equipmentItems || [];
     jobData.faults[idx].equipmentItems.push(item);
     const $list = $card.find('.equipment-list');
-    $list.append(`<div class="list-group-item d-flex justify-content-between align-items-center added-item" data-name="${name}" data-qty="${qty}"><div>${name} <small class="text-muted">× ${qty}</small></div><label class="btn-sm btn-outline-danger remove-added-item" aria-label="Remove item" title="Remove item">x</label></div>`);
+    $list.append(`<label class="list-group-item d-flex justify-content-between align-items-center added-item" data-name="${name}" data-qty="${qty}">${name} <small class="text-muted">× ${qty}</small><label class="btn-sm btn-outline-danger remove-added-item" aria-label="Remove item" title="Remove item">x</label></label>`);
     $card.find('.equipment-select').val('');
     $card.find('.equipment-qty').val(1);
   });
@@ -1004,7 +981,7 @@ $("#nextBtn").html('Next <span><i class="fa-solid fa-angle-right"></i></span>&nb
     jobData.faults[idx].consumablesItems = jobData.faults[idx].consumablesItems || [];
     jobData.faults[idx].consumablesItems.push(item);
     const $list = $card.find('.consumables-list');
-    $list.append(`<div class="list-group-item d-flex justify-content-between align-items-center added-item" data-name="${name}" data-qty="${qty}"><div>${name} <small class="text-muted">× ${qty}</small></div><label class="btn-sm btn-outline-danger remove-added-item" aria-label="Remove item" title="Remove item">x</label></div>`);
+    $list.append(`<label class="list-group-item d-flex justify-content-between align-items-center added-item" data-name="${name}" data-qty="${qty}">${name} <small class="text-muted">× ${qty}</small><label class="btn-sm btn-outline-danger remove-added-item" aria-label="Remove item" title="Remove item">x</label></label>`);
     $card.find('.consumables-select').val('');
     $card.find('.consumables-qty').val(1);
   });
