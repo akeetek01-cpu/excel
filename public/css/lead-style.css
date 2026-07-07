@@ -150,7 +150,7 @@ textarea {
 }
 
 .stat-card .title {
-  font-size: 13px;
+  font-size: 9px;
   color: var(--muted);
 }
 
@@ -520,13 +520,13 @@ textarea {
 .spinner-btn {
   background-color:Transparent;
   border: none;
-  padding: 10px 12px;
-  font-size: 16px;
+  padding: 10px 8px;
+  font-size: 14px;
   font-weight: 600;
     color: var(--teal);
       cursor: pointer;
   transition: all 0.2s ease;
-  min-width: 44px;
+  min-width: 30px;
   height: 44px;
   display: flex;
   align-items: center;
@@ -547,7 +547,7 @@ textarea {
   text-align: center;
   font-size: 16px;
   font-weight: 500;
-  padding: 10px;
+  padding: 5px;
   appearance: textfield;
   -moz-appearance: textfield;
 }
