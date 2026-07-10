@@ -2,7 +2,7 @@ $(function () {
   // Data model
   const jobData = {
     customer: {},
-    asset: { description: "", location: "" },
+    asset: { description: "", location: "", customerAssetId: "" },
     faults: [],
     estimates: {
       technicians: 0,
@@ -140,6 +140,7 @@ $("#nextBtn").html('Next <span><i class="fa-solid fa-angle-right"></i></span>&nb
     $(
       "#assetDescriptionError, #assetDescriptionInputError, #assetLocationError, #assetLocationInputError",
     ).text("");
+    $("#customerAssetId").val("");
     $("#costCenterSelect").val("");
     $("#tagsSelect").val("");
     $("#technicians").val(1);
@@ -147,7 +148,7 @@ $("#nextBtn").html('Next <span><i class="fa-solid fa-angle-right"></i></span>&nb
     $("#apprentice").val(0);
     $("#afterHours").prop("checked", false);
     jobData.customer = {};
-    jobData.asset = { description: "", location: "" };
+    jobData.asset = { description: "", location: "", customerAssetId: "" };
     jobData.faults = [];
     jobData.estimates = {
       technicians: 0,
@@ -212,7 +213,7 @@ $("#nextBtn").html('Next <span><i class="fa-solid fa-angle-right"></i></span>&nb
       showError(
         "#customerName",
         "#customerNameError",
-        "Customer Contract Name is required.",
+        "Customer Contact Name is required.",
       );
       valid = false;
     } else if (customerName.length < 2) {
@@ -738,8 +739,8 @@ $("#nextBtn").html('Next <span><i class="fa-solid fa-angle-right"></i></span>&nb
           <div class="fault-body" ${expanded ? "" : 'style="display:none;"'}>
             <div class="mb-2">
               <label class="form-label">Fault Description</label>
-              <textarea class="form-control auto-resize fault-desc" rows="3" maxlength="150"
-                placeholder="Describe the Fault">${f.description || ""}</textarea>
+              <textarea class="form-control auto-resize fault-desc" rows="1" maxlength="150"
+                placeholder="Describe in one line">${f.description || ""}</textarea>
               <div class="invalid-feedback fault-desc-error"></div>
             </div>
 
@@ -748,7 +749,7 @@ $("#nextBtn").html('Next <span><i class="fa-solid fa-angle-right"></i></span>&nb
                 <div class="d-flex justify-content-between align-items-center">
                   <label class="form-label mb-0">Work Required</label>
                 </div>
-                <input maxlength="150" class="form-control work-req" placeholder="AI Recommended / Enter" value="${f.work || ""}">
+                <input maxlength="150" class="form-control work-req" placeholder="Describe in one line" value="${f.work || ""}">
                 <div class="invalid-feedback work-req-error"></div>
               </div>
 
@@ -765,7 +766,7 @@ $("#nextBtn").html('Next <span><i class="fa-solid fa-angle-right"></i></span>&nb
                       <option value="Valve">Valve</option>
                       <option value="Fuse">Fuse</option>
                     </select>
-                    <input type="number" min="1" class="form-control parts-qty" value="1" style="max-width:65px;">
+                    <input type="number" min="0" class="form-control parts-qty" value="0" style="max-width:65px;">
                     <button type="button" class="btn btn-outline-primary add-part-btn">Add</button>
                   </div>
                   <div class="parts-list mb-2" aria-live="polite">
@@ -773,10 +774,10 @@ $("#nextBtn").html('Next <span><i class="fa-solid fa-angle-right"></i></span>&nb
                       <label class="list-group-item d-flex justify-content-between align-items-center added-item" data-name="${item.name}" data-qty="${item.qty}">
                         <span class="d-flex align-items-center gap-2">
                           <span class="item-label">${item.name}</span>
-                          <small class="text-muted">× ${item.qty}</small>
+                          <small class="text-muted">${item.qty}</small>
                         </span>
                         <button type="button" class="btn close remove-added-item" aria-label="Close" title="Remove item">
-                          <span aria-hidden="true">×</span>
+                          <i class="fa-solid fa-xmark" aria-hidden="true"></i>
                         </button>
                       </label>
                     `).join('') : ''}
@@ -794,7 +795,7 @@ $("#nextBtn").html('Next <span><i class="fa-solid fa-angle-right"></i></span>&nb
                       <option value="Pressure Tester">Pressure Tester</option>
                       <option value="Ladder">Ladder</option>
                     </select>
-                    <input type="number" min="1" class="form-control equipment-qty" value="1" style="max-width:65px;">
+                    <input type="number" min="0" class="form-control equipment-qty" value="0" style="max-width:65px;">
                     <button type="button" class="btn btn-outline-primary add-equipment-btn">Add</button>
                   </div>
                   <div class="equipment-list mb-2">
@@ -802,10 +803,10 @@ $("#nextBtn").html('Next <span><i class="fa-solid fa-angle-right"></i></span>&nb
                       <label class="list-group-item d-flex justify-content-between align-items-center added-item" data-name="${item.name}" data-qty="${item.qty}">
                         <span class="d-flex align-items-center gap-2">
                           <span class="item-label">${item.name}</span>
-                          <small class="text-muted">× ${item.qty}</small>
+                          <small class="text-muted">${item.qty}</small>
                         </span>
                         <button type="button" class="btn close remove-added-item" aria-label="Close" title="Remove item">
-                          <span aria-hidden="true">×</span>
+                          <i class="fa-solid fa-xmark" aria-hidden="true"></i>
                         </button>
                       </label>
                     `).join('') : ''}
@@ -823,7 +824,7 @@ $("#nextBtn").html('Next <span><i class="fa-solid fa-angle-right"></i></span>&nb
                       <option value="O-Ring">O-Ring</option>
                       <option value="Cleaner">Cleaner</option>
                     </select>
-                    <input type="number" min="1" class="form-control consumables-qty" value="1" style="max-width:65px;">
+                    <input type="number" min="0" class="form-control consumables-qty" value="0" style="max-width:65px;">
                     <button type="button" class="btn btn-outline-primary add-consumable-btn">Add</button>
                   </div>
                   <div class="consumables-list mb-2">
@@ -831,10 +832,10 @@ $("#nextBtn").html('Next <span><i class="fa-solid fa-angle-right"></i></span>&nb
                       <label class="list-group-item d-flex justify-content-between align-items-center added-item" data-name="${item.name}" data-qty="${item.qty}">
                         <span class="d-flex align-items-center gap-2">
                           <span class="item-label">${item.name}</span>
-                          <small class="text-muted">× ${item.qty}</small>
+                          <small class="text-muted">${item.qty}</small>
                         </span>
                         <button type="button" class="btn close remove-added-item" aria-label="Close" title="Remove item">
-                          <span aria-hidden="true">×</span>
+                          <i class="fa-solid fa-xmark" aria-hidden="true"></i>
                         </button>
                       </label>
                     `).join('') : ''}
@@ -972,7 +973,7 @@ $("#nextBtn").html('Next <span><i class="fa-solid fa-angle-right"></i></span>&nb
     jobData.faults[idx].partsItems = jobData.faults[idx].partsItems || [];
     jobData.faults[idx].partsItems.push(item);
     const $list = $card.find('.parts-list');
-    $list.append(`<label class="list-group-item d-flex justify-content-between align-items-center added-item" data-name="${name}" data-qty="${qty}">${name} <small class="text-muted">× ${qty}</small><label class="btn-sm btn-outline-danger remove-added-item" aria-label="Remove item" title="Remove item">x</label></label>`);
+    $list.append(`<label class="list-group-item d-flex justify-content-between align-items-center added-item" data-name="${name}" data-qty="${qty}">${name} <small class="text-muted">${qty}</small><label class="btn-sm btn-outline-danger remove-added-item" aria-label="Remove item" title="Remove item"><i class="fa-solid fa-xmark" aria-hidden="true"></i></label></label>`);
     $card.find('.parts-select').val('');
     $card.find('.parts-qty').val(1);
   });
@@ -988,7 +989,7 @@ $("#nextBtn").html('Next <span><i class="fa-solid fa-angle-right"></i></span>&nb
     jobData.faults[idx].equipmentItems = jobData.faults[idx].equipmentItems || [];
     jobData.faults[idx].equipmentItems.push(item);
     const $list = $card.find('.equipment-list');
-    $list.append(`<label class="list-group-item d-flex justify-content-between align-items-center added-item" data-name="${name}" data-qty="${qty}">${name} <small class="text-muted">× ${qty}</small><label class="btn-sm btn-outline-danger remove-added-item" aria-label="Remove item" title="Remove item">x</label></label>`);
+    $list.append(`<label class="list-group-item d-flex justify-content-between align-items-center added-item" data-name="${name}" data-qty="${qty}">${name} <small class="text-muted">${qty}</small><label class="btn-sm btn-outline-danger remove-added-item" aria-label="Remove item" title="Remove item"><i class="fa-solid fa-xmark" aria-hidden="true"></i></label></label>`);
     $card.find('.equipment-select').val('');
     $card.find('.equipment-qty').val(1);
   });
@@ -1004,7 +1005,7 @@ $("#nextBtn").html('Next <span><i class="fa-solid fa-angle-right"></i></span>&nb
     jobData.faults[idx].consumablesItems = jobData.faults[idx].consumablesItems || [];
     jobData.faults[idx].consumablesItems.push(item);
     const $list = $card.find('.consumables-list');
-    $list.append(`<label class="list-group-item d-flex justify-content-between align-items-center added-item" data-name="${name}" data-qty="${qty}">${name} <small class="text-muted">× ${qty}</small><label class="btn-sm btn-outline-danger remove-added-item" aria-label="Remove item" title="Remove item">x</label></label>`);
+    $list.append(`<label class="list-group-item d-flex justify-content-between align-items-center added-item" data-name="${name}" data-qty="${qty}">${name} <small class="text-muted">${qty}</small><label class="btn-sm btn-outline-danger remove-added-item" aria-label="Remove item" title="Remove item"><i class="fa-solid fa-xmark" aria-hidden="true"></i></label></label>`);
     $card.find('.consumables-select').val('');
     $card.find('.consumables-qty').val(1);
   });
@@ -1327,6 +1328,7 @@ $("#nextBtn").html('Next <span><i class="fa-solid fa-angle-right"></i></span>&nb
         selectedLocation === "other"
           ? $("#assetLocationInput").val().trim()
           : selectedLocation;
+      jobData.asset.customerAssetId = $("#customerAssetId").val().trim();
       // faults already bound
     }
     if (idx === 2) {
