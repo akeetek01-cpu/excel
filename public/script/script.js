@@ -755,37 +755,7 @@ $("#nextBtn").html('Next <span><i class="fa-solid fa-angle-right"></i></span>&nb
 
               <div class="row">
                 <div class="col-12 mb-2">
-                  <label class="form-label">Parts & Material Required</label>
-                  <div class="d-flex align-items-center gap-2">
-                    <select class="form-select parts-select" aria-label="Select part">
-                      <option value="">Select part</option>
-                      <option value="Filter">Filter</option>
-                      <option value="Coil">Coil</option>
-                      <option value="Compressor">Compressor</option>
-                      <option value="Capacitor">Capacitor</option>
-                      <option value="Valve">Valve</option>
-                      <option value="Fuse">Fuse</option>
-                    </select>
-                    <input type="number" min="0" class="form-control parts-qty" value="0" style="max-width:65px;">
-                    <button type="button" class="btn btn-outline-primary add-part-btn">Add</button>
-                  </div>
-                  <div class="parts-list mb-2" aria-live="polite">
-                    ${Array.isArray(f.partsItems) && f.partsItems.length ? f.partsItems.map(item => `
-                      <label class="list-group-item d-flex justify-content-between align-items-center added-item" data-name="${item.name}" data-qty="${item.qty}">
-                        <span class="d-flex align-items-center gap-2">
-                          <span class="item-label">${item.name}</span>
-                          <small class="text-muted">${item.qty}</small>
-                        </span>
-                        <button type="button" class="btn close remove-added-item" aria-label="Close" title="Remove item">
-                          <i class="fa-solid fa-xmark" aria-hidden="true"></i>
-                        </button>
-                      </label>
-                    `).join('') : ''}
-                  </div>
-                  <div class="invalid-feedback parts-error"></div>
-                </div>
-                <div class="col-12 mb-2">
-                  <label class="form-label">Special Equipment Required</label>
+                  <label class="form-label">Total Recovery (Special Equipments & Consumables)</label>
                   <div class="d-flex align-items-center gap-2">
                     <select class="form-select equipment-select" aria-label="Select equipment">
                       <option value="">Select equipment</option>
@@ -814,21 +784,15 @@ $("#nextBtn").html('Next <span><i class="fa-solid fa-angle-right"></i></span>&nb
                   <div class="invalid-feedback equipment-error"></div>
                 </div>
                 <div class="col-12 mb-2">
-                  <label class="form-label">Consumables</label>
+                  <label class="form-label">Parts & Material Required</label>
                   <div class="d-flex align-items-center gap-2">
-                    <select class="form-select consumables-select" aria-label="Select consumable">
-                      <option value="">Select consumable</option>
-                      <option value="Sealant">Sealant</option>
-                      <option value="Lubricant">Lubricant</option>
-                      <option value="Insulation Tape">Insulation Tape</option>
-                      <option value="O-Ring">O-Ring</option>
-                      <option value="Cleaner">Cleaner</option>
-                    </select>
-                    <input type="number" min="0" class="form-control consumables-qty" value="0" style="max-width:65px;">
-                    <button type="button" class="btn btn-outline-primary add-consumable-btn">Add</button>
+                    
+                    <input id="partsMeterial" maxlength="150" class="form-control form-select parts-select" placeholder="Enter">
+                    <input type="number" min="0" class="form-control parts-qty" value="0" style="max-width:65px;">
+                    <button type="button" class="btn btn-outline-primary add-part-btn">Add</button>
                   </div>
-                  <div class="consumables-list mb-2">
-                    ${Array.isArray(f.consumablesItems) && f.consumablesItems.length ? f.consumablesItems.map(item => `
+                  <div class="parts-list mb-2" aria-live="polite">
+                    ${Array.isArray(f.partsItems) && f.partsItems.length ? f.partsItems.map(item => `
                       <label class="list-group-item d-flex justify-content-between align-items-center added-item" data-name="${item.name}" data-qty="${item.qty}">
                         <span class="d-flex align-items-center gap-2">
                           <span class="item-label">${item.name}</span>
@@ -840,6 +804,7 @@ $("#nextBtn").html('Next <span><i class="fa-solid fa-angle-right"></i></span>&nb
                       </label>
                     `).join('') : ''}
                   </div>
+                  <div class="invalid-feedback parts-error"></div>
                 </div>
 
                 <div class="col-12 mb-2">
