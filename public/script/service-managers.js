@@ -78,6 +78,10 @@ $(function() {
       if (user.TeamName) {
         $('#salesTeamId').text(user.TeamName);
       }
+      if (user.Name) {
+        $('#createLeadLabel').text(user.Name);
+      }
+      
 
       if (user.ManagerName) {
         // set ManagerName as default display or select value
