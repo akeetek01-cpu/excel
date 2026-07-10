@@ -757,15 +757,20 @@ $("#nextBtn").html('Next <span><i class="fa-solid fa-angle-right"></i></span>&nb
                 <div class="col-12 mb-2">
                   <label class="form-label">Total Recovery (Special Equipments & Consumables)</label>
                   <div class="d-flex align-items-center gap-2">
-                    <select class="form-select equipment-select" aria-label="Select equipment">
-                      <option value="">Select equipment</option>
-                      <option value="Manifold Gauge">Manifold Gauge</option>
-                      <option value="Vacuum Pump">Vacuum Pump</option>
-                      <option value="Multimeter">Multimeter</option>
-                      <option value="Pressure Tester">Pressure Tester</option>
-                      <option value="Ladder">Ladder</option>
+                    <select class="form-select equipment-select totalRecovery-select" aria-label="Select equipment">
+                      ${
+                        (window.totalRecoveryItems && window.totalRecoveryItems.length)
+                          ? window.totalRecoveryItems
+                              .map((it) => {
+                                const name = (it && it.Catalog && it.Catalog.Name) || it.Name || "";
+                                const val = escapeHtml(name);
+                                return `<option value="${val}">${val}</option>`;
+                              })
+                              .join("")
+                          : `<option value="">Select equipment</option>`
+                      }
                     </select>
-                    <input type="number" min="0" class="form-control equipment-qty" value="0" style="max-width:65px;">
+                    <input type="number" min="0" class="form-control equipment-qty" value="1" style="max-width:65px;">
                     <button type="button" class="btn btn-outline-primary add-equipment-btn">Add</button>
                   </div>
                   <div class="equipment-list mb-2">
@@ -788,7 +793,7 @@ $("#nextBtn").html('Next <span><i class="fa-solid fa-angle-right"></i></span>&nb
                   <div class="d-flex align-items-center gap-2">
                     
                     <input id="partsMeterial" maxlength="150" class="form-control form-select parts-select" placeholder="Enter">
-                    <input type="number" min="0" class="form-control parts-qty" value="0" style="max-width:65px;">
+                    <input type="number" min="0" class="form-control parts-qty" value="1" style="max-width:65px;">
                     <button type="button" class="btn btn-outline-primary add-part-btn">Add</button>
                   </div>
                   <div class="parts-list mb-2" aria-live="polite">
@@ -1000,6 +1005,16 @@ $("#nextBtn").html('Next <span><i class="fa-solid fa-angle-right"></i></span>&nb
 
   // initial
   addFault();
+
+  // helper to escape HTML for option values/labels
+  function escapeHtml(s) {
+    return String(s || "")
+      .replace(/&/g, "&amp;")
+      .replace(/</g, "&lt;")
+      .replace(/>/g, "&gt;")
+      .replace(/\"/g, "&quot;")
+      .replace(/'/g, "&#39;");
+  }
 
   // Estimates calculations
   function calculate() {
