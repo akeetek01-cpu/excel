@@ -755,7 +755,7 @@ $("#nextBtn").html('Next <span><i class="fa-solid fa-angle-right"></i></span>&nb
 
               <div class="row">
                 <div class="col-12 mb-2">
-                  <label class="form-label">Total Recovery (Special Equipments & Consumables)</label>
+                  <label class="form-label">Tool Recovery (Special Equipments & Consumables)</label>
                   <div class="d-flex align-items-center gap-2">
                     <select class="form-select equipment-select totalRecovery-select" aria-label="Select equipment">
                       ${
@@ -770,7 +770,7 @@ $("#nextBtn").html('Next <span><i class="fa-solid fa-angle-right"></i></span>&nb
                           : `<option value="">Select equipment</option>`
                       }
                     </select>
-                    <input type="number" min="0" class="form-control equipment-qty" value="1" style="max-width:65px;">
+                    <input type="number" min="0" class="form-control equipment-qty" value="0" style="max-width:65px;">
                     <button type="button" class="btn btn-outline-primary add-equipment-btn">Add</button>
                   </div>
                   <div class="equipment-list mb-2">
@@ -793,7 +793,7 @@ $("#nextBtn").html('Next <span><i class="fa-solid fa-angle-right"></i></span>&nb
                   <div class="d-flex align-items-center gap-2">
                     
                     <input id="partsMeterial" maxlength="150" class="form-control form-select parts-select" placeholder="Enter">
-                    <input type="number" min="0" class="form-control parts-qty" value="1" style="max-width:65px;">
+                    <input type="number" min="0" class="form-control parts-qty" value="0" style="max-width:65px;">
                     <button type="button" class="btn btn-outline-primary add-part-btn">Add</button>
                   </div>
                   <div class="parts-list mb-2" aria-live="polite">
