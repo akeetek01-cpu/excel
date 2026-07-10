@@ -24,7 +24,23 @@
   border-radius: 8px;
 }
 
+#loginForm .card {
+    background: #fff;
+
+}
+/* Override browser autofill background/color for login inputs */
+#loginForm input:-webkit-autofill,
+#loginForm input:-webkit-autofill:hover,
+#loginForm input:-webkit-autofill:focus,
+#loginForm textarea:-webkit-autofill,
+#loginForm textarea:-webkit-autofill:focus,
+#loginForm select:-webkit-autofill {
+  -webkit-box-shadow: 0 0 0px 1000px #ffffff inset !important;
+  box-shadow: 0 0 0px 1000px #ffffff inset !important;
+  -webkit-text-fill-color: #000000 !important;
+}
 .card {
+  /* background: #fff; */
   border: none;
   overflow: visible !important;
 }
@@ -83,7 +99,7 @@ textarea {
 
 .step.completed .icon {
   background: transparent;
-  color: var(--purple);
+  border: 2px solid var(--teal);
 }
 
 .step .label {
@@ -99,6 +115,10 @@ textarea {
 
 .step.completed .label {
   color: var(--muted);
+}
+
+.step.completed .icon i {
+  color: var(--teal);
 }
 
 .divider {
@@ -141,23 +161,35 @@ textarea {
 
 
 
+.cards-row {
+  display: flex;
+  /* flex-wrap: wrap; */
+  gap: 0.5rem;
+}
+
 .stat-card {
-  flex: 1;
-  /* background: #f6f5ed; */
-  padding: 12px;
+  flex: 1 1 180px;
+  display: flex;
+  align-items: center;
+  justify-content: start;
+  gap: 8px;
+  padding: 10px 12px;
   border-radius: 8px;
   text-align: center;
+  min-width: 0;
 }
 
 .stat-card .title {
-  font-size: 9px;
+  font-size: 13px;
   color: var(--muted);
+  white-space: nowrap;
 }
 
 .stat-card .value {
   font-weight: 600;
-  font-size: 16px;
-  color: #333;
+  font-size: 13px;
+  color: var(--teal);
+  white-space: nowrap;
 }
 
 .photo-upload-card {
@@ -272,7 +304,8 @@ textarea {
   font-weight: 600;
 }
 .afterhrs-container {
-  padding-top: 30px;
+  margin-top: 35px;
+  /* padding-top: 30px; */
   padding-left: 20px;
 }
 .alert-purple {
@@ -475,7 +508,7 @@ textarea {
   color: #fff;
 }
 .border-dashed {
-  font-size: 12px;
+  font-size: 13px;
   border: 1px dashed #12c8c0 !important;
     background: transparent;
     color: gray;
@@ -618,7 +651,7 @@ display: inline-flex !important;
 .consumables-list .list-group-item::before {
   content: "";
 }
-.added-item .remove-added-item {
+/* .added-item .remove-added-item {
   border: none;
   background: transparent;
   color: red;
@@ -630,7 +663,7 @@ display: inline-flex !important;
 }
 .added-item .remove-added-item:hover {
   color: #000;
-}
+} */
 .added-item .item-label {
   font-weight: 500;
   color: #212529;

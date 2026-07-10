@@ -109,7 +109,7 @@
             
                                 <div class="col mb-3 align-items-start">
                                     <label class="form-label me-2 mb-0" style="min-width:100px">
-                                        Customer Contract Name
+                                        Customer Contact Name
                                     </label>
 
                                     <div class="flex-grow-1">
@@ -199,12 +199,22 @@
                                     Asset Location</label>
                                 <div class="flex-grow-1">
                                     <input id="assetLocation" maxlength="150" class="form-control work-req"
-                                        placeholder="Enter asset location">
+                                        placeholder="Enter Asset Location">
                                     <div id="assetLocationError" class="invalid-feedback"></div>
 
                                     <div id="assetLocationInputError" class="invalid-feedback"></div>
 
                                 </div>
+                            </div>
+
+                            <div class="mb-3 align-items-start">
+                                <label class="form-label me-2 mb-0" style="min-width:100px">
+                                    Customer Asset ID or Excel Barcode</label>
+                                <div class="flex-grow-1">
+                                    <input id="customerAssetId" maxlength="150" class="form-control"
+                                        placeholder="Enter Customer Asset ID or Excel Barcode">
+                                </div>
+                                
                                 <!-- <div class="mb-3 d-flex gap-2 flex-column flex-sm-row">
                                 
                                 <select id="assetDescription" class="form-select flex-grow-1"
@@ -275,7 +285,7 @@
                     </div>
 
                   
-                    <div class="mt-3 photo-upload-card p-3 rounded-12">
+                    <div class="mt-3 mb-3 photo-upload-card p-3 rounded-12">
                         <div class="photo-upload-header d-flex justify-content-between align-items-start mb-3">
                             <div>
                                 <label class="form-label-1 mb-1">Upload Job Photos</label>
@@ -295,13 +305,14 @@
                             <input type="file" id="photoInput" accept="image/*" multiple hidden>
                         </div>
 
-                        <div id="previewGrid" class="photo-preview-grid mt-3 d-flex flex-wrap gap-2"
+                        <div id="previewGrid" class="photo-preview-grid mt-3 mb-3 d-flex flex-wrap gap-2"
                             style="display:none;"></div>
                         <div id="uploadStatus" class="photo-status mt-2" style="display:none;"></div>
                     </div>
+                        <div class="summary-title mt-3">Review Summary</div>
 
-                    <div class="summary-estimates mt-3">
-                        <div class="cards-row d-flex gap-2">
+                    <div class="summary-estimates">
+                        <div class="cards-row mb-3">
 
 
                             <div class="stat-card">
@@ -339,7 +350,7 @@
                                 <div id="serviceManagerError" class="invalid-feedback"></div>
                             </div>
  <div class="col-6 d-flex align-items-end afterhrs-container">
-                            <label class="after-hours-label me-2 mb-2">After Hours?</label>
+                            <label class="after-hours-label me-2 mb-2">After Hours(OT)?</label>
                             <div class="form-check form-switch">
                                 <!-- <input class="form-check-input" type="checkbox" id="afterHours"> -->
                                 <label class="switch">
@@ -412,7 +423,7 @@
     <script src="script/cost-center-api.js"></script>
     <script src="script/validation.js"></script>
     <script src="script/service-managers.js"></script>
-
+    <script src="script/totalRecovery.js"></script>
 </body>
 
 </html>
