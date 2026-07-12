@@ -120,7 +120,7 @@ $(function () {
     } else {
              $("#nextBtn").removeClass("submit-btn");
 // $("#nextBtn").html("Next <span><i class=\"fa-solid fa-angle-right\"></i> </span>   Asset & Fault");    }
-$("#nextBtn").html('Next <span><i class="fa-solid fa-angle-right"></i></span>&nbsp;&nbsp;Asset & Fault');}
+$("#nextBtn").html('Next <span><i class="fa-solid fa-angle-right"></i></span>&nbsp;&nbsp;Asset & Faults');}
     $("#createNewBtn").toggle(idx === 2);
   }
 

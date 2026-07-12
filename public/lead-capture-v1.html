@@ -157,7 +157,7 @@
 
                             <div class="mb-2">
                                 <label class="form-label">Notes</label>
-                                <textarea id="customerNotes" class="form-control auto-resize" rows="2" maxlength="150"
+                                <textarea id="customerNotes" class="form-control auto-resize" rows="1" maxlength="150"
                                     placeholder="Enter notes"></textarea>
                             </div>
 
@@ -181,7 +181,7 @@
                                         <div id="assetDescriptionSelectWrapper" class="col-12">
                                             <select id="assetDescriptionSelect" class="form-select"
                                                 aria-label="Asset description">
-                                                <option value="">Select / Enter</option>
+                                                <option value="" selected disabled>Select / Enter</option>
                                                 <option value="other">Other</option>
                                             </select>
                                             <div id="assetDescriptionError" class="invalid-feedback"></div>
@@ -352,7 +352,7 @@
                                 <div id="serviceManagerError" class="invalid-feedback"></div>
                             </div>
  <div class="col-6 d-flex align-items-end afterhrs-container">
-                            <label class="after-hours-label me-2 mb-2">After Hours (OT)?</label>
+                            <label class="after-hours-label mb-2">After Hours (OT)?</label>
                             <div class="form-check form-switch">
                                 <!-- <input class="form-check-input" type="checkbox" id="afterHours"> -->
                                 <label class="switch">
@@ -379,7 +379,7 @@
             </button>
             <div id="nextButtonContainer" class="d-flex justify-content-center align-items-center">
                 <button id="nextBtn" type="button" class="customer-next-btn btn btn-primary">Next -> Asset &
-                    Fault</button>
+                    Faults</button>
 
                 <button style="display: none;" type="button" class="btn btn-outline-secondary btn-sm"
                     id="createNewBtn">+ New</button>
