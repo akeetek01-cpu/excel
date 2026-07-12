@@ -6,7 +6,7 @@
 }
 
 body {
-  min-height: 100vh;
+  min-height: 65vh;
   display: flex;
   justify-content: center;
   align-items: center;
@@ -149,7 +149,7 @@ textarea {
 .welcome {
   text-align: center;
   font-size: 26px;
-  margin: 80px 0 40px;
+  margin: 15px 0 35px;
 }
 
 .button--loading .button__text {
@@ -244,12 +244,15 @@ textarea {
   display: none;
 }
 
-.stats-card {
-  margin-top: 80px;
+ 
+  .stats-card {
+  margin-top: 55px;
   border: 1px solid rgba(255, 255, 255, 0.7);
   border-radius: 12px;
   padding: 8px;
+    background: #f5f5f5;  
 }
+
 
 .stat-row {
   display: flex;
@@ -258,7 +261,7 @@ textarea {
 }
 
 .divider {
-  border-bottom: 2px dashed rgba(255, 255, 255, 0.7);
+  border-bottom: 2px dashed #12c8c0;
   margin: 5px 0;
 }
 
@@ -277,13 +280,13 @@ textarea {
 
 .circle-bg {
   fill: none;
-  stroke: rgba(255, 255, 255, 0.25);
+  stroke: rgb(176 171 171 / 25%);
   stroke-width: 5;
 }
 
 .circle-progress {
   fill: none;
-  stroke: white;
+  stroke: #12c8c0;
   stroke-width: 5;
   stroke-linecap: round;
   transition: all 0.8s ease;
@@ -296,15 +299,18 @@ textarea {
   align-items: center;
   justify-content: center;
   font-size: 22px;
-  color: white;
+ color: #12c8c0;
 }
 
 .stat-title {
+  color:#a4b0c5;
   font-size: 18px;
   margin-bottom: 8px;
   text-align: left;
 }
-
+/* .text-muted{
+color: var(--teal)!important;
+} */
 .stat-sub {
   color: #a4b0c5;
   font-size: 16px;
@@ -688,7 +694,7 @@ textarea {
 .after-hours-label {
   color: #000000;
   margin-bottom: 12px !important;
-  font-size: 15px;
+  font-size: 12px;
 }
 .summary-estimates {
   background: #f5f5f5;
@@ -701,6 +707,9 @@ textarea {
   margin-bottom: 3px;
 }
 
+.rounded-pill{
+color: #12c8c0;
+}
 .switch {
   position: relative;
   display: inline-block;

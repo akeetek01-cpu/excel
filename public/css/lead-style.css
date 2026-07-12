@@ -303,18 +303,20 @@ textarea {
   font-weight: 600;
 }
 .afterhrs-container {
-  margin-top: 35px;
-  padding-left: 20px;
+  margin-top: 40px;
+  /* padding-left: 20px; */
   display: flex;
   align-items: center;
   justify-content: flex-start;
-  gap: 10px;
+  gap: 5px;
   flex-wrap: nowrap;
   min-height: 32px;
 }
 
 .after-hours-label {
-  font-size: 14px;
+   font-size: 12px;
+  font-weight: 500;
+  /* font-size: 14px; */
   line-height: 1;
   margin-bottom: 0;
   white-space: nowrap;
