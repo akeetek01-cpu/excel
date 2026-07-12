@@ -211,7 +211,6 @@ textarea {
 
 .photo-upload-dropzone {
   cursor: pointer;
-  min-height: 160px;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -236,8 +235,8 @@ textarea {
 }
 
 .photo-thumb-card {
-  width: 76px;
-  height: 76px;
+  width: 50px;
+  height: 50px;
   border: 1px solid #e6e6ea;
   border-radius: 16px;
   overflow: hidden;
@@ -305,8 +304,39 @@ textarea {
 }
 .afterhrs-container {
   margin-top: 35px;
-  /* padding-top: 30px; */
   padding-left: 20px;
+  display: flex;
+  align-items: center;
+  justify-content: flex-start;
+  gap: 10px;
+  flex-wrap: nowrap;
+  min-height: 32px;
+}
+
+.after-hours-label {
+  font-size: 14px;
+  line-height: 1;
+  margin-bottom: 0;
+  white-space: nowrap;
+  display: flex;
+  align-items: center;
+}
+
+.afterhrs-container .form-check.form-switch {
+  display: flex;
+  align-items: center;
+  margin-bottom: 0;
+  padding-left: 0;
+}
+
+.afterhrs-container .form-check-input {
+  margin-top: 0;
+}
+
+.afterhrs-container .switch {
+  display: inline-flex;
+  align-items: center;
+  margin: 0;
 }
 .alert-purple {
   background: linear-gradient(

@@ -1142,7 +1142,7 @@ $("#nextBtn").html('Next <span><i class="fa-solid fa-angle-right"></i></span>&nb
     e.preventDefault();
     const current = Number($("#hours").val() || 0);
     if (current > 0) {
-      $("#hours").val(Math.max(0, current - 0.5)).trigger("change");
+      $("#hours").val(Math.max(0, current - 1)).trigger("change");
     }
   });
   
@@ -1150,7 +1150,7 @@ $("#nextBtn").html('Next <span><i class="fa-solid fa-angle-right"></i></span>&nb
     e.preventDefault();
     const current = Number($("#hours").val() || 0);
     if (current < 24) {
-      $("#hours").val(Math.min(24, current + 0.5)).trigger("change");
+      $("#hours").val(Math.min(24, current + 1)).trigger("change");
     }
   });
 
