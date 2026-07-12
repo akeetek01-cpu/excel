@@ -1,6 +1,8 @@
 $(function() {
     const assetDescriptionSelect = $("#assetDescriptionSelect");
+    const assetDescriptionSelectWrapper = $("#assetDescriptionSelectWrapper");
     const assetLocationSelect = $("#assetLocation");
+    const assetDescriptionInputWrapper = $("#assetDescriptionInputWrapper");
     const assetDescriptionInput = $("#assetDescriptionInput");
     const assetLocationInput = $("#assetLocationInput");
 
@@ -36,7 +38,7 @@ $(function() {
     function renderAssetDescriptions() {
         assetDescriptionSelect.find("option:gt(0)").remove();
         assetDescriptionSelect.append(
-            `<option value="other">Other (enter below)</option>`
+            `<option value="other">Other</option>`
         );
         assetDescriptions.forEach(entry => {
             assetDescriptionSelect.append(
@@ -45,17 +47,19 @@ $(function() {
         });
     }
 
-    function setOtherMode(selectElem, inputElem) {
+    function setOtherMode(selectElem, selectWrapperElem, inputWrapperElem) {
         const selectedValue = selectElem.val();
         if (selectedValue === "other") {
-            inputElem.removeClass("d-none");
+            selectWrapperElem.removeClass("col-12").addClass("col-6");
+            inputWrapperElem.removeClass("d-none").removeClass("col-12").addClass("col-6");
         } else {
-            inputElem.addClass("d-none");
+            selectWrapperElem.removeClass("col-6").addClass("col-12");
+            inputWrapperElem.addClass("d-none").removeClass("col-6").addClass("col-12");
         }
     }
 
     assetDescriptionSelect.on("change", function() {
-        setOtherMode($(this), assetDescriptionInput);
+        setOtherMode($(this), assetDescriptionSelectWrapper, assetDescriptionInputWrapper);
     });
 
     assetLocationSelect.on("change", function() {
@@ -67,7 +71,7 @@ $(function() {
 
         if (!siteId) {
             assetDescriptionSelect.find("option:gt(0)").remove();
-            assetDescriptionSelect.append(`<option value="other">Other (enter below)</option>`);
+            assetDescriptionSelect.append(`<option value="other">Other</option>`);
             assetLocationSelect.val("");
             assetLocationInput.addClass("d-none");
             return;

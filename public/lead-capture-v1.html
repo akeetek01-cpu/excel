@@ -86,7 +86,7 @@
 
                                     <div class="flex-grow-1">
                                         <select id="customerTenancy" class="form-select" aria-label="Site">
-                                            <option value="">Select Site</option>
+                                            <option value="" selected disabled hidden>Select Site</option>
                                             <option value="Other">Other</option>
                                         </select>
 
@@ -177,18 +177,21 @@
                                 </label>
 
                                 <div class="flex-grow-1">
-                                    <select id="assetDescriptionSelect" class="form-select"
-                                        aria-label="Asset description">
-                                        <option value="">Select / Enter</option>
-                                        <option value="other">Other (enter below)</option>
-                                    </select>
-                                    <div id="assetDescriptionError" class="invalid-feedback"></div>
-
-                                    <!-- <input type="text" id="assetDescriptionInput" class="form-control mt-2 d-none"
-                                        placeholder="Enter asset description"> -->
-                                    <textarea id="assetDescriptionInput" class="form-control auto-resize d-none"" rows="
-                                        2" maxlength="150" placeholder="Enter asset description"></textarea>
-                                    <div id="assetDescriptionInputError" class="invalid-feedback"></div>
+                                    <div class="row g-3 align-items-start">
+                                        <div id="assetDescriptionSelectWrapper" class="col-12">
+                                            <select id="assetDescriptionSelect" class="form-select"
+                                                aria-label="Asset description">
+                                                <option value="">Select / Enter</option>
+                                                <option value="other">Other</option>
+                                            </select>
+                                            <div id="assetDescriptionError" class="invalid-feedback"></div>
+                                        </div>
+                                        <div id="assetDescriptionInputWrapper" class="col-12 d-none">
+                                            <textarea id="assetDescriptionInput" class="form-control auto-resize" rows="1"
+                                                maxlength="150" placeholder="Enter asset description"></textarea>
+                                            <div id="assetDescriptionInputError" class="invalid-feedback"></div>
+                                        </div>
+                                    </div>
                                 </div>
 
                             </div>

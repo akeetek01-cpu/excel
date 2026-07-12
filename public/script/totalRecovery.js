@@ -13,7 +13,9 @@
   };
 
   function buildOptions(items) {
-    if (!Array.isArray(items) || items.length === 0) return '<option value="">Select equipment</option>';
+    const placeholder = '<option value="">Select</option>';
+
+    if (!Array.isArray(items) || items.length === 0) return placeholder;
 
     const sortedItems = [...items].sort((a, b) => {
       const nameA = ((a && a.Catalog && a.Catalog.Name) || a.Name || "").toString();
@@ -21,13 +23,15 @@
       return nameA.localeCompare(nameB, undefined, { sensitivity: "base" });
     });
 
-    return sortedItems
+    const optionHtml = sortedItems
       .map((it) => {
         const name = ((it && it.Catalog && it.Catalog.Name) || it.Name || "").toString();
         const val = String(name || "");
         return `<option value="${val}">${val}</option>`;
       })
       .join("");
+
+    return placeholder + optionHtml;
   }
 
   function updateSelects(items) {
