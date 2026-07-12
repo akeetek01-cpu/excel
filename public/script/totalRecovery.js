@@ -14,9 +14,16 @@
 
   function buildOptions(items) {
     if (!Array.isArray(items) || items.length === 0) return '<option value="">Select equipment</option>';
-    return items
+
+    const sortedItems = [...items].sort((a, b) => {
+      const nameA = ((a && a.Catalog && a.Catalog.Name) || a.Name || "").toString();
+      const nameB = ((b && b.Catalog && b.Catalog.Name) || b.Name || "").toString();
+      return nameA.localeCompare(nameB, undefined, { sensitivity: "base" });
+    });
+
+    return sortedItems
       .map((it) => {
-        const name = (it && it.Catalog && it.Catalog.Name) || it.Name || "";
+        const name = ((it && it.Catalog && it.Catalog.Name) || it.Name || "").toString();
         const val = String(name || "");
         return `<option value="${val}">${val}</option>`;
       })

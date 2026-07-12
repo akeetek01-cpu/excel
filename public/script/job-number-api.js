@@ -35,8 +35,11 @@ $(function () {
     $select.find("option").not(":first").remove();
 
     if (Array.isArray(sites) && sites.length) {
-      sites.forEach((site) => {
-        if (!site || !site.Name) return;
+      const sortedSites = [...sites]
+        .filter((site) => site && site.Name)
+        .sort((a, b) => (a.Name || "").localeCompare(b.Name || "", undefined, { sensitivity: "base" }));
+
+      sortedSites.forEach((site) => {
         const optionValue = site.ID != null ? String(site.ID) : site.Name;
         const option = new Option(site.Name, optionValue);
         if (site.ID != null) {

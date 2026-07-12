@@ -26,7 +26,11 @@ $(function() {
             }
         });
 
-        assetDescriptions = Array.from(descriptions.values());
+        assetDescriptions = Array.from(descriptions.values()).sort((a, b) => {
+            const nameA = (a && a.name) || "";
+            const nameB = (b && b.name) || "";
+            return nameA.localeCompare(nameB, undefined, { sensitivity: "base" });
+        });
     }
 
     function renderAssetDescriptions() {
