@@ -35,7 +35,7 @@ body {
 }
 .lead-capture.container {
   padding: 0;
-  margin: 25px;
+  margin: 10px;
 }
 
 .lead-capture {
@@ -96,7 +96,6 @@ h2 {
   background: transparent;
   border-radius: 14px;
   overflow: hidden;
-  margin-bottom: 20px;
 }
 
 .lable_icon {
@@ -764,7 +763,7 @@ input:checked + .slider:before {
 
 .stepper {
   border-bottom: 1px solid #ccc;
-  margin: 1rem;
+  margin: 0.5rem 1rem;
 }
 
 /* Responsive */

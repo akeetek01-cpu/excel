@@ -19,17 +19,17 @@
 
 <body>
 
-    <div class="lead-capture container py-4">
+    <div class="lead-capture container">
         <div class="logo">
             <img src="images/excel_log.png" alt="Excel Logo">
             <label id="createLeadLabel" class="create-lead-label" style="min-width:100px">
                 
             </label>
         </div>
-        <div class="wizard-card mx-auto">
+        <div class="mx-auto">
 
             <!-- Top Stepper -->
-            <div class="stepper d-flex justify-content-between mb-3" id="stepper">
+            <div class="stepper d-flex justify-content-between" id="stepper">
                 <div class="step" data-step="0">
                     <div class="icon"> <i class="fa-solid fa-user"></i> </div>
                     <div class="label">1. Customer Details</div>
@@ -51,7 +51,7 @@
 
                 <!-- STEP 1 -->
                 <div class="step-pane" data-step-pane="0">
-                    <div class="card p-3 mb-3 rounded-12">
+                    <div class="card p-3 rounded-12">
 
                         <form id="form-customer" novalidate>
                             <div class="row">
@@ -86,7 +86,7 @@
 
                                     <div class="flex-grow-1">
                                         <select id="customerTenancy" class="form-select" aria-label="Site">
-                                            <option value="">Select Site</option>
+                                            <option value="" selected disabled hidden>Select Site</option>
                                             <option value="Other">Other</option>
                                         </select>
 
@@ -177,18 +177,21 @@
                                 </label>
 
                                 <div class="flex-grow-1">
-                                    <select id="assetDescriptionSelect" class="form-select"
-                                        aria-label="Asset description">
-                                        <option value="">Select / Enter</option>
-                                        <option value="other">Other (enter below)</option>
-                                    </select>
-                                    <div id="assetDescriptionError" class="invalid-feedback"></div>
-
-                                    <!-- <input type="text" id="assetDescriptionInput" class="form-control mt-2 d-none"
-                                        placeholder="Enter asset description"> -->
-                                    <textarea id="assetDescriptionInput" class="form-control auto-resize d-none"" rows="
-                                        2" maxlength="150" placeholder="Enter asset description"></textarea>
-                                    <div id="assetDescriptionInputError" class="invalid-feedback"></div>
+                                    <div class="row g-3 align-items-start">
+                                        <div id="assetDescriptionSelectWrapper" class="col-12">
+                                            <select id="assetDescriptionSelect" class="form-select"
+                                                aria-label="Asset description">
+                                                <option value="">Select / Enter</option>
+                                                <option value="other">Other</option>
+                                            </select>
+                                            <div id="assetDescriptionError" class="invalid-feedback"></div>
+                                        </div>
+                                        <div id="assetDescriptionInputWrapper" class="col-12 d-none">
+                                            <textarea id="assetDescriptionInput" class="form-control auto-resize" rows="1"
+                                                maxlength="150" placeholder="Enter asset description"></textarea>
+                                            <div id="assetDescriptionInputError" class="invalid-feedback"></div>
+                                        </div>
+                                    </div>
                                 </div>
 
                             </div>
@@ -275,7 +278,7 @@
                             <label class="form-label">Hours</label>
                             <div class="spinner-control">
                                 <button type="button" class="spinner-btn spinner-minus" id="hoursMinus">−</button>
-                                <input type="number" id="hours" class="form-control spinner-input" min="0" step="0.5"
+                                <input type="number" id="hours" class="form-control spinner-input" min="0" step="1"
                                     value="0">
                                 <button type="button" class="spinner-btn spinner-plus" id="hoursPlus">+</button>
                             </div>
@@ -294,7 +297,7 @@
                                 style="color: var(--teal); font-size: 13px;">0 / 10</div>
                         </div>
 
-                        <div id="dropZone" class="photo-upload-dropzone p-4 text-center rounded-8">
+                        <div id="dropZone" class="photo-upload-dropzone text-center rounded-8">
                             <div class="dz-content">
                                 <i class="fa-regular fa-image fa-2x mb-2"></i>
                                 <div class="fw-bold" style="color: var(--teal);">Tap to browse or drag & drop</div>
@@ -304,14 +307,14 @@
                             <input type="file" id="photoInput" accept="image/*" multiple hidden>
                         </div>
 
-                        <div id="previewGrid" class="photo-preview-grid mt-3 mb-3 d-flex flex-wrap gap-2"
+                        <div id="previewGrid" class="photo-preview-grid mb-1 d-flex flex-wrap gap-2"
                             style="display:none;"></div>
                         <div id="uploadStatus" class="photo-status mt-2" style="display:none;"></div>
                     </div>
                         <div class="summary-title mt-3">Review Summary</div>
 
                     <div class="summary-estimates">
-                        <div class="cards-row mb-3">
+                        <div class="cards-row mb-1">
 
 
                             <div class="stat-card">
@@ -349,7 +352,7 @@
                                 <div id="serviceManagerError" class="invalid-feedback"></div>
                             </div>
  <div class="col-6 d-flex align-items-end afterhrs-container">
-                            <label class="after-hours-label me-2 mb-2">After Hours(OT)?</label>
+                            <label class="after-hours-label me-2 mb-2">After Hours (OT)?</label>
                             <div class="form-check form-switch">
                                 <!-- <input class="form-check-input" type="checkbox" id="afterHours"> -->
                                 <label class="switch">
@@ -379,7 +382,7 @@
                     Fault</button>
 
                 <button style="display: none;" type="button" class="btn btn-outline-secondary btn-sm"
-                    id="createNewBtn">+ Create New</button>
+                    id="createNewBtn">+ New</button>
 
             </div>
 

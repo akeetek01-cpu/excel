@@ -18,7 +18,13 @@ $(function () {
 
         $select.find("option:not(:first)").remove();
 
-        items.forEach(function (item) {
+        const sortedItems = [...items].sort(function (a, b) {
+          const nameA = (a && a.Name) || "";
+          const nameB = (b && b.Name) || "";
+          return nameA.localeCompare(nameB, undefined, { sensitivity: "base" });
+        });
+
+        sortedItems.forEach(function (item) {
           const id = item && item.ID;
           const name = item && item.Name;
           if (!name) return;

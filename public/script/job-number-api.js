@@ -27,6 +27,22 @@ $(function () {
     return $.ajax(settings);
   }
 
+  function clearSiteSelection($select) {
+    const $emptyOption = $select.find('option[value=""]');
+
+    if ($emptyOption.length) {
+      $select.find("option").prop("selected", false);
+      $emptyOption.prop("selected", true);
+      $select.val("");
+      return;
+    }
+
+    $select.find("option").prop("selected", false);
+    if ($select[0]) {
+      $select[0].selectedIndex = -1;
+    }
+  }
+
   // populate sites and optionally select a default by ID or name
   function populateCustomerTenancySites(sites, defaultSiteId) {
     const $select = $("#customerTenancy");
@@ -35,8 +51,11 @@ $(function () {
     $select.find("option").not(":first").remove();
 
     if (Array.isArray(sites) && sites.length) {
-      sites.forEach((site) => {
-        if (!site || !site.Name) return;
+      const sortedSites = [...sites]
+        .filter((site) => site && site.Name)
+        .sort((a, b) => (a.Name || "").localeCompare(b.Name || "", undefined, { sensitivity: "base" }));
+
+      sortedSites.forEach((site) => {
         const optionValue = site.ID != null ? String(site.ID) : site.Name;
         const option = new Option(site.Name, optionValue);
         if (site.ID != null) {
@@ -51,20 +70,19 @@ $(function () {
       $select.append(new Option("Other", "Other"));
     }
 
-    // prefer current selection if it matches; otherwise try defaultSiteId (ID or name),
-    // otherwise fall back to the first returned site (if any)
+    // prefer current selection if it matches; otherwise try defaultSiteId (ID or name)
+    // and leave the field unselected if none of those match.
     if (currentValue && $select.find(`option[value="${currentValue}"]`).length) {
       $select.val(currentValue);
     } else if (defaultSiteId != null && $select.find(`option[value="${defaultSiteId}"]`).length) {
       $select.val(String(defaultSiteId));
-    } else if (Array.isArray(sites) && sites.length) {
-      const firstSite = sites[0];
-      const firstValue = firstSite.ID != null ? String(firstSite.ID) : firstSite.Name;
-      $select.val(firstValue);
     } else {
-      $select.val("");
+      clearSiteSelection($select);
     }
   }
+
+  const $customerTenancy = $("#customerTenancy");
+  clearSiteSelection($customerTenancy);
 
   window.handleJobNumberCompleteApi = function (value) {
     if (!value) return;
