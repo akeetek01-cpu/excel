@@ -409,10 +409,26 @@ $("#nextBtn").html('Next <span><i class="fa-solid fa-angle-right"></i></span>&nb
     .attr("maxlength", "6")
     .on("input", function () {
       enforceJobNumberLimit();
+
+      const value = $(this).val().trim();
+      if (value === "" || value.length < 6) {
+        if (window.clearJobNumberDependentFields) {
+          window.clearJobNumberDependentFields();
+        } else {
+          $("#autoJobBtn").text("");
+          $("#customerTenancy").val("").trigger("change");
+        }
+      }
     })
     .on("blur", function () {
       const value = $(this).val().trim();
       if (!$("#autoJob").is(":checked") && value === "") {
+        if (window.clearJobNumberDependentFields) {
+          window.clearJobNumberDependentFields();
+        } else {
+          $("#autoJobBtn").text("");
+          $("#customerTenancy").val("").trigger("change");
+        }
         showError("#jobNumber", "#jobNumberError", "Job Number is required.");
       } else if (!$("#autoJob").is(":checked") && !/^\d{6}$/.test(value)) {
         showError(
