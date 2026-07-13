@@ -47,6 +47,7 @@ body {
   text-align: center;
   background: #0f2d53;
   border-radius: 10px;
+  margin: 10px;
 }
 
 /* Title */
@@ -777,9 +778,9 @@ input:checked + .slider:before {
 
 /* Responsive */
 @media (max-width: 480px) {
-  .container {
+  /* .container {
     padding: 15px;
-  }
+  } */
 
   .circle {
     width: 90px;
