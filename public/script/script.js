@@ -170,6 +170,8 @@ $("#nextBtn").html('Next <span><i class="fa-solid fa-angle-right"></i></span>&nb
     ).text("-");
     $(".is-invalid").removeClass("is-invalid");
     $(".invalid-feedback").text("");
+    $(".fault-card").removeClass("fault-card-invalid");
+    $(".fault-header").removeClass("fault-header-invalid");
     addFault();
     showStep(0);
     calculate();
@@ -187,6 +189,16 @@ $("#nextBtn").html('Next <span><i class="fa-solid fa-angle-right"></i></span>&nb
     const $error = $(errorId);
     $field.removeClass("is-invalid");
     if ($error.length) $error.text("");
+  }
+
+  function markFaultCardInvalid($card) {
+    $card.addClass("fault-card-invalid");
+    $card.find(".fault-header").addClass("fault-header-invalid");
+  }
+
+  function clearFaultCardInvalid($card) {
+    $card.removeClass("fault-card-invalid");
+    $card.find(".fault-header").removeClass("fault-header-invalid");
   }
 
   function validateStep0() {
@@ -348,6 +360,7 @@ $("#nextBtn").html('Next <span><i class="fa-solid fa-angle-right"></i></span>&nb
     } else {
       $faultCards.each(function () {
         const $card = $(this);
+        let cardInvalid = false;
 
         const $desc = $card.find(".fault-desc");
         const $descError = $card.find(".fault-desc-error");
@@ -355,6 +368,7 @@ $("#nextBtn").html('Next <span><i class="fa-solid fa-angle-right"></i></span>&nb
 
         if (desc === "") {
           showError($desc, $descError, "Fault Description is required.");
+          cardInvalid = true;
           valid = false;
         } else {
           clearError($desc, $descError);
@@ -366,6 +380,7 @@ $("#nextBtn").html('Next <span><i class="fa-solid fa-angle-right"></i></span>&nb
 
         if (work === "") {
           showError($work, $workError, "Work required is required.");
+          cardInvalid = true;
           valid = false;
         } else if (work.length > 150) {
           showError(
@@ -373,12 +388,17 @@ $("#nextBtn").html('Next <span><i class="fa-solid fa-angle-right"></i></span>&nb
             $workError,
             "Work required cannot exceed 150 characters.",
           );
+          cardInvalid = true;
           valid = false;
         } else {
           clearError($work, $workError);
         }
 
-
+        if (cardInvalid) {
+          markFaultCardInvalid($card);
+        } else {
+          clearFaultCardInvalid($card);
+        }
       });
     }
 
@@ -829,6 +849,7 @@ $("#nextBtn").html('Next <span><i class="fa-solid fa-angle-right"></i></span>&nb
       $list.append($card);
       updateAiLabelState($card);
     });
+    calculate();
   }
 
   function addFault(autos = false) {
