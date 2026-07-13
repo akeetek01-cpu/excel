@@ -791,61 +791,64 @@ $("#nextBtn").html('Next <span><i class="fa-solid fa-angle-right"></i></span>&nb
 
               <div class="row">
                 <div class="col-12 mb-2">
-                  <label class="form-label">Tool Recovery (Special Equipments & Consumables)</label>
-                  <div class="d-flex align-items-center gap-2">
-                    <select class="form-select equipment-select totalRecovery-select" aria-label="Select equipment">
-                      ${
-                        (window.totalRecoveryItems && window.totalRecoveryItems.length)
-                          ? window.totalRecoveryItems
-                              .map((it) => {
-                                const name = (it && it.Catalog && it.Catalog.Name) || it.Name || "";
-                                const val = escapeHtml(name);
-                                return `<option value="${val}">${val}</option>`;
-                              })
-                              .join("")
-                          : `<option value="">Select equipment</option>`
-                      }
-                    </select>
-                    <input type="number" min="1" class="form-control equipment-qty" value="0" style="max-width:65px;">
-                    <button type="button" class="btn btn-outline-primary add-equipment-btn">Add</button>
+                  <div class="fault-material-section">
+                    <div class="fault-material-block">
+                      <label class="form-label">Tool Recovery (Special Equipments & Consumables)</label>
+                      <div class="d-flex align-items-center gap-2">
+                        <select class="form-select equipment-select totalRecovery-select" aria-label="Select equipment">
+                          ${
+                            (window.totalRecoveryItems && window.totalRecoveryItems.length)
+                              ? window.totalRecoveryItems
+                                  .map((it) => {
+                                    const name = (it && it.Catalog && it.Catalog.Name) || it.Name || "";
+                                    const val = escapeHtml(name);
+                                    return `<option value="${val}">${val}</option>`;
+                                  })
+                                  .join("")
+                              : `<option value="">Select equipment</option>`
+                          }
+                        </select>
+                        <input type="number" min="1" class="form-control equipment-qty" value="0" style="max-width:65px;">
+                        <button type="button" class="btn btn-outline-primary add-equipment-btn">Add</button>
+                      </div>
+                      <div class="equipment-list mb-2">
+                        ${Array.isArray(f.equipmentItems) && f.equipmentItems.length ? f.equipmentItems.map(item => `
+                          <label class="list-group-item d-flex justify-content-between align-items-center added-item" data-name="${item.name}" data-qty="${item.qty}">
+                            <span class="d-flex align-items-center gap-1">
+                            <small class="text-muted">${item.qty}</small>
+                              <span class="item-label">${item.name}</span>
+                            </span>
+                            <button type="button" class="close remove-added-item" aria-label="Close" title="Remove item">
+                              <i class="fa-solid fa-xmark" aria-hidden="true"></i>
+                            </button>
+                          </label>
+                        `).join('') : ''}
+                      </div>
+                      <div class="invalid-feedback equipment-error"></div>
+                    </div>
+                    <div class="fault-material-block">
+                      <label class="form-label">Parts & Material Required</label>
+                      <div class="d-flex align-items-center gap-2">
+                        <input id="partsMeterial" maxlength="150" class="form-control form-select parts-select" placeholder="Enter">
+                        <input type="number" min="1" class="form-control parts-qty" value="0" style="max-width:65px;">
+                        <button type="button" class="btn btn-outline-primary add-part-btn">Add</button>
+                      </div>
+                      <div class="parts-list mb-2" aria-live="polite">
+                        ${Array.isArray(f.partsItems) && f.partsItems.length ? f.partsItems.map(item => `
+                          <label class="list-group-item d-flex justify-content-between align-items-center added-item" data-name="${item.name}" data-qty="${item.qty}">
+                            <span class="d-flex align-items-center gap-1">
+                              <small class="text-muted">${item.qty}</small>
+                              <span class="item-label">${item.name}</span>
+                            </span>
+                            <button type="button" class="close remove-added-item" aria-label="Close" title="Remove item">
+                              <i class="fa-solid fa-xmark" aria-hidden="true"></i>
+                            </button>
+                          </label>
+                        `).join('') : ''}
+                      </div>
+                      <div class="invalid-feedback parts-error"></div>
+                    </div>
                   </div>
-                  <div class="equipment-list mb-2">
-                    ${Array.isArray(f.equipmentItems) && f.equipmentItems.length ? f.equipmentItems.map(item => `
-                      <label class="list-group-item d-flex justify-content-between align-items-center added-item" data-name="${item.name}" data-qty="${item.qty}">
-                        <span class="d-flex align-items-center gap-1">
-                        <small class="text-muted">${item.qty}</small>
-                          <span class="item-label">${item.name}</span>
-                        </span>
-                        <button type="button" class="close remove-added-item" aria-label="Close" title="Remove item">
-                          <i class="fa-solid fa-xmark" aria-hidden="true"></i>
-                        </button>
-                      </label>
-                    `).join('') : ''}
-                  </div>
-                  <div class="invalid-feedback equipment-error"></div>
-                </div>
-                <div class="col-12 mb-2">
-                  <label class="form-label">Parts & Material Required</label>
-                  <div class="d-flex align-items-center gap-2">
-                    
-                    <input id="partsMeterial" maxlength="150" class="form-control form-select parts-select" placeholder="Enter">
-                    <input type="number" min="1" class="form-control parts-qty" value="0" style="max-width:65px;">
-                    <button type="button" class="btn btn-outline-primary add-part-btn">Add</button>
-                  </div>
-                  <div class="parts-list mb-2" aria-live="polite">
-                    ${Array.isArray(f.partsItems) && f.partsItems.length ? f.partsItems.map(item => `
-                      <label class="list-group-item d-flex justify-content-between align-items-center added-item" data-name="${item.name}" data-qty="${item.qty}">
-                        <span class="d-flex align-items-center gap-1">
-                          <small class="text-muted">${item.qty}</small>
-                          <span class="item-label">${item.name}</span>
-                        </span>
-                        <button type="button" class="  close remove-added-item" aria-label="Close" title="Remove item">
-                          <i class="fa-solid fa-xmark" aria-hidden="true"></i>
-                        </button>
-                      </label>
-                    `).join('') : ''}
-                  </div>
-                  <div class="invalid-feedback parts-error"></div>
                 </div>
 
                 <div class="col-12 mb-2">

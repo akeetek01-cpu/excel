@@ -644,6 +644,33 @@ textarea {
 }
 
 /* Parts / Equipment / Consumables UI styles */
+.fault-material-section {
+  display: grid;
+  gap: 10px;
+}
+
+.fault-material-block {
+  background: #f8fafc;
+  border: 1px solid rgba(0,0,0,0.06);
+  border-radius: 10px;
+  padding: 10px 12px;
+}
+
+.fault-material-block .form-label{
+  color: black;
+}
+
+.fault-input-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.fault-input-row .form-select,
+.fault-input-row .form-control {
+  background: #ffffff;
+}
+
 .d-flex .form-select.parts-select,
 .d-flex .form-select.equipment-select,
 .d-flex .form-select.consumables-select {
