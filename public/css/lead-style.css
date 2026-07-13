@@ -433,6 +433,16 @@ textarea {
   border: 1px solid #cccccc;
   border-radius: 8px;
   margin-bottom: 12px;
+  transition: border-color 0.2s ease, box-shadow 0.2s ease;
+}
+
+#faultList .fault-card.fault-card-invalid {
+  border-color: #dc3545;
+  box-shadow: 0 0 0 2px rgba(220, 53, 69, 0.12);
+}
+
+#faultList .fault-card .fault-header.fault-header-invalid {
+  color: #dc3545;
 }
 
 .fault-card.collapsed .fault-body {
@@ -634,6 +644,33 @@ textarea {
 }
 
 /* Parts / Equipment / Consumables UI styles */
+.fault-material-section {
+  display: grid;
+  gap: 10px;
+}
+
+.fault-material-block {
+  background: #f8fafc;
+  border: 1px solid rgba(0,0,0,0.06);
+  border-radius: 10px;
+  padding: 10px 12px;
+}
+
+.fault-material-block .form-label{
+  color: black;
+}
+
+.fault-input-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.fault-input-row .form-select,
+.fault-input-row .form-control {
+  background: #ffffff;
+}
+
 .d-flex .form-select.parts-select,
 .d-flex .form-select.equipment-select,
 .d-flex .form-select.consumables-select {

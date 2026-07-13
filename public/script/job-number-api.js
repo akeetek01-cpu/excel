@@ -43,6 +43,12 @@ $(function () {
     }
   }
 
+  window.clearJobNumberDependentFields = function () {
+    const $siteSelect = $("#customerTenancy");
+    clearSiteSelection($siteSelect);
+    $("#autoJobBtn").text("");
+  };
+
   // populate sites and optionally select a default by ID or name
   function populateCustomerTenancySites(sites, defaultSiteId) {
     const $select = $("#customerTenancy");

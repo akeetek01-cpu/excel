@@ -170,6 +170,8 @@ $("#nextBtn").html('Next <span><i class="fa-solid fa-angle-right"></i></span>&nb
     ).text("-");
     $(".is-invalid").removeClass("is-invalid");
     $(".invalid-feedback").text("");
+    $(".fault-card").removeClass("fault-card-invalid");
+    $(".fault-header").removeClass("fault-header-invalid");
     addFault();
     showStep(0);
     calculate();
@@ -187,6 +189,16 @@ $("#nextBtn").html('Next <span><i class="fa-solid fa-angle-right"></i></span>&nb
     const $error = $(errorId);
     $field.removeClass("is-invalid");
     if ($error.length) $error.text("");
+  }
+
+  function markFaultCardInvalid($card) {
+    $card.addClass("fault-card-invalid");
+    $card.find(".fault-header").addClass("fault-header-invalid");
+  }
+
+  function clearFaultCardInvalid($card) {
+    $card.removeClass("fault-card-invalid");
+    $card.find(".fault-header").removeClass("fault-header-invalid");
   }
 
   function validateStep0() {
@@ -348,6 +360,7 @@ $("#nextBtn").html('Next <span><i class="fa-solid fa-angle-right"></i></span>&nb
     } else {
       $faultCards.each(function () {
         const $card = $(this);
+        let cardInvalid = false;
 
         const $desc = $card.find(".fault-desc");
         const $descError = $card.find(".fault-desc-error");
@@ -355,6 +368,7 @@ $("#nextBtn").html('Next <span><i class="fa-solid fa-angle-right"></i></span>&nb
 
         if (desc === "") {
           showError($desc, $descError, "Fault Description is required.");
+          cardInvalid = true;
           valid = false;
         } else {
           clearError($desc, $descError);
@@ -366,6 +380,7 @@ $("#nextBtn").html('Next <span><i class="fa-solid fa-angle-right"></i></span>&nb
 
         if (work === "") {
           showError($work, $workError, "Work required is required.");
+          cardInvalid = true;
           valid = false;
         } else if (work.length > 150) {
           showError(
@@ -373,12 +388,17 @@ $("#nextBtn").html('Next <span><i class="fa-solid fa-angle-right"></i></span>&nb
             $workError,
             "Work required cannot exceed 150 characters.",
           );
+          cardInvalid = true;
           valid = false;
         } else {
           clearError($work, $workError);
         }
 
-
+        if (cardInvalid) {
+          markFaultCardInvalid($card);
+        } else {
+          clearFaultCardInvalid($card);
+        }
       });
     }
 
@@ -389,10 +409,26 @@ $("#nextBtn").html('Next <span><i class="fa-solid fa-angle-right"></i></span>&nb
     .attr("maxlength", "6")
     .on("input", function () {
       enforceJobNumberLimit();
+
+      const value = $(this).val().trim();
+      if (value === "" || value.length < 6) {
+        if (window.clearJobNumberDependentFields) {
+          window.clearJobNumberDependentFields();
+        } else {
+          $("#autoJobBtn").text("");
+          $("#customerTenancy").val("").trigger("change");
+        }
+      }
     })
     .on("blur", function () {
       const value = $(this).val().trim();
       if (!$("#autoJob").is(":checked") && value === "") {
+        if (window.clearJobNumberDependentFields) {
+          window.clearJobNumberDependentFields();
+        } else {
+          $("#autoJobBtn").text("");
+          $("#customerTenancy").val("").trigger("change");
+        }
         showError("#jobNumber", "#jobNumberError", "Job Number is required.");
       } else if (!$("#autoJob").is(":checked") && !/^\d{6}$/.test(value)) {
         showError(
@@ -755,61 +791,64 @@ $("#nextBtn").html('Next <span><i class="fa-solid fa-angle-right"></i></span>&nb
 
               <div class="row">
                 <div class="col-12 mb-2">
-                  <label class="form-label">Tool Recovery (Special Equipments & Consumables)</label>
-                  <div class="d-flex align-items-center gap-2">
-                    <select class="form-select equipment-select totalRecovery-select" aria-label="Select equipment">
-                      ${
-                        (window.totalRecoveryItems && window.totalRecoveryItems.length)
-                          ? window.totalRecoveryItems
-                              .map((it) => {
-                                const name = (it && it.Catalog && it.Catalog.Name) || it.Name || "";
-                                const val = escapeHtml(name);
-                                return `<option value="${val}">${val}</option>`;
-                              })
-                              .join("")
-                          : `<option value="">Select equipment</option>`
-                      }
-                    </select>
-                    <input type="number" min="1" class="form-control equipment-qty" value="0" style="max-width:65px;">
-                    <button type="button" class="btn btn-outline-primary add-equipment-btn">Add</button>
+                  <div class="fault-material-section">
+                    <div class="fault-material-block">
+                      <label class="form-label">Tool Recovery (Special Equipments & Consumables)</label>
+                      <div class="d-flex align-items-center gap-2">
+                        <select class="form-select equipment-select totalRecovery-select" aria-label="Select equipment">
+                          ${
+                            (window.totalRecoveryItems && window.totalRecoveryItems.length)
+                              ? window.totalRecoveryItems
+                                  .map((it) => {
+                                    const name = (it && it.Catalog && it.Catalog.Name) || it.Name || "";
+                                    const val = escapeHtml(name);
+                                    return `<option value="${val}">${val}</option>`;
+                                  })
+                                  .join("")
+                              : `<option value="">Select equipment</option>`
+                          }
+                        </select>
+                        <input type="number" min="1" class="form-control equipment-qty" value="0" style="max-width:65px;">
+                        <button type="button" class="btn btn-outline-primary add-equipment-btn">Add</button>
+                      </div>
+                      <div class="equipment-list mb-2">
+                        ${Array.isArray(f.equipmentItems) && f.equipmentItems.length ? f.equipmentItems.map(item => `
+                          <label class="list-group-item d-flex justify-content-between align-items-center added-item" data-name="${item.name}" data-qty="${item.qty}">
+                            <span class="d-flex align-items-center gap-1">
+                            <small class="text-muted">${item.qty}</small>
+                              <span class="item-label">${item.name}</span>
+                            </span>
+                            <button type="button" class="close remove-added-item" aria-label="Close" title="Remove item">
+                              <i class="fa-solid fa-xmark" aria-hidden="true"></i>
+                            </button>
+                          </label>
+                        `).join('') : ''}
+                      </div>
+                      <div class="invalid-feedback equipment-error"></div>
+                    </div>
+                    <div class="fault-material-block">
+                      <label class="form-label">Parts & Material Required</label>
+                      <div class="d-flex align-items-center gap-2">
+                        <input id="partsMeterial" maxlength="150" class="form-control form-select parts-select" placeholder="Enter">
+                        <input type="number" min="1" class="form-control parts-qty" value="0" style="max-width:65px;">
+                        <button type="button" class="btn btn-outline-primary add-part-btn">Add</button>
+                      </div>
+                      <div class="parts-list mb-2" aria-live="polite">
+                        ${Array.isArray(f.partsItems) && f.partsItems.length ? f.partsItems.map(item => `
+                          <label class="list-group-item d-flex justify-content-between align-items-center added-item" data-name="${item.name}" data-qty="${item.qty}">
+                            <span class="d-flex align-items-center gap-1">
+                              <small class="text-muted">${item.qty}</small>
+                              <span class="item-label">${item.name}</span>
+                            </span>
+                            <button type="button" class="close remove-added-item" aria-label="Close" title="Remove item">
+                              <i class="fa-solid fa-xmark" aria-hidden="true"></i>
+                            </button>
+                          </label>
+                        `).join('') : ''}
+                      </div>
+                      <div class="invalid-feedback parts-error"></div>
+                    </div>
                   </div>
-                  <div class="equipment-list mb-2">
-                    ${Array.isArray(f.equipmentItems) && f.equipmentItems.length ? f.equipmentItems.map(item => `
-                      <label class="list-group-item d-flex justify-content-between align-items-center added-item" data-name="${item.name}" data-qty="${item.qty}">
-                        <span class="d-flex align-items-center gap-1">
-                        <small class="text-muted">${item.qty}</small>
-                          <span class="item-label">${item.name}</span>
-                        </span>
-                        <button type="button" class="close remove-added-item" aria-label="Close" title="Remove item">
-                          <i class="fa-solid fa-xmark" aria-hidden="true"></i>
-                        </button>
-                      </label>
-                    `).join('') : ''}
-                  </div>
-                  <div class="invalid-feedback equipment-error"></div>
-                </div>
-                <div class="col-12 mb-2">
-                  <label class="form-label">Parts & Material Required</label>
-                  <div class="d-flex align-items-center gap-2">
-                    
-                    <input id="partsMeterial" maxlength="150" class="form-control form-select parts-select" placeholder="Enter">
-                    <input type="number" min="1" class="form-control parts-qty" value="0" style="max-width:65px;">
-                    <button type="button" class="btn btn-outline-primary add-part-btn">Add</button>
-                  </div>
-                  <div class="parts-list mb-2" aria-live="polite">
-                    ${Array.isArray(f.partsItems) && f.partsItems.length ? f.partsItems.map(item => `
-                      <label class="list-group-item d-flex justify-content-between align-items-center added-item" data-name="${item.name}" data-qty="${item.qty}">
-                        <span class="d-flex align-items-center gap-1">
-                          <small class="text-muted">${item.qty}</small>
-                          <span class="item-label">${item.name}</span>
-                        </span>
-                        <button type="button" class="  close remove-added-item" aria-label="Close" title="Remove item">
-                          <i class="fa-solid fa-xmark" aria-hidden="true"></i>
-                        </button>
-                      </label>
-                    `).join('') : ''}
-                  </div>
-                  <div class="invalid-feedback parts-error"></div>
                 </div>
 
                 <div class="col-12 mb-2">
@@ -829,6 +868,7 @@ $("#nextBtn").html('Next <span><i class="fa-solid fa-angle-right"></i></span>&nb
       $list.append($card);
       updateAiLabelState($card);
     });
+    calculate();
   }
 
   function addFault(autos = false) {
