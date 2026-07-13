@@ -1329,7 +1329,7 @@ $("#nextBtn").html('Next <span><i class="fa-solid fa-angle-right"></i></span>&nb
       saveStepData(currentStep);
       showStep(currentStep + 1);
     } else {
-      if (!validateStep(2)) return;
+      validateStep(2);
       saveStepData(2);
       submitJob();
     }
@@ -1356,8 +1356,8 @@ $("#nextBtn").html('Next <span><i class="fa-solid fa-angle-right"></i></span>&nb
     if (idx === 2) {
       const tech = Number($("#technicians").val() || 0);
       const hrs = Number($("#hours").val() || 0);
-      const costCenter = $("#costCenterSelect").val().trim();
-      const tags = $("#tagsSelect").val().trim();
+      const costCenter = String($("#costCenterSelect").val() || "").trim();
+      const tags = String($("#tagsSelect").val() || "").trim();
       let valid = true;
 
       if (costCenter === "") {
@@ -1403,25 +1403,25 @@ $("#nextBtn").html('Next <span><i class="fa-solid fa-angle-right"></i></span>&nb
 
   function saveStepData(idx) {
     if (idx === 0) {
-      jobData.customer.jobNumber = $("#jobNumber").val().trim();
-      jobData.customer.name = $("#customerName").val().trim();
-      jobData.customer.phone = $("#customerPhone").val().trim();
-      jobData.customer.email = $("#customerEmail").val().trim();
-      jobData.customer.tenancy = $("#customerTenancy").val().trim();
-      jobData.customer.notes = $("#customerNotes").val().trim();
+      jobData.customer.jobNumber = String($("#jobNumber").val() || "").trim();
+      jobData.customer.name = String($("#customerName").val() || "").trim();
+      jobData.customer.phone = String($("#customerPhone").val() || "").trim();
+      jobData.customer.email = String($("#customerEmail").val() || "").trim();
+      jobData.customer.tenancy = String($("#customerTenancy").val() || "").trim();
+      jobData.customer.notes = String($("#customerNotes").val() || "").trim();
     }
     if (idx === 1) {
       const selectedDescription = $("#assetDescriptionSelect").val();
       const selectedLocation = $("#assetLocation").val();
       jobData.asset.description =
         selectedDescription === "other"
-          ? $("#assetDescriptionInput").val().trim()
-          : selectedDescription;
+          ? String($("#assetDescriptionInput").val() || "").trim()
+          : String(selectedDescription || "").trim();
       jobData.asset.location =
         selectedLocation === "other"
-          ? $("#assetLocationInput").val().trim()
-          : selectedLocation;
-      jobData.asset.customerAssetId = $("#customerAssetId").val().trim();
+          ? String($("#assetLocationInput").val() || "").trim()
+          : String(selectedLocation || "").trim();
+      jobData.asset.customerAssetId = String($("#customerAssetId").val() || "").trim();
       // faults already bound
     }
     if (idx === 2) {
@@ -1435,8 +1435,8 @@ $("#nextBtn").html('Next <span><i class="fa-solid fa-angle-right"></i></span>&nb
       jobData.estimates.totalHours = totalHours;
       jobData.estimates.apprentice = $("#apprentice").is(":checked");
       jobData.estimates.afterHours = $("#afterHours").is(":checked");
-      jobData.estimates.costCenter = $("#costCenterSelect").val().trim();
-      jobData.estimates.tags = $("#tagsSelect").val().trim();
+      jobData.estimates.costCenter = String($("#costCenterSelect").val() || "").trim();
+      jobData.estimates.tags = String($("#tagsSelect").val() || "").trim();
     }
   }
 
@@ -1472,8 +1472,19 @@ $("#nextBtn").html('Next <span><i class="fa-solid fa-angle-right"></i></span>&nb
     $("#modalCustomer").text(jobData.customer.name || "");
     $("#modalTime").text(new Date().toLocaleString());
     $("#jsonOutput").text(json);
-    const modal = new bootstrap.Modal(document.getElementById("submitModal"));
-    modal.show();
+
+    const modalElement = document.getElementById("submitModal");
+    if (modalElement) {
+      if (window.bootstrap && typeof window.bootstrap.Modal === "function") {
+        const modal = new window.bootstrap.Modal(modalElement);
+        modal.show();
+      } else {
+        modalElement.classList.add("show");
+        modalElement.style.display = "block";
+        modalElement.setAttribute("aria-hidden", "false");
+        document.body.classList.add("modal-open");
+      }
+    }
 
     $("#downloadJson")
       .off("click")
