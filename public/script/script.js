@@ -1224,6 +1224,48 @@ $("#nextBtn").html('Next <span><i class="fa-solid fa-angle-right"></i></span>&nb
     $("#photoInput").trigger("click");
   });
 
+  $("#barcodeScanBtn").on("click", function () {
+    $("#barcodeFileInput").trigger("click");
+  });
+
+  $("#barcodeFileInput").on("change", async function (event) {
+    const file = event.target.files && event.target.files[0];
+    if (!file) return;
+
+    try {
+      if (window.BarcodeDetector) {
+        const detector = new window.BarcodeDetector({ formats: ["code_128", "qr_code", "ean_13", "ean_8", "code_39", "upc_a", "upc_e"] });
+        const barcode = await detector.detect(file);
+        const value = barcode?.[0]?.rawValue || "";
+        if (value) {
+          $("#customerAssetId").val(value);
+          if (window.lookupAssetByValue) {
+            window.lookupAssetByValue(value);
+          }
+          return;
+        }
+      }
+
+      if (window.alert) {
+        alert("Barcode could not be read from this image. Please enter the value manually.");
+      }
+    } catch (error) {
+      console.error("Barcode scan failed:", error);
+      if (window.alert) {
+        alert("Barcode scan is not available in this browser. Please enter the value manually.");
+      }
+    } finally {
+      $(this).val("");
+    }
+  });
+
+  $("#customerAssetId").on("input change", function () {
+    const value = $(this).val().trim();
+    if (value.length >= 4 && window.lookupAssetByValue) {
+      window.lookupAssetByValue(value);
+    }
+  });
+
   // stop clicks on the input bubbling up (defensive)
   $("#photoInput").on("click", function (e) {
     e.stopPropagation();

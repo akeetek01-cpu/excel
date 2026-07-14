@@ -175,9 +175,13 @@
                                <div class="mb-3 align-items-start">
                                 <label class="form-label me-2 mb-0" style="min-width:100px">
                                     Customer Asset ID or Excel Barcode</label>
-                                <div class="flex-grow-1">
+                                <div class="flex-grow-1 d-flex gap-2 align-items-center">
                                     <input id="customerAssetId" maxlength="150" class="form-control"
                                         placeholder="Enter Customer Asset ID or Excel Barcode">
+                                    <button type="button" id="barcodeScanBtn" class="btn btn-outline-secondary" title="Scan barcode">
+                                        <i class="fa-solid fa-barcode"></i>
+                                    </button>
+                                    <input type="file" id="barcodeFileInput" accept="image/*" capture="environment" class="d-none">
                                 </div>
                                 
                         
@@ -225,7 +229,7 @@
                         <div id="faultList"></div>
 
                         <div class="d-grid mt-2">
-                            <button type="button" id="addFaultBtn" class="btn btn-outline-purple">+ Add Another
+                            <button type="button" id="addFaultBtn" class="btn1 btn btn-outline-purple">+ Add Another
                                 Fault</button>
                         </div>
 
@@ -360,14 +364,14 @@
 
         <!-- Sticky Footer Nav -->
         <div class="footer-nav d-flex justify-content-between align-items-center p-3">
-            <button class="btn btn-outline-secondary btn-sm" id="backBtn" aria-label="Back">
+            <button class="btn1 btn btn-outline-secondary btn-sm" id="backBtn" aria-label="Back">
                 <i class="fa-solid fa-arrow-left"></i>Back
             </button>
             <div id="nextButtonContainer" class="d-flex justify-content-center align-items-center">
-                <button id="nextBtn" type="button" class="customer-next-btn btn btn-primary">Next -> Asset &
+                <button id="nextBtn" type="button" class="customer-next-btn btn1 btn btn-primary">Next -> Asset &
                     Faults</button>
 
-                <button style="display: none;" type="button" class="btn btn-outline-secondary btn-sm"
+                <button style="display: none;" type="button" class="btn1 btn btn-outline-secondary btn-sm"
                     id="createNewBtn">+ New</button>
 
             </div>
@@ -395,8 +399,8 @@
                     <pre id="jsonOutput" class="p-2 bg-light rounded-2" style="max-height:400px; overflow:auto;"></pre>
                 </div>
                 <div class="modal-footer">
-                    <button class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
-                    <button class="btn btn-success" id="downloadJson">Download JSON</button>
+                    <button class="btn1 btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                    <button class="btn1 btn btn-success" id="downloadJson">Download JSON</button>
                 </div>
             </div>
         </div>
@@ -410,6 +414,7 @@
     <script src="script/job-number-api.js"></script>
     <script src="script/customer-contact-api.js"></script>
     <script src="script/cost-center-api.js"></script>
+    <script src="script/asset-lookup-api.js"></script>
     <script src="script/validation.js"></script>
     <script src="script/service-managers.js"></script>
     <script src="script/totalRecovery.js"></script>
