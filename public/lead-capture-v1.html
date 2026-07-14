@@ -69,7 +69,7 @@
                                 </div>
 
                                 <div class="col-8 mb-3 align-items-start">
-                                    <label class="form-label me-2 mb-0" style="min-width:100px">Company Name</label>
+                                    <label class="form-label me-2 mb-0" style="min-width:100px">Customer Name</label>
                                     <div class="flex-grow-1">
                                         <div id="autoJobBtn" class="border border-dashed rounded-3 px-3 py-2"
                                             style="min-height: 38px; display: flex; align-items: center;">
@@ -112,8 +112,9 @@
                                     </label>
 
                                     <div class="flex-grow-1">
-                                        <input type="text" id="customerName" maxlength="100" class="form-control"
-                                            style="text-transform: capitalize;" placeholder="Enter Customer Name">
+                                        <select id="customerName" class="form-select" aria-label="Customer contact name">
+                                            <option value="" selected disabled>Select Contact</option>
+                                        </select>
 
                                         <div id="customerNameError" class="invalid-feedback"></div>
                                     </div>
@@ -171,6 +172,16 @@
                     <div class="card p-3 mb-3 rounded-12">
 
                         <div class="fault-card">
+                               <div class="mb-3 align-items-start">
+                                <label class="form-label me-2 mb-0" style="min-width:100px">
+                                    Customer Asset ID or Excel Barcode</label>
+                                <div class="flex-grow-1">
+                                    <input id="customerAssetId" maxlength="150" class="form-control"
+                                        placeholder="Enter Customer Asset ID or Excel Barcode">
+                                </div>
+                                
+                        
+                            </div>
                             <div class="mb-3 align-items-start">
                                 <label class="form-label me-2 mb-0" style="min-width:100px">
                                     Asset Description
@@ -209,32 +220,7 @@
                                 </div>
                             </div>
 
-                            <div class="mb-3 align-items-start">
-                                <label class="form-label me-2 mb-0" style="min-width:100px">
-                                    Customer Asset ID or Excel Barcode</label>
-                                <div class="flex-grow-1">
-                                    <input id="customerAssetId" maxlength="150" class="form-control"
-                                        placeholder="Enter Customer Asset ID or Excel Barcode">
-                                </div>
-                                
-                                <!-- <div class="mb-3 d-flex gap-2 flex-column flex-sm-row">
-                                
-                                <select id="assetDescription" class="form-select flex-grow-1"
-                                    aria-label="Asset description">
-                                    <option value="">Select / enter</option>
-                                    <option>Air Conditioner</option>
-                                    <option>Fridge</option>
-                                    <option>Oven</option>
-                                </select>
-
-                                <select id="assetLocation" class="form-select flex-grow-1" aria-label="Asset location">
-                                    <option value="">Select / enter</option>
-                                    <option>Kitchen</option>
-                                    <option>Store Room</option>
-                                    <option>Roof</option>
-                                </select>
-                            </div> -->
-                            </div>
+                         
                         </div>
                         <div id="faultList"></div>
 
@@ -422,6 +408,7 @@
     <script src="script/script.js"></script>
     <script src="script/lead-capture-v1.js"></script>
     <script src="script/job-number-api.js"></script>
+    <script src="script/customer-contact-api.js"></script>
     <script src="script/cost-center-api.js"></script>
     <script src="script/validation.js"></script>
     <script src="script/service-managers.js"></script>

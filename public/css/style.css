@@ -360,6 +360,13 @@ color: var(--teal)!important;
   flex: 1;
 }
 
+#assetDescriptionInput {
+      font-size: 13px;
+}
+#addFaultBtn{
+  display: none;
+}
+
 .form-select{
     font-size: 13px;
 }

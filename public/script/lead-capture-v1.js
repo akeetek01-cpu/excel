@@ -50,11 +50,11 @@ $(function() {
     function setOtherMode(selectElem, selectWrapperElem, inputWrapperElem) {
         const selectedValue = selectElem.val();
         if (selectedValue === "other") {
-            selectWrapperElem.removeClass("col-12").addClass("col-6");
-            inputWrapperElem.removeClass("d-none").removeClass("col-12").addClass("col-6");
+            selectWrapperElem.removeClass("col-12").addClass("col-3");
+            inputWrapperElem.removeClass("d-none").removeClass("col-12").addClass("col-9");
         } else {
-            selectWrapperElem.removeClass("col-6").addClass("col-12");
-            inputWrapperElem.addClass("d-none").removeClass("col-6").addClass("col-12");
+            selectWrapperElem.removeClass("col-3").addClass("col-12");
+            inputWrapperElem.addClass("d-none").removeClass("col-9").addClass("col-12");
         }
     }
 

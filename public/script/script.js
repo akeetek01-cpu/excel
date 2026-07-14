@@ -1,17 +1,37 @@
 $(function () {
   // Data model
   const jobData = {
-    customer: {},
-    asset: { description: "", location: "", customerAssetId: "" },
+    customer: {
+      customerId: "",
+      id: "",
+      jobNumber: "",
+      name: "",
+      phone: "",
+      email: "",
+      tenancy: "",
+      tenancyLabel: "",
+      notes: "",
+      siteContact: "",
+      siteContactLabel: "",
+    },
+    asset: {
+      description: "",
+      descriptionLabel: "",
+      location: "",
+      locationLabel: "",
+      customerAssetId: "",
+    },  
     faults: [],
     estimates: {
       technicians: 0,
       hours: 0,
       totalHours: 0,
-      apprentice: false,
+      apprentice: 0,
       afterHours: false,
       costCenter: "",
+      costCenterLabel: "",
       tags: "",
+      tagsLabel: "",
     },
     photos: [],
   };
@@ -124,6 +144,27 @@ $("#nextBtn").html('Next <span><i class="fa-solid fa-angle-right"></i></span>&nb
     $("#createNewBtn").toggle(idx === 2);
   }
 
+  function syncLookupContextToJobData() {
+    const lookup = window.leadCaptureLookup || {};
+
+    if (lookup.customerId && !jobData.customer.customerId) {
+      jobData.customer.customerId = String(lookup.customerId);
+      jobData.customer.id = String(lookup.customerId);
+    }
+
+    if (lookup.customerName && !jobData.customer.name) {
+      jobData.customer.name = String(lookup.customerName);
+    }
+
+    if (lookup.siteContactName && !jobData.customer.siteContact) {
+      jobData.customer.siteContact = String(lookup.siteContactName);
+    }
+
+    if (lookup.defaultSiteId && !jobData.customer.tenancy) {
+      jobData.customer.tenancy = String(lookup.defaultSiteId);
+    }
+  }
+
   function resetWizard() {
     $("#form-customer")[0].reset();
     $("#faultList").empty();
@@ -147,17 +188,37 @@ $("#nextBtn").html('Next <span><i class="fa-solid fa-angle-right"></i></span>&nb
     $("#hours").val(0);
     $("#apprentice").val(0);
     $("#afterHours").prop("checked", false);
-    jobData.customer = {};
-    jobData.asset = { description: "", location: "", customerAssetId: "" };
+    jobData.customer = {
+      customerId: "",
+      id: "",
+      jobNumber: "",
+      name: "",
+      phone: "",
+      email: "",
+      tenancy: "",
+      tenancyLabel: "",
+      notes: "",
+      siteContact: "",
+      siteContactLabel: "",
+    };
+    jobData.asset = {
+      description: "",
+      descriptionLabel: "",
+      location: "",
+      locationLabel: "",
+      customerAssetId: "",
+    };
     jobData.faults = [];
     jobData.estimates = {
       technicians: 0,
       hours: 0,
       totalHours: 0,
-      apprentice: false,
+      apprentice: 0,
       afterHours: false,
       costCenter: "",
+      costCenterLabel: "",
       tags: "",
+      tagsLabel: "",
     };
     jobData.photos = [];
     photoFiles = [];
@@ -239,53 +300,8 @@ $("#nextBtn").html('Next <span><i class="fa-solid fa-angle-right"></i></span>&nb
       clearError("#customerName", "#customerNameError");
     }
 
-    const phone = $("#customerPhone").val().trim();
-    if (phone === "") {
-      showError(
-        "#customerPhone",
-        "#customerPhoneError",
-        "Phone Number is required.",
-      );
-      valid = false;
-    } else if (!/^\d+$/.test(phone)) {
-      showError(
-        "#customerPhone",
-        "#customerPhoneError",
-        "Customer Phone must contain only numeric characters.",
-      );
-      valid = false;
-    } else if (phone.length < 9) {
-      showError(
-        "#customerPhone",
-        "#customerPhoneError",
-        "Customer Phone must contain a minimum of 9 digits.",
-      );
-      valid = false;
-    } else if (phone.length > 12) {
-      showError(
-        "#customerPhone",
-        "#customerPhoneError",
-        "Customer Phone cannot exceed 12 digits.",
-      );
-      valid = false;
-    } else {
-      clearError("#customerPhone", "#customerPhoneError");
-    }
-
-    const email = $("#customerEmail").val().trim();
-    if (email === "") {
-      showError("#customerEmail", "#customerEmailError", "Email is required.");
-      valid = false;
-    } else if (!/^\S+@\S+\.\S+$/.test(email)) {
-      showError(
-        "#customerEmail",
-        "#customerEmailError",
-        "Enter a valid email address.",
-      );
-      valid = false;
-    } else {
-      clearError("#customerEmail", "#customerEmailError");
-    }
+    clearError("#customerPhone", "#customerPhoneError");
+    clearError("#customerEmail", "#customerEmailError");
 
     if ($("#customerTenancy").val().trim() === "") {
       showError(
@@ -489,49 +505,11 @@ $("#nextBtn").html('Next <span><i class="fa-solid fa-angle-right"></i></span>&nb
   });
 
   $("#customerPhone").on("blur", function () {
-    const phone = $(this).val().trim();
-    if (phone === "") {
-      showError(
-        "#customerPhone",
-        "#customerPhoneError",
-        "Phone Number is required.",
-      );
-    } else if (!/^\d+$/.test(phone)) {
-      showError(
-        "#customerPhone",
-        "#customerPhoneError",
-        "Customer Phone must contain only numeric characters.",
-      );
-    } else if (phone.length < 9) {
-      showError(
-        "#customerPhone",
-        "#customerPhoneError",
-        "Customer Phone must contain a minimum of 9 digits.",
-      );
-    } else if (phone.length > 12) {
-      showError(
-        "#customerPhone",
-        "#customerPhoneError",
-        "Customer Phone cannot exceed 12 digits.",
-      );
-    } else {
-      clearError("#customerPhone", "#customerPhoneError");
-    }
+    clearError("#customerPhone", "#customerPhoneError");
   });
 
   $("#customerEmail").on("blur", function () {
-    const value = $(this).val().trim();
-    if (value === "") {
-      showError("#customerEmail", "#customerEmailError", "Email is required.");
-    } else if (!/^\S+@\S+\.\S+$/.test(value)) {
-      showError(
-        "#customerEmail",
-        "#customerEmailError",
-        "Enter a valid email address.",
-      );
-    } else {
-      clearError("#customerEmail", "#customerEmailError");
-    }
+    clearError("#customerEmail", "#customerEmailError");
   });
 
   $("#customerTenancy").on("blur", function () {
@@ -1403,12 +1381,16 @@ $("#nextBtn").html('Next <span><i class="fa-solid fa-angle-right"></i></span>&nb
 
   function saveStepData(idx) {
     if (idx === 0) {
+      syncLookupContextToJobData();
       jobData.customer.jobNumber = String($("#jobNumber").val() || "").trim();
       jobData.customer.name = String($("#customerName").val() || "").trim();
       jobData.customer.phone = String($("#customerPhone").val() || "").trim();
       jobData.customer.email = String($("#customerEmail").val() || "").trim();
       jobData.customer.tenancy = String($("#customerTenancy").val() || "").trim();
+      jobData.customer.tenancyLabel = String($("#customerTenancy option:selected").text() || "").trim();
       jobData.customer.notes = String($("#customerNotes").val() || "").trim();
+      jobData.customer.siteContact = String($("#siteContractName").text() || "").trim() || jobData.customer.siteContact;
+      jobData.customer.siteContactLabel = String($("#siteContractName").text() || "").trim() || jobData.customer.siteContactLabel;
     }
     if (idx === 1) {
       const selectedDescription = $("#assetDescriptionSelect").val();
@@ -1417,10 +1399,12 @@ $("#nextBtn").html('Next <span><i class="fa-solid fa-angle-right"></i></span>&nb
         selectedDescription === "other"
           ? String($("#assetDescriptionInput").val() || "").trim()
           : String(selectedDescription || "").trim();
+      jobData.asset.descriptionLabel = String($("#assetDescriptionSelect option:selected").text() || "").trim();
       jobData.asset.location =
         selectedLocation === "other"
           ? String($("#assetLocationInput").val() || "").trim()
           : String(selectedLocation || "").trim();
+      jobData.asset.locationLabel = String($("#assetLocation option:selected").text() || "").trim();
       jobData.asset.customerAssetId = String($("#customerAssetId").val() || "").trim();
       // faults already bound
     }
@@ -1433,10 +1417,12 @@ $("#nextBtn").html('Next <span><i class="fa-solid fa-angle-right"></i></span>&nb
       jobData.estimates.technicians = technicians + apprentice;
       jobData.estimates.hours = hours;
       jobData.estimates.totalHours = totalHours;
-      jobData.estimates.apprentice = $("#apprentice").is(":checked");
+      jobData.estimates.apprentice = apprentice;
       jobData.estimates.afterHours = $("#afterHours").is(":checked");
       jobData.estimates.costCenter = String($("#costCenterSelect").val() || "").trim();
+      jobData.estimates.costCenterLabel = String($("#costCenterSelect option:selected").text() || "").trim();
       jobData.estimates.tags = String($("#tagsSelect").val() || "").trim();
+      jobData.estimates.tagsLabel = String($("#tagsSelect option:selected").text() || "").trim();
     }
   }
 
@@ -1452,21 +1438,59 @@ $("#nextBtn").html('Next <span><i class="fa-solid fa-angle-right"></i></span>&nb
     $("#revMan").text(jobData.estimates.totalHours || "-");
   }
 
+  function buildLeadPayload() {
+    const customerJobNumber = String(jobData.customer.jobNumber || "").trim();
+    const customerId = Number(jobData.customer.customerId || jobData.customer.id || 0) || Number(customerJobNumber || 0);
+    const customerName = String(jobData.customer.name || "").trim();
+    const customerPhone = String(jobData.customer.phone || "").trim();
+    const customerNotes = String(jobData.customer.notes || "").trim();
+    const siteValue = String(jobData.customer.tenancy || "").trim();
+    const siteLabel = String(jobData.customer.tenancyLabel || "").trim();
+    const selectedTags = jobData.estimates.tags || String($("#tagsSelect").val() || "").trim();
+    const selectedCostCenter = jobData.estimates.costCenter || String($("#costCenterSelect").val() || "").trim();
+    const tagIds = Array.isArray(selectedTags)
+      ? selectedTags.map((value) => Number(String(value).trim())).filter((value) => Number.isFinite(value))
+      : String(selectedTags || "")
+          .split(",")
+          .map((value) => Number(String(value).trim()))
+          .filter((value) => Number.isFinite(value));
+    const description = [jobData.asset.description, ...jobData.faults.map((fault) => fault.description)].filter(Boolean).join(" | ");
+    const notes = [customerNotes, jobData.asset.location, jobData.asset.locationLabel, siteLabel].filter(Boolean).join(" | ");
+    const followUpDate = new Date();
+    followUpDate.setDate(followUpDate.getDate() + 7);
+    const contactNumber = Number(customerPhone.replace(/\D/g, "")) || 0;
+
+    return {
+      Customer: customerId || 0,
+      Site: Number(siteValue) || 0,
+      LeadName: customerName || customerJobNumber || "Lead",
+      CustomerContact: contactNumber || Number(customerJobNumber) || 0,
+      AdditionalContacts: contactNumber ? [contactNumber] : [],
+      SiteContact: contactNumber || Number(customerJobNumber) || 0,
+      Stage: "Open",
+      FollowUpDate: followUpDate.toISOString().split("T")[0],
+      Description: description || "",
+      Notes: notes || "",
+      CostCenter: Number(selectedCostCenter) || 0,
+      Tags: tagIds,
+      Salesperson: 0,
+      ProjectManager: 0,
+      Status: 0,
+      Forecast: {
+        EstimatedPrice: Number(jobData.estimates.totalHours || 0),
+        Probability: Number(jobData.estimates.technicians || 0) > 0 ? 100 : 0,
+        ExpectedYear: new Date().getFullYear(),
+        ExpectedMonth: new Date().getMonth() + 1,
+      },
+      AutoAdjustStatus: Boolean(jobData.estimates.afterHours),
+    };
+  }
+
   function submitJob() {
     saveStepData(0);
     saveStepData(1);
     saveStepData(2);
-    const payload = {
-      customer: jobData.customer,
-      asset: jobData.asset,
-      faults: jobData.faults,
-      estimates: jobData.estimates,
-      photos: jobData.photos.map((f, i) => ({
-        name: f.name,
-        size: f.size,
-        type: f.type,
-      })),
-    };
+    const payload = buildLeadPayload();
     const json = JSON.stringify(payload, null, 2);
     $("#modalJobNum").text(jobData.customer.jobNumber || "");
     $("#modalCustomer").text(jobData.customer.name || "");
