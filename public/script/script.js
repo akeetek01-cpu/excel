@@ -1257,6 +1257,45 @@ $("#nextBtn").html('Next <span><i class="fa-solid fa-angle-right"></i></span>&nb
     $("#photoInput").trigger("click");
   });
 
+  async function readBarcodeFromImage(file) {
+    if (!file) return "";
+
+    if (window.BarcodeDetector) {
+      try {
+        const detector = new window.BarcodeDetector({
+          formats: ["code_128", "qr_code", "ean_13", "ean_8", "code_39", "upc_a", "upc_e"],
+        });
+        const barcode = await detector.detect(file);
+        const value = barcode?.[0]?.rawValue || "";
+        if (value) {
+          return String(value).trim();
+        }
+      } catch (error) {
+        console.warn("Built-in barcode detection failed:", error);
+      }
+    }
+
+    if (window.ZXing && window.ZXing.BrowserMultiFormatReader) {
+      try {
+        const codeReader = new window.ZXing.BrowserMultiFormatReader();
+        const imageUrl = URL.createObjectURL(file);
+        try {
+          const result = await codeReader.decodeFromImageUrl(imageUrl);
+          const value = result?.getText ? result.getText() : result?.text || "";
+          if (value) {
+            return String(value).trim();
+          }
+        } finally {
+          URL.revokeObjectURL(imageUrl);
+        }
+      } catch (error) {
+        console.warn("ZXing barcode detection failed:", error);
+      }
+    }
+
+    return "";
+  }
+
   $("#barcodeScanBtn").on("click", function () {
     $("#barcodeFileInput").trigger("click");
   });
@@ -1266,20 +1305,13 @@ $("#nextBtn").html('Next <span><i class="fa-solid fa-angle-right"></i></span>&nb
     if (!file) return;
 
     try {
-      if (window.BarcodeDetector) {
-        const detector = new window.BarcodeDetector({ formats: ["code_128", "qr_code", "ean_13", "ean_8", "code_39", "upc_a", "upc_e"] });
-        const barcode = await detector.detect(file);
-        const value = barcode?.[0]?.rawValue || "";
-        if (value) {
-          $("#customerAssetId").val(value);
-          if (window.lookupAssetByValue) {
-            window.lookupAssetByValue(value);
-          }
-          return;
+      const value = await readBarcodeFromImage(file);
+      if (value) {
+        $("#customerAssetId").val(value);
+        if (window.lookupAssetByValue) {
+          window.lookupAssetByValue(value);
         }
-      }
-
-      if (window.alert) {
+      } else if (window.alert) {
         alert("Barcode could not be read from this image. Please enter the value manually.");
       }
     } catch (error) {
