@@ -69,7 +69,7 @@
                                 </div>
 
                                 <div class="col-8 mb-3 align-items-start">
-                                    <label class="form-label me-2 mb-0" style="min-width:100px">Company Name</label>
+                                    <label class="form-label me-2 mb-0" style="min-width:100px">Customer Name</label>
                                     <div class="flex-grow-1">
                                         <div id="autoJobBtn" class="border border-dashed rounded-3 px-3 py-2"
                                             style="min-height: 38px; display: flex; align-items: center;">
@@ -112,10 +112,19 @@
                                     </label>
 
                                     <div class="flex-grow-1">
-                                        <input type="text" id="customerName" maxlength="100" class="form-control"
-                                            style="text-transform: capitalize;" placeholder="Enter Customer Name">
-
-                                        <div id="customerNameError" class="invalid-feedback"></div>
+                                        <div class="row g-2 align-items-start">
+                                            <div id="customerNameSelectWrapper" class="col-12">
+                                                <select id="customerName" class="form-select" aria-label="Customer contact name">
+                                                    <option value="" selected disabled>Select Contact</option>
+                                                    <option value="other">Other</option>
+                                                </select>
+                                                <div id="customerNameError" class="invalid-feedback"></div>
+                                            </div>
+                                            <div id="customerNameInputWrapper" class="col-12 d-none">
+                                                <input type="text" id="customerNameInput" class="form-control" maxlength="150" placeholder="Enter customer contact name">
+                                                <div id="customerNameInputError" class="invalid-feedback"></div>
+                                            </div>
+                                        </div>
                                     </div>
                                 </div>
 
@@ -171,6 +180,20 @@
                     <div class="card p-3 mb-3 rounded-12">
 
                         <div class="fault-card">
+                               <div class="mb-3 align-items-start">
+                                <label class="form-label me-2 mb-0" style="min-width:100px">
+                                    Customer Asset ID or Excel Barcode</label>
+                                <div class="flex-grow-1 d-flex gap-2 align-items-center">
+                                    <input id="customerAssetId" maxlength="150" class="form-control"
+                                        placeholder="Enter Customer Asset ID or Excel Barcode">
+                                    <button type="button" id="barcodeScanBtn" class="btn btn-outline-secondary" title="Scan barcode">
+                                        <i class="fa-solid fa-barcode"></i>
+                                    </button>
+                                    <input type="file" id="barcodeFileInput" accept="image/*" capture="environment" class="d-none">
+                                </div>
+                                
+                        
+                            </div>
                             <div class="mb-3 align-items-start">
                                 <label class="form-label me-2 mb-0" style="min-width:100px">
                                     Asset Description
@@ -209,37 +232,12 @@
                                 </div>
                             </div>
 
-                            <div class="mb-3 align-items-start">
-                                <label class="form-label me-2 mb-0" style="min-width:100px">
-                                    Customer Asset ID or Excel Barcode</label>
-                                <div class="flex-grow-1">
-                                    <input id="customerAssetId" maxlength="150" class="form-control"
-                                        placeholder="Enter Customer Asset ID or Excel Barcode">
-                                </div>
-                                
-                                <!-- <div class="mb-3 d-flex gap-2 flex-column flex-sm-row">
-                                
-                                <select id="assetDescription" class="form-select flex-grow-1"
-                                    aria-label="Asset description">
-                                    <option value="">Select / enter</option>
-                                    <option>Air Conditioner</option>
-                                    <option>Fridge</option>
-                                    <option>Oven</option>
-                                </select>
-
-                                <select id="assetLocation" class="form-select flex-grow-1" aria-label="Asset location">
-                                    <option value="">Select / enter</option>
-                                    <option>Kitchen</option>
-                                    <option>Store Room</option>
-                                    <option>Roof</option>
-                                </select>
-                            </div> -->
-                            </div>
+                         
                         </div>
                         <div id="faultList"></div>
 
                         <div class="d-grid mt-2">
-                            <button type="button" id="addFaultBtn" class="btn btn-outline-purple">+ Add Another
+                            <button type="button" id="addFaultBtn" class="btn1 btn btn-outline-purple">+ Add Another
                                 Fault</button>
                         </div>
 
@@ -374,14 +372,14 @@
 
         <!-- Sticky Footer Nav -->
         <div class="footer-nav d-flex justify-content-between align-items-center p-3">
-            <button class="btn btn-outline-secondary btn-sm" id="backBtn" aria-label="Back">
+            <button class="btn1 btn btn-outline-secondary btn-sm" id="backBtn" aria-label="Back">
                 <i class="fa-solid fa-arrow-left"></i>Back
             </button>
             <div id="nextButtonContainer" class="d-flex justify-content-center align-items-center">
-                <button id="nextBtn" type="button" class="customer-next-btn btn btn-primary">Next -> Asset &
+                <button id="nextBtn" type="button" class="customer-next-btn btn1 btn btn-primary">Next -> Asset &
                     Faults</button>
 
-                <button style="display: none;" type="button" class="btn btn-outline-secondary btn-sm"
+                <button style="display: none;" type="button" class="btn1 btn btn-outline-secondary btn-sm"
                     id="createNewBtn">+ New</button>
 
             </div>
@@ -409,8 +407,8 @@
                     <pre id="jsonOutput" class="p-2 bg-light rounded-2" style="max-height:400px; overflow:auto;"></pre>
                 </div>
                 <div class="modal-footer">
-                    <button class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
-                    <button class="btn btn-success" id="downloadJson">Download JSON</button>
+                    <button class="btn1 btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                    <button class="btn1 btn btn-success" id="downloadJson">Download JSON</button>
                 </div>
             </div>
         </div>
@@ -419,10 +417,13 @@
     <!-- Scripts -->
     <script src="https://code.jquery.com/jquery-4.0.0.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@zxing/library@0.21.3/umd/index.min.js"></script>
     <script src="script/script.js"></script>
     <script src="script/lead-capture-v1.js"></script>
     <script src="script/job-number-api.js"></script>
+    <script src="script/customer-contact-api.js"></script>
     <script src="script/cost-center-api.js"></script>
+    <script src="script/asset-lookup-api.js"></script>
     <script src="script/validation.js"></script>
     <script src="script/service-managers.js"></script>
     <script src="script/totalRecovery.js"></script>

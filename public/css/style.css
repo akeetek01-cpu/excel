@@ -105,7 +105,7 @@ h2 {
 }
 
 /* Button */
-.btn {
+.btn1 {
   width: 100%;
   padding: 16px;
   border-radius: 14px;
@@ -360,12 +360,23 @@ color: var(--teal)!important;
   flex: 1;
 }
 
+#assetDescriptionInput {
+      font-size: 13px;
+}
+#addFaultBtn{
+  display: none;
+}
+
 .form-select{
     font-size: 13px;
 }
 
 
-
+.fault-card .btn{
+  width: auto;
+  padding: none;
+      border-radius: revert-rule;
+}
 
 select {
   appearance: none;
@@ -493,7 +504,7 @@ textarea {
   flex-shrink: 0;
 }
 
-.btn {
+.btn1 {
   background: #12c8c0;
   color: #fff;
   border: none;

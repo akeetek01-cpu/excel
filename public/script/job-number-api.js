@@ -97,6 +97,14 @@ $(function () {
       .done(function (response) {
         const customerName = response?.Customer?.CompanyName || response?.CompanyName || response?.Customer?.Name || response?.Name || "";
         const customerId = response?.Customer?.ID || response?.CustomerID || response?.ID || "";
+        const firstSite = response?.Site;
+        const defaultSiteId = firstSite?.ID != null ? String(firstSite.ID) : firstSite?.Name;
+        window.leadCaptureLookup = {
+          customerId,
+          customerName,
+          siteContactName: response?.SiteContact?.GivenName || "",
+          defaultSiteId,
+        };
 
         if (customerName) {
           $("#autoJobBtn").text(customerName);
@@ -106,9 +114,6 @@ $(function () {
         if (siteContractName) {
           $("#siteContractName").text(siteContractName);
         }
-
-        const firstSite = response?.Site;
-        const defaultSiteId = firstSite?.ID != null ? String(firstSite.ID) : firstSite?.Name;
         if (defaultSiteId) {
              fetchAssetData(defaultSiteId);
         }
@@ -117,6 +122,10 @@ $(function () {
         console.log("CustomerID:", customerId);
 
         if (customerId) {
+          if (window.loadCustomerContacts) {
+            window.loadCustomerContacts(customerId);
+          }
+
           getCompanySites(customerId)
             .done(function (sitesResponse) {
               const sites = sitesResponse?.Sites || sitesResponse?.sites || [];

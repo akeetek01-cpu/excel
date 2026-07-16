@@ -1,17 +1,37 @@
 $(function () {
   // Data model
   const jobData = {
-    customer: {},
-    asset: { description: "", location: "", customerAssetId: "" },
+    customer: {
+      customerId: "",
+      id: "",
+      jobNumber: "",
+      name: "",
+      phone: "",
+      email: "",
+      tenancy: "",
+      tenancyLabel: "",
+      notes: "",
+      siteContact: "",
+      siteContactLabel: "",
+    },
+    asset: {
+      description: "",
+      descriptionLabel: "",
+      location: "",
+      locationLabel: "",
+      customerAssetId: "",
+    },  
     faults: [],
     estimates: {
       technicians: 0,
       hours: 0,
       totalHours: 0,
-      apprentice: false,
+      apprentice: 0,
       afterHours: false,
       costCenter: "",
+      costCenterLabel: "",
       tags: "",
+      tagsLabel: "",
     },
     photos: [],
   };
@@ -124,6 +144,27 @@ $("#nextBtn").html('Next <span><i class="fa-solid fa-angle-right"></i></span>&nb
     $("#createNewBtn").toggle(idx === 2);
   }
 
+  function syncLookupContextToJobData() {
+    const lookup = window.leadCaptureLookup || {};
+
+    if (lookup.customerId && !jobData.customer.customerId) {
+      jobData.customer.customerId = String(lookup.customerId);
+      jobData.customer.id = String(lookup.customerId);
+    }
+
+    if (lookup.customerName && !jobData.customer.name) {
+      jobData.customer.name = String(lookup.customerName);
+    }
+
+    if (lookup.siteContactName && !jobData.customer.siteContact) {
+      jobData.customer.siteContact = String(lookup.siteContactName);
+    }
+
+    if (lookup.defaultSiteId && !jobData.customer.tenancy) {
+      jobData.customer.tenancy = String(lookup.defaultSiteId);
+    }
+  }
+
   function resetWizard() {
     $("#form-customer")[0].reset();
     $("#faultList").empty();
@@ -140,6 +181,8 @@ $("#nextBtn").html('Next <span><i class="fa-solid fa-angle-right"></i></span>&nb
     $(
       "#assetDescriptionError, #assetDescriptionInputError, #assetLocationError, #assetLocationInputError",
     ).text("");
+    $("#customerNameInput").val("");
+    $("#customerNameInputWrapper").addClass("d-none");
     $("#customerAssetId").val("");
     $("#costCenterSelect").val("");
     $("#tagsSelect").val("");
@@ -147,17 +190,37 @@ $("#nextBtn").html('Next <span><i class="fa-solid fa-angle-right"></i></span>&nb
     $("#hours").val(0);
     $("#apprentice").val(0);
     $("#afterHours").prop("checked", false);
-    jobData.customer = {};
-    jobData.asset = { description: "", location: "", customerAssetId: "" };
+    jobData.customer = {
+      customerId: "",
+      id: "",
+      jobNumber: "",
+      name: "",
+      phone: "",
+      email: "",
+      tenancy: "",
+      tenancyLabel: "",
+      notes: "",
+      siteContact: "",
+      siteContactLabel: "",
+    };
+    jobData.asset = {
+      description: "",
+      descriptionLabel: "",
+      location: "",
+      locationLabel: "",
+      customerAssetId: "",
+    };
     jobData.faults = [];
     jobData.estimates = {
       technicians: 0,
       hours: 0,
       totalHours: 0,
-      apprentice: false,
+      apprentice: 0,
       afterHours: false,
       costCenter: "",
+      costCenterLabel: "",
       tags: "",
+      tagsLabel: "",
     };
     jobData.photos = [];
     photoFiles = [];
@@ -219,73 +282,42 @@ $("#nextBtn").html('Next <span><i class="fa-solid fa-angle-right"></i></span>&nb
     } else {
       clearError("#jobNumber", "#jobNumberError");
     }
-    let customerName = $("#customerName").val().trim();
+    const customerNameValue = String($("#customerName").val() || "").trim();
+    const customerNameInput = String($("#customerNameInput").val() || "").trim();
 
-    if (customerName === "") {
+    if (customerNameValue === "other") {
+      if (customerNameInput === "") {
+        showError(
+          "#customerNameInput",
+          "#customerNameInputError",
+          "Customer Contact Name is required.",
+        );
+        valid = false;
+      } else if (customerNameInput.length < 2) {
+        showError(
+          "#customerNameInput",
+          "#customerNameInputError",
+          "Customer Name must contain a minimum of 2 characters.",
+        );
+        valid = false;
+      } else {
+        clearError("#customerNameInput", "#customerNameInputError");
+      }
+      clearError("#customerName", "#customerNameError");
+    } else if (customerNameValue === "") {
       showError(
         "#customerName",
         "#customerNameError",
         "Customer Contact Name is required.",
       );
       valid = false;
-    } else if (customerName.length < 2) {
-      showError(
-        "#customerName",
-        "#customerNameError",
-        "Customer Name must contain a minimum of 2 characters.",
-      );
-      valid = false;
     } else {
       clearError("#customerName", "#customerNameError");
+      clearError("#customerNameInput", "#customerNameInputError");
     }
 
-    const phone = $("#customerPhone").val().trim();
-    if (phone === "") {
-      showError(
-        "#customerPhone",
-        "#customerPhoneError",
-        "Phone Number is required.",
-      );
-      valid = false;
-    } else if (!/^\d+$/.test(phone)) {
-      showError(
-        "#customerPhone",
-        "#customerPhoneError",
-        "Customer Phone must contain only numeric characters.",
-      );
-      valid = false;
-    } else if (phone.length < 9) {
-      showError(
-        "#customerPhone",
-        "#customerPhoneError",
-        "Customer Phone must contain a minimum of 9 digits.",
-      );
-      valid = false;
-    } else if (phone.length > 12) {
-      showError(
-        "#customerPhone",
-        "#customerPhoneError",
-        "Customer Phone cannot exceed 12 digits.",
-      );
-      valid = false;
-    } else {
-      clearError("#customerPhone", "#customerPhoneError");
-    }
-
-    const email = $("#customerEmail").val().trim();
-    if (email === "") {
-      showError("#customerEmail", "#customerEmailError", "Email is required.");
-      valid = false;
-    } else if (!/^\S+@\S+\.\S+$/.test(email)) {
-      showError(
-        "#customerEmail",
-        "#customerEmailError",
-        "Enter a valid email address.",
-      );
-      valid = false;
-    } else {
-      clearError("#customerEmail", "#customerEmailError");
-    }
+    clearError("#customerPhone", "#customerPhoneError");
+    clearError("#customerEmail", "#customerEmailError");
 
     if ($("#customerTenancy").val().trim() === "") {
       showError(
@@ -475,63 +507,42 @@ $("#nextBtn").html('Next <span><i class="fa-solid fa-angle-right"></i></span>&nb
       showError(
         "#customerName",
         "#customerNameError",
-        "Customer Contract Name is required.",
+        "Customer Contact Name is required.",
       );
-    } else if (value.length < 2) {
-      showError(
-        "#customerName",
-        "#customerNameError",
-        "Customer Name must contain a minimum of 2 characters.",
-      );
+    } else if (value === "other") {
+      clearError("#customerName", "#customerNameError");
     } else {
       clearError("#customerName", "#customerNameError");
     }
   });
 
-  $("#customerPhone").on("blur", function () {
-    const phone = $(this).val().trim();
-    if (phone === "") {
-      showError(
-        "#customerPhone",
-        "#customerPhoneError",
-        "Phone Number is required.",
-      );
-    } else if (!/^\d+$/.test(phone)) {
-      showError(
-        "#customerPhone",
-        "#customerPhoneError",
-        "Customer Phone must contain only numeric characters.",
-      );
-    } else if (phone.length < 9) {
-      showError(
-        "#customerPhone",
-        "#customerPhoneError",
-        "Customer Phone must contain a minimum of 9 digits.",
-      );
-    } else if (phone.length > 12) {
-      showError(
-        "#customerPhone",
-        "#customerPhoneError",
-        "Customer Phone cannot exceed 12 digits.",
-      );
-    } else {
-      clearError("#customerPhone", "#customerPhoneError");
+  $("#customerNameInput").on("blur", function () {
+    const value = $(this).val().trim();
+    if ($("#customerName").val() === "other") {
+      if (value === "") {
+        showError(
+          "#customerNameInput",
+          "#customerNameInputError",
+          "Customer Contact Name is required.",
+        );
+      } else if (value.length < 2) {
+        showError(
+          "#customerNameInput",
+          "#customerNameInputError",
+          "Customer Name must contain a minimum of 2 characters.",
+        );
+      } else {
+        clearError("#customerNameInput", "#customerNameInputError");
+      }
     }
   });
 
+  $("#customerPhone").on("blur", function () {
+    clearError("#customerPhone", "#customerPhoneError");
+  });
+
   $("#customerEmail").on("blur", function () {
-    const value = $(this).val().trim();
-    if (value === "") {
-      showError("#customerEmail", "#customerEmailError", "Email is required.");
-    } else if (!/^\S+@\S+\.\S+$/.test(value)) {
-      showError(
-        "#customerEmail",
-        "#customerEmailError",
-        "Enter a valid email address.",
-      );
-    } else {
-      clearError("#customerEmail", "#customerEmailError");
-    }
+    clearError("#customerEmail", "#customerEmailError");
   });
 
   $("#customerTenancy").on("blur", function () {
@@ -1246,6 +1257,80 @@ $("#nextBtn").html('Next <span><i class="fa-solid fa-angle-right"></i></span>&nb
     $("#photoInput").trigger("click");
   });
 
+  async function readBarcodeFromImage(file) {
+    if (!file) return "";
+
+    if (window.BarcodeDetector) {
+      try {
+        const detector = new window.BarcodeDetector({
+          formats: ["code_128", "qr_code", "ean_13", "ean_8", "code_39", "upc_a", "upc_e"],
+        });
+        const barcode = await detector.detect(file);
+        const value = barcode?.[0]?.rawValue || "";
+        if (value) {
+          return String(value).trim();
+        }
+      } catch (error) {
+        console.warn("Built-in barcode detection failed:", error);
+      }
+    }
+
+    if (window.ZXing && window.ZXing.BrowserMultiFormatReader) {
+      try {
+        const codeReader = new window.ZXing.BrowserMultiFormatReader();
+        const imageUrl = URL.createObjectURL(file);
+        try {
+          const result = await codeReader.decodeFromImageUrl(imageUrl);
+          const value = result?.getText ? result.getText() : result?.text || "";
+          if (value) {
+            return String(value).trim();
+          }
+        } finally {
+          URL.revokeObjectURL(imageUrl);
+        }
+      } catch (error) {
+        console.warn("ZXing barcode detection failed:", error);
+      }
+    }
+
+    return "";
+  }
+
+  $("#barcodeScanBtn").on("click", function () {
+    $("#barcodeFileInput").trigger("click");
+  });
+
+  $("#barcodeFileInput").on("change", async function (event) {
+    const file = event.target.files && event.target.files[0];
+    if (!file) return;
+
+    try {
+      const value = await readBarcodeFromImage(file);
+      if (value) {
+        $("#customerAssetId").val(value);
+        if (window.lookupAssetByValue) {
+          window.lookupAssetByValue(value);
+        }
+      } else if (window.alert) {
+        alert("Barcode could not be read from this image. Please enter the value manually.");
+      }
+    } catch (error) {
+      console.error("Barcode scan failed:", error);
+      if (window.alert) {
+        alert("Barcode scan is not available in this browser. Please enter the value manually.");
+      }
+    } finally {
+      $(this).val("");
+    }
+  });
+
+  $("#customerAssetId").on("input change", function () {
+    const value = $(this).val().trim();
+    if (value.length >= 4 && window.lookupAssetByValue) {
+      window.lookupAssetByValue(value);
+    }
+  });
+
   // stop clicks on the input bubbling up (defensive)
   $("#photoInput").on("click", function (e) {
     e.stopPropagation();
@@ -1329,7 +1414,7 @@ $("#nextBtn").html('Next <span><i class="fa-solid fa-angle-right"></i></span>&nb
       saveStepData(currentStep);
       showStep(currentStep + 1);
     } else {
-      if (!validateStep(2)) return;
+      validateStep(2);
       saveStepData(2);
       submitJob();
     }
@@ -1356,8 +1441,8 @@ $("#nextBtn").html('Next <span><i class="fa-solid fa-angle-right"></i></span>&nb
     if (idx === 2) {
       const tech = Number($("#technicians").val() || 0);
       const hrs = Number($("#hours").val() || 0);
-      const costCenter = $("#costCenterSelect").val().trim();
-      const tags = $("#tagsSelect").val().trim();
+      const costCenter = String($("#costCenterSelect").val() || "").trim();
+      const tags = String($("#tagsSelect").val() || "").trim();
       let valid = true;
 
       if (costCenter === "") {
@@ -1403,25 +1488,34 @@ $("#nextBtn").html('Next <span><i class="fa-solid fa-angle-right"></i></span>&nb
 
   function saveStepData(idx) {
     if (idx === 0) {
-      jobData.customer.jobNumber = $("#jobNumber").val().trim();
-      jobData.customer.name = $("#customerName").val().trim();
-      jobData.customer.phone = $("#customerPhone").val().trim();
-      jobData.customer.email = $("#customerEmail").val().trim();
-      jobData.customer.tenancy = $("#customerTenancy").val().trim();
-      jobData.customer.notes = $("#customerNotes").val().trim();
+      syncLookupContextToJobData();
+      jobData.customer.jobNumber = String($("#jobNumber").val() || "").trim();
+      const selectedContactValue = String($("#customerName").val() || "").trim();
+      const selectedContactLabel = String($("#customerName option:selected").text() || "").trim();
+      const manualContactName = String($("#customerNameInput").val() || "").trim();
+      jobData.customer.name = selectedContactValue === "other" ? manualContactName : selectedContactLabel;
+      jobData.customer.phone = String($("#customerPhone").val() || "").trim();
+      jobData.customer.email = String($("#customerEmail").val() || "").trim();
+      jobData.customer.tenancy = String($("#customerTenancy").val() || "").trim();
+      jobData.customer.tenancyLabel = String($("#customerTenancy option:selected").text() || "").trim();
+      jobData.customer.notes = String($("#customerNotes").val() || "").trim();
+      jobData.customer.siteContact = String($("#siteContractName").text() || "").trim() || jobData.customer.siteContact;
+      jobData.customer.siteContactLabel = String($("#siteContractName").text() || "").trim() || jobData.customer.siteContactLabel;
     }
     if (idx === 1) {
       const selectedDescription = $("#assetDescriptionSelect").val();
       const selectedLocation = $("#assetLocation").val();
       jobData.asset.description =
         selectedDescription === "other"
-          ? $("#assetDescriptionInput").val().trim()
-          : selectedDescription;
+          ? String($("#assetDescriptionInput").val() || "").trim()
+          : String(selectedDescription || "").trim();
+      jobData.asset.descriptionLabel = String($("#assetDescriptionSelect option:selected").text() || "").trim();
       jobData.asset.location =
         selectedLocation === "other"
-          ? $("#assetLocationInput").val().trim()
-          : selectedLocation;
-      jobData.asset.customerAssetId = $("#customerAssetId").val().trim();
+          ? String($("#assetLocationInput").val() || "").trim()
+          : String(selectedLocation || "").trim();
+      jobData.asset.locationLabel = String($("#assetLocation option:selected").text() || "").trim();
+      jobData.asset.customerAssetId = String($("#customerAssetId").val() || "").trim();
       // faults already bound
     }
     if (idx === 2) {
@@ -1433,10 +1527,12 @@ $("#nextBtn").html('Next <span><i class="fa-solid fa-angle-right"></i></span>&nb
       jobData.estimates.technicians = technicians + apprentice;
       jobData.estimates.hours = hours;
       jobData.estimates.totalHours = totalHours;
-      jobData.estimates.apprentice = $("#apprentice").is(":checked");
+      jobData.estimates.apprentice = apprentice;
       jobData.estimates.afterHours = $("#afterHours").is(":checked");
-      jobData.estimates.costCenter = $("#costCenterSelect").val().trim();
-      jobData.estimates.tags = $("#tagsSelect").val().trim();
+      jobData.estimates.costCenter = String($("#costCenterSelect").val() || "").trim();
+      jobData.estimates.costCenterLabel = String($("#costCenterSelect option:selected").text() || "").trim();
+      jobData.estimates.tags = String($("#tagsSelect").val() || "").trim();
+      jobData.estimates.tagsLabel = String($("#tagsSelect option:selected").text() || "").trim();
     }
   }
 
@@ -1452,28 +1548,77 @@ $("#nextBtn").html('Next <span><i class="fa-solid fa-angle-right"></i></span>&nb
     $("#revMan").text(jobData.estimates.totalHours || "-");
   }
 
+  function buildLeadPayload() {
+    const customerJobNumber = String(jobData.customer.jobNumber || "").trim();
+    const customerId = Number(jobData.customer.customerId || jobData.customer.id || 0) || Number(customerJobNumber || 0);
+    const customerName = String(jobData.customer.name || "").trim();
+    const customerPhone = String(jobData.customer.phone || "").trim();
+    const customerNotes = String(jobData.customer.notes || "").trim();
+    const siteValue = String(jobData.customer.tenancy || "").trim();
+    const siteLabel = String(jobData.customer.tenancyLabel || "").trim();
+    const selectedTags = jobData.estimates.tags || String($("#tagsSelect").val() || "").trim();
+    const selectedCostCenter = jobData.estimates.costCenter || String($("#costCenterSelect").val() || "").trim();
+    const tagIds = Array.isArray(selectedTags)
+      ? selectedTags.map((value) => Number(String(value).trim())).filter((value) => Number.isFinite(value))
+      : String(selectedTags || "")
+          .split(",")
+          .map((value) => Number(String(value).trim()))
+          .filter((value) => Number.isFinite(value));
+    const description = [jobData.asset.description, ...jobData.faults.map((fault) => fault.description)].filter(Boolean).join(" | ");
+    const notes = [customerNotes, jobData.asset.location, jobData.asset.locationLabel, siteLabel].filter(Boolean).join(" | ");
+    const followUpDate = new Date();
+    followUpDate.setDate(followUpDate.getDate() + 7);
+    const contactNumber = Number(customerPhone.replace(/\D/g, "")) || 0;
+
+    return {
+      Customer: customerId || 0,
+      Site: Number(siteValue) || 0,
+      LeadName: customerName || customerJobNumber || "Lead",
+      CustomerContact: contactNumber || Number(customerJobNumber) || 0,
+      AdditionalContacts: contactNumber ? [contactNumber] : [],
+      SiteContact: contactNumber || Number(customerJobNumber) || 0,
+      Stage: "Open",
+      FollowUpDate: followUpDate.toISOString().split("T")[0],
+      Description: description || "",
+      Notes: notes || "",
+      CostCenter: Number(selectedCostCenter) || 0,
+      Tags: tagIds,
+      Salesperson: 0,
+      ProjectManager: 0,
+      Status: 0,
+      Forecast: {
+        EstimatedPrice: Number(jobData.estimates.totalHours || 0),
+        Probability: Number(jobData.estimates.technicians || 0) > 0 ? 100 : 0,
+        ExpectedYear: new Date().getFullYear(),
+        ExpectedMonth: new Date().getMonth() + 1,
+      },
+      AutoAdjustStatus: Boolean(jobData.estimates.afterHours),
+    };
+  }
+
   function submitJob() {
     saveStepData(0);
     saveStepData(1);
     saveStepData(2);
-    const payload = {
-      customer: jobData.customer,
-      asset: jobData.asset,
-      faults: jobData.faults,
-      estimates: jobData.estimates,
-      photos: jobData.photos.map((f, i) => ({
-        name: f.name,
-        size: f.size,
-        type: f.type,
-      })),
-    };
+    const payload = buildLeadPayload();
     const json = JSON.stringify(payload, null, 2);
     $("#modalJobNum").text(jobData.customer.jobNumber || "");
     $("#modalCustomer").text(jobData.customer.name || "");
     $("#modalTime").text(new Date().toLocaleString());
     $("#jsonOutput").text(json);
-    const modal = new bootstrap.Modal(document.getElementById("submitModal"));
-    modal.show();
+
+    const modalElement = document.getElementById("submitModal");
+    if (modalElement) {
+      if (window.bootstrap && typeof window.bootstrap.Modal === "function") {
+        const modal = new window.bootstrap.Modal(modalElement);
+        modal.show();
+      } else {
+        modalElement.classList.add("show");
+        modalElement.style.display = "block";
+        modalElement.setAttribute("aria-hidden", "false");
+        document.body.classList.add("modal-open");
+      }
+    }
 
     $("#downloadJson")
       .off("click")
