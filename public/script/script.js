@@ -1302,8 +1302,20 @@ $("#nextBtn").html('Next <span><i class="fa-solid fa-angle-right"></i></span>&nb
   });
 
   $("#barcodeFileInput").on("change", async function (event) {
-    const file = event.target.files && event.target.files[0];
-    if (!file) return;
+    const input = this;
+    const file = event.target?.files?.[0] || event.originalEvent?.dataTransfer?.files?.[0] || null;
+
+    if (!file) {
+      return;
+    }
+
+    const fileName = (file.name || "").toLowerCase();
+    if (!fileName.match(/\.(png|jpg|jpeg|webp|bmp|gif)$/i)) {
+      if (window.alert) {
+        alert("Please choose a valid image file.");
+      }
+      return;
+    }
 
     try {
       const value = await readBarcodeFromImage(file);
@@ -1321,7 +1333,11 @@ $("#nextBtn").html('Next <span><i class="fa-solid fa-angle-right"></i></span>&nb
         alert("Barcode scan is not available in this browser. Please enter the value manually.");
       }
     } finally {
-      $(this).val("");
+      try {
+        input.value = "";
+      } catch (_) {
+        $(input).val("");
+      }
     }
   });
 
@@ -1583,7 +1599,7 @@ $("#nextBtn").html('Next <span><i class="fa-solid fa-angle-right"></i></span>&nb
       Site: Number(siteValue) || 0,
       LeadName: customerJobNumber,
       CustomerContact: customerContactId || contactNumber || Number(customerJobNumber) || 0,
-      AdditionalContacts: customerContactId ? [customerContactId] : contactNumber ? [contactNumber] : [],
+      AdditionalContacts:  [],
       SiteContact: customerContactId || contactNumber || Number(customerJobNumber) || 0,
       Stage: "Open",
       FollowUpDate: followUpDate.toISOString().split("T")[0],
