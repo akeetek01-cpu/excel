@@ -112,11 +112,19 @@
                                     </label>
 
                                     <div class="flex-grow-1">
-                                        <select id="customerName" class="form-select" aria-label="Customer contact name">
-                                            <option value="" selected disabled>Select Contact</option>
-                                        </select>
-
-                                        <div id="customerNameError" class="invalid-feedback"></div>
+                                        <div class="row g-2 align-items-start">
+                                            <div id="customerNameSelectWrapper" class="col-12">
+                                                <select id="customerName" class="form-select" aria-label="Customer contact name">
+                                                    <option value="" selected disabled>Select Contact</option>
+                                                    <option value="other">Other</option>
+                                                </select>
+                                                <div id="customerNameError" class="invalid-feedback"></div>
+                                            </div>
+                                            <div id="customerNameInputWrapper" class="col-12 d-none">
+                                                <input type="text" id="customerNameInput" class="form-control" maxlength="150" placeholder="Enter customer contact name">
+                                                <div id="customerNameInputError" class="invalid-feedback"></div>
+                                            </div>
+                                        </div>
                                     </div>
                                 </div>
 

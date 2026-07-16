@@ -13,6 +13,24 @@ $(function () {
     $("#customerEmail").val(email);
   }
 
+  function setCustomerNameMode() {
+    const $select = $("#customerName");
+    const selectedValue = String($select.val() || "").trim();
+    const $wrapper = $("#customerNameInputWrapper");
+    const $selectWrapper = $("#customerNameSelectWrapper");
+    const $input = $("#customerNameInput");
+
+    if (selectedValue === "other") {
+      $wrapper.removeClass("d-none").removeClass("col-12").addClass("col-9");
+      $selectWrapper.removeClass("col-12").addClass("col-3");
+    } else {
+      $wrapper.addClass("d-none").removeClass("col-9").addClass("col-12");
+      $selectWrapper.removeClass("col-3").addClass("col-12");
+      $input.removeClass("is-invalid").val("");
+      $("#customerNameInputError").text("");
+    }
+  }
+
   function populateCustomerContacts(contacts) {
     const $select = $("#customerName");
     const selectedValue = String($select.val() || "").trim();
@@ -21,6 +39,7 @@ $(function () {
     $select.find("option").not(':first').remove();
     $select.empty().append(new Option(placeholderText, "", true, true));
     $select.find("option[value='']").prop("disabled", true).prop("hidden", true);
+    $select.append(new Option("Other", "other"));
 
     window.customerContactsById = {};
 
@@ -41,29 +60,44 @@ $(function () {
         $select.append(new Option(label, value));
       });
 
-    if (selectedValue && window.customerContactsById[selectedValue]) {
+    if (!normalizedContacts.length) {
+      $select.val("other");
+      setCustomerNameMode();
+      return;
+    }
+
+    if (selectedValue === "other") {
+      $select.val("other");
+    } else if (selectedValue && window.customerContactsById[selectedValue]) {
       $select.val(selectedValue);
     } else {
       $select.val("");
     }
 
-    if ($select.val()) {
+    if ($select.val() && $select.val() !== "other") {
       const selectedContact = window.customerContactsById[$select.val()];
       if (selectedContact) {
         populateContactDetails(selectedContact);
       }
+    } else {
+      $("#customerPhone").val("");
+      $("#customerEmail").val("");
     }
+
+    setCustomerNameMode();
   }
 
   window.loadCustomerContacts = function (customerId) {
     const $select = $("#customerName");
     $select.empty().append(new Option("Select Contact", "", true, true));
     $select.find("option[value='']").prop("disabled", true).prop("hidden", true);
+    $select.append(new Option("Other", "other"));
     $("#customerPhone").val("");
     $("#customerEmail").val("");
 
     if (!customerId) {
       window.customerContactsById = {};
+      setCustomerNameMode();
       return;
     }
 
@@ -88,16 +122,23 @@ $(function () {
   };
 
   $(document).on("change", "#customerName", function () {
-    const contactId = String($(this).val() || "").trim();
-    if (!contactId) {
-      $("#customerPhone").val("");
-      $("#customerEmail").val("");
+    const contactValue = String($(this).val() || "").trim();
+    if (contactValue === "other") {
+      setCustomerNameMode();
       return;
     }
 
-    const selectedContact = window.customerContactsById?.[contactId];
+    if (!contactValue) {
+      $("#customerPhone").val("");
+      $("#customerEmail").val("");
+      setCustomerNameMode();
+      return;
+    }
+
+    const selectedContact = window.customerContactsById?.[contactValue];
     if (selectedContact) {
       populateContactDetails(selectedContact);
     }
+    setCustomerNameMode();
   });
 });

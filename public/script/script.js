@@ -181,6 +181,8 @@ $("#nextBtn").html('Next <span><i class="fa-solid fa-angle-right"></i></span>&nb
     $(
       "#assetDescriptionError, #assetDescriptionInputError, #assetLocationError, #assetLocationInputError",
     ).text("");
+    $("#customerNameInput").val("");
+    $("#customerNameInputWrapper").addClass("d-none");
     $("#customerAssetId").val("");
     $("#costCenterSelect").val("");
     $("#tagsSelect").val("");
@@ -280,24 +282,38 @@ $("#nextBtn").html('Next <span><i class="fa-solid fa-angle-right"></i></span>&nb
     } else {
       clearError("#jobNumber", "#jobNumberError");
     }
-    let customerName = $("#customerName").val().trim();
+    const customerNameValue = String($("#customerName").val() || "").trim();
+    const customerNameInput = String($("#customerNameInput").val() || "").trim();
 
-    if (customerName === "") {
+    if (customerNameValue === "other") {
+      if (customerNameInput === "") {
+        showError(
+          "#customerNameInput",
+          "#customerNameInputError",
+          "Customer Contact Name is required.",
+        );
+        valid = false;
+      } else if (customerNameInput.length < 2) {
+        showError(
+          "#customerNameInput",
+          "#customerNameInputError",
+          "Customer Name must contain a minimum of 2 characters.",
+        );
+        valid = false;
+      } else {
+        clearError("#customerNameInput", "#customerNameInputError");
+      }
+      clearError("#customerName", "#customerNameError");
+    } else if (customerNameValue === "") {
       showError(
         "#customerName",
         "#customerNameError",
         "Customer Contact Name is required.",
       );
       valid = false;
-    } else if (customerName.length < 2) {
-      showError(
-        "#customerName",
-        "#customerNameError",
-        "Customer Name must contain a minimum of 2 characters.",
-      );
-      valid = false;
     } else {
       clearError("#customerName", "#customerNameError");
+      clearError("#customerNameInput", "#customerNameInputError");
     }
 
     clearError("#customerPhone", "#customerPhoneError");
@@ -491,16 +507,33 @@ $("#nextBtn").html('Next <span><i class="fa-solid fa-angle-right"></i></span>&nb
       showError(
         "#customerName",
         "#customerNameError",
-        "Customer Contract Name is required.",
+        "Customer Contact Name is required.",
       );
-    } else if (value.length < 2) {
-      showError(
-        "#customerName",
-        "#customerNameError",
-        "Customer Name must contain a minimum of 2 characters.",
-      );
+    } else if (value === "other") {
+      clearError("#customerName", "#customerNameError");
     } else {
       clearError("#customerName", "#customerNameError");
+    }
+  });
+
+  $("#customerNameInput").on("blur", function () {
+    const value = $(this).val().trim();
+    if ($("#customerName").val() === "other") {
+      if (value === "") {
+        showError(
+          "#customerNameInput",
+          "#customerNameInputError",
+          "Customer Contact Name is required.",
+        );
+      } else if (value.length < 2) {
+        showError(
+          "#customerNameInput",
+          "#customerNameInputError",
+          "Customer Name must contain a minimum of 2 characters.",
+        );
+      } else {
+        clearError("#customerNameInput", "#customerNameInputError");
+      }
     }
   });
 
@@ -1425,7 +1458,10 @@ $("#nextBtn").html('Next <span><i class="fa-solid fa-angle-right"></i></span>&nb
     if (idx === 0) {
       syncLookupContextToJobData();
       jobData.customer.jobNumber = String($("#jobNumber").val() || "").trim();
-      jobData.customer.name = String($("#customerName").val() || "").trim();
+      const selectedContactValue = String($("#customerName").val() || "").trim();
+      const selectedContactLabel = String($("#customerName option:selected").text() || "").trim();
+      const manualContactName = String($("#customerNameInput").val() || "").trim();
+      jobData.customer.name = selectedContactValue === "other" ? manualContactName : selectedContactLabel;
       jobData.customer.phone = String($("#customerPhone").val() || "").trim();
       jobData.customer.email = String($("#customerEmail").val() || "").trim();
       jobData.customer.tenancy = String($("#customerTenancy").val() || "").trim();
