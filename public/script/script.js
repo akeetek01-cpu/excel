@@ -13,6 +13,7 @@ $(function () {
       notes: "",
       siteContact: "",
       siteContactLabel: "",
+      customerContact: "",
     },
     asset: {
       description: "",
@@ -1493,7 +1494,12 @@ $("#nextBtn").html('Next <span><i class="fa-solid fa-angle-right"></i></span>&nb
       const selectedContactValue = String($("#customerName").val() || "").trim();
       const selectedContactLabel = String($("#customerName option:selected").text() || "").trim();
       const manualContactName = String($("#customerNameInput").val() || "").trim();
-      jobData.customer.name = selectedContactValue === "other" ? manualContactName : selectedContactLabel;
+      const selectedContactId = selectedContactValue && selectedContactValue !== "other" ? selectedContactValue : "";
+      jobData.customer.name = selectedContactValue === "other"
+        ? manualContactName
+        : selectedContactValue
+          ? selectedContactLabel
+          : "";
       jobData.customer.phone = String($("#customerPhone").val() || "").trim();
       jobData.customer.email = String($("#customerEmail").val() || "").trim();
       jobData.customer.tenancy = String($("#customerTenancy").val() || "").trim();
@@ -1501,6 +1507,7 @@ $("#nextBtn").html('Next <span><i class="fa-solid fa-angle-right"></i></span>&nb
       jobData.customer.notes = String($("#customerNotes").val() || "").trim();
       jobData.customer.siteContact = String($("#siteContractName").text() || "").trim() || jobData.customer.siteContact;
       jobData.customer.siteContactLabel = String($("#siteContractName").text() || "").trim() || jobData.customer.siteContactLabel;
+      jobData.customer.customerContact = selectedContactId;
     }
     if (idx === 1) {
       const selectedDescription = $("#assetDescriptionSelect").val();
@@ -1555,6 +1562,7 @@ $("#nextBtn").html('Next <span><i class="fa-solid fa-angle-right"></i></span>&nb
     const customerPhone = String(jobData.customer.phone || "").trim();
     const customerNotes = String(jobData.customer.notes || "").trim();
     const siteValue = String(jobData.customer.tenancy || "").trim();
+    const customerContactId = Number(jobData.customer.customerContact || 0) || 0;
     const siteLabel = String(jobData.customer.tenancyLabel || "").trim();
     const selectedTags = jobData.estimates.tags || String($("#tagsSelect").val() || "").trim();
     const selectedCostCenter = jobData.estimates.costCenter || String($("#costCenterSelect").val() || "").trim();
@@ -1573,10 +1581,10 @@ $("#nextBtn").html('Next <span><i class="fa-solid fa-angle-right"></i></span>&nb
     return {
       Customer: customerId || 0,
       Site: Number(siteValue) || 0,
-      LeadName: customerName || customerJobNumber || "Lead",
-      CustomerContact: contactNumber || Number(customerJobNumber) || 0,
-      AdditionalContacts: contactNumber ? [contactNumber] : [],
-      SiteContact: contactNumber || Number(customerJobNumber) || 0,
+      LeadName: customerJobNumber,
+      CustomerContact: customerContactId || contactNumber || Number(customerJobNumber) || 0,
+      AdditionalContacts: customerContactId ? [customerContactId] : contactNumber ? [contactNumber] : [],
+      SiteContact: customerContactId || contactNumber || Number(customerJobNumber) || 0,
       Stage: "Open",
       FollowUpDate: followUpDate.toISOString().split("T")[0],
       Description: description || "",

@@ -2,13 +2,13 @@
   // Default settings (can be overridden by passing options to initTotalRecovery)
   const DEFAULT = {
     url:
-      "https://excel.simprocloud.com//api/v1.0/companies/6/storageDevices/37/stock/?search=any&pageSize=250&page=1&limit=100",
+      `${window.SIMPRO_CONFIG.baseUrl}/companies/6/storageDevices/37/stock/?search=any&pageSize=250&page=1&limit=100`,
     method: "GET",
     timeout: 0,
     headers: {
       Accept: "application/json",
       Authorization:
-        "Bearer c9c47eab18f514ad102ae8c78ce2a444e3bc4dab",
+        `Bearer ${window.SIMPRO_CONFIG.authToken}`,
     },
   };
 
