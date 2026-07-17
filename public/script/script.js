@@ -1285,6 +1285,31 @@ $("#nextBtn").html('Next <span><i class="fa-solid fa-angle-right"></i></span>&nb
       throw new Error("HEIC/HEIF images are not supported for barcode scanning on this device.");
     }
 
+    if (window.Html5Qrcode) {
+      const readerId = "barcode-reader-hidden";
+      let container = document.getElementById(readerId);
+      if (!container) {
+        container = document.createElement("div");
+        container.id = readerId;
+        container.style.display = "none";
+        document.body.appendChild(container);
+      }
+
+      const html5QrCode = new window.Html5Qrcode(readerId);
+      try {
+        const decodedText = await html5QrCode.scanFile(file, true);
+        if (decodedText) {
+          return String(decodedText).trim();
+        }
+      } catch (error) {
+        console.warn("Html5Qrcode scan failed:", error);
+      } finally {
+        try {
+          await html5QrCode.clear();
+        } catch (_) {}
+      }
+    }
+
     try {
       if (window.createImageBitmap) {
         const bitmap = await window.createImageBitmap(file);
