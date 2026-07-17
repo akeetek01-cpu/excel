@@ -1258,40 +1258,103 @@ $("#nextBtn").html('Next <span><i class="fa-solid fa-angle-right"></i></span>&nb
     $("#photoInput").trigger("click");
   });
 
+  function setBarcodeStatus(message, isError = false) {
+    const $status = $("#barcodeStatus");
+    if (!$status.length) return;
+
+    $status
+      .text(message || "")
+      .removeClass("text-muted text-danger text-success")
+      .addClass(isError ? "text-danger" : message ? "text-success" : "text-muted");
+  }
+
+  function loadImageElement(src) {
+    return new Promise((resolve, reject) => {
+      const image = new Image();
+      image.onload = () => resolve(image);
+      image.onerror = () => reject(new Error("Unable to load image"));
+      image.src = src;
+    });
+  }
+
   async function readBarcodeFromImage(file) {
     if (!file) return "";
 
-    if (window.BarcodeDetector) {
-      try {
-        const detector = new window.BarcodeDetector({
-          formats: ["code_128", "qr_code", "ean_13", "ean_8", "code_39", "upc_a", "upc_e"],
-        });
-        const barcode = await detector.detect(file);
-        const value = barcode?.[0]?.rawValue || "";
-        if (value) {
-          return String(value).trim();
-        }
-      } catch (error) {
-        console.warn("Built-in barcode detection failed:", error);
-      }
+    const fileName = (file.name || "").toLowerCase();
+    if (/(heic|heif)$/i.test(fileName) || /heic|heif/i.test(file.type || "")) {
+      throw new Error("HEIC/HEIF images are not supported for barcode scanning on this device.");
     }
 
-    if (window.ZXing && window.ZXing.BrowserMultiFormatReader) {
-      try {
-        const codeReader = new window.ZXing.BrowserMultiFormatReader();
-        const imageUrl = URL.createObjectURL(file);
+    try {
+      if (window.createImageBitmap) {
+        const bitmap = await window.createImageBitmap(file);
         try {
-          const result = await codeReader.decodeFromImageUrl(imageUrl);
-          const value = result?.getText ? result.getText() : result?.text || "";
+          if (window.BarcodeDetector) {
+            try {
+              const detector = new window.BarcodeDetector({
+                formats: ["code_128", "qr_code", "ean_13", "ean_8", "code_39", "upc_a", "upc_e"],
+              });
+              const barcode = await detector.detect(bitmap);
+              const value = barcode?.[0]?.rawValue || "";
+              if (value) {
+                return String(value).trim();
+              }
+            } catch (error) {
+              console.warn("Built-in barcode detection failed:", error);
+            }
+          }
+        } finally {
+          bitmap.close && bitmap.close();
+        }
+      }
+    } catch (error) {
+      console.warn("ImageBitmap barcode detection failed:", error);
+    }
+
+    const imageUrl = URL.createObjectURL(file);
+    try {
+      const image = await loadImageElement(imageUrl);
+
+      if (window.BarcodeDetector) {
+        try {
+          const detector = new window.BarcodeDetector({
+            formats: ["code_128", "qr_code", "ean_13", "ean_8", "code_39", "upc_a", "upc_e"],
+          });
+          const barcode = await detector.detect(image);
+          const value = barcode?.[0]?.rawValue || "";
           if (value) {
             return String(value).trim();
           }
-        } finally {
-          URL.revokeObjectURL(imageUrl);
+        } catch (error) {
+          console.warn("Built-in barcode detection with image element failed:", error);
         }
-      } catch (error) {
-        console.warn("ZXing barcode detection failed:", error);
       }
+
+      if (window.ZXing && window.ZXing.BrowserMultiFormatReader) {
+        try {
+          const codeReader = new window.ZXing.BrowserMultiFormatReader();
+
+          if (typeof codeReader.decodeFromImageElement === "function") {
+            const result = await codeReader.decodeFromImageElement(image);
+            const value = result?.getText ? result.getText() : result?.text || "";
+            if (value) {
+              return String(value).trim();
+            }
+          }
+
+          if (typeof codeReader.decodeFromImageUrl === "function") {
+            const result = await codeReader.decodeFromImageUrl(imageUrl);
+            const value = result?.getText ? result.getText() : result?.text || "";
+            if (value) {
+              return String(value).trim();
+            }
+          }
+        } catch (error) {
+          console.warn("ZXing barcode detection failed:", error);
+        }
+      }
+    } finally {
+      URL.revokeObjectURL(imageUrl);
     }
 
     return "";
@@ -1311,24 +1374,32 @@ $("#nextBtn").html('Next <span><i class="fa-solid fa-angle-right"></i></span>&nb
 
     const fileName = (file.name || "").toLowerCase();
     if (!fileName.match(/\.(png|jpg|jpeg|webp|bmp|gif)$/i)) {
+      setBarcodeStatus("Please choose a valid image file.", true);
       if (window.alert) {
         alert("Please choose a valid image file.");
       }
       return;
     }
 
+    setBarcodeStatus("Scanning barcode…", false);
+
     try {
       const value = await readBarcodeFromImage(file);
       if (value) {
         $("#customerAssetId").val(value);
+        setBarcodeStatus("Barcode read successfully.");
         if (window.lookupAssetByValue) {
           window.lookupAssetByValue(value);
         }
-      } else if (window.alert) {
-        alert("Barcode could not be read from this image. Please enter the value manually.");
+      } else {
+        setBarcodeStatus("Barcode could not be read from this image. Please enter the value manually.", true);
+        if (window.alert) {
+          alert("Barcode could not be read from this image. Please enter the value manually.");
+        }
       }
     } catch (error) {
       console.error("Barcode scan failed:", error);
+      setBarcodeStatus("Barcode scan is not available on this device. Please enter the value manually.", true);
       if (window.alert) {
         alert("Barcode scan is not available in this browser. Please enter the value manually.");
       }
