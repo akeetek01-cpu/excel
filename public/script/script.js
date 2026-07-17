@@ -1263,56 +1263,9 @@ $("#nextBtn").html('Next <span><i class="fa-solid fa-angle-right"></i></span>&nb
 
   function setBarcodeStatus(message, isError = false) {
     const $status = $("#barcodeStatus");
-    if (!$status.length) return;
-
-    $status
-      .text(message || "")
-      .removeClass("text-muted text-danger text-success")
-      .addClass(isError ? "text-danger" : message ? "text-success" : "text-muted");
-  }
-
-  function hideBarcodeChoiceMenu() {
-    $("#barcodeChoiceMenu").remove();
-  }
-
-  function showBarcodeChoiceMenu() {
-    if ($("#barcodeChoiceMenu").length) return;
-
-    const canUseCamera = Boolean(navigator.mediaDevices && navigator.mediaDevices.getUserMedia);
-
-    $("body").append(`
-      <div id="barcodeChoiceMenu" style="position:fixed; inset:0; z-index:99998; background:rgba(0,0,0,0.28); display:flex; align-items:center; justify-content:center; padding:16px;">
-        <div style="width:min(100%, 320px); background:#fff; border-radius:14px; padding:18px; box-shadow:0 12px 32px rgba(0,0,0,0.2);">
-          <div style="font-size:16px; font-weight:600; margin-bottom:12px;">Scan barcode</div>
-          <button type="button" id="barcodeUseCameraBtn" class="btn btn-primary w-100 mb-2" ${canUseCamera ? "" : "disabled"}>Use camera</button>
-          <button type="button" id="barcodeChooseImageBtn" class="btn btn-outline-secondary w-100">Choose image</button>
-        </div>
-      </div>
-    `);
-
-    $("#barcodeChoiceMenu").on("click", function (event) {
-      if (event.target.id === "barcodeChoiceMenu") {
-        hideBarcodeChoiceMenu();
-      }
-    });
-
-    $("#barcodeUseCameraBtn").on("click", async function (event) {
-      event.preventDefault();
-      hideBarcodeChoiceMenu();
-      try {
-        await startBarcodeScanner();
-      } catch (error) {
-        console.warn("Camera scanner failed:", error);
-        setBarcodeStatus("Camera scanning is not available. Please choose an image instead.", true);
-        $("#barcodeFileInput").trigger("click");
-      }
-    });
-
-    $("#barcodeChooseImageBtn").on("click", function (event) {
-      event.preventDefault();
-      hideBarcodeChoiceMenu();
-      $("#barcodeFileInput").trigger("click");
-    });
+    if ($status.length) {
+      $status.text("");
+    }
   }
 
   function ensureBarcodeScannerUI() {
@@ -1352,12 +1305,16 @@ $("#nextBtn").html('Next <span><i class="fa-solid fa-angle-right"></i></span>&nb
 
   async function startBarcodeScanner() {
     if (!window.Html5QrcodeScanner) {
-      setBarcodeStatus("Camera scanning is not available on this browser. Please upload a photo instead.", true);
+      if (window.alert) {
+        alert("Camera scanning is not available on this browser.");
+      }
       return;
     }
 
     if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) {
-      setBarcodeStatus("Camera access is not available on this device. Please upload a photo instead.", true);
+      if (window.alert) {
+        alert("Camera access is not available on this device.");
+      }
       return;
     }
 
@@ -1379,6 +1336,10 @@ $("#nextBtn").html('Next <span><i class="fa-solid fa-angle-right"></i></span>&nb
         qrbox: { width: 240, height: 240 },
         aspectRatio: 1.0,
         showTorchButtonIfSupported: true,
+        rememberLastUsedCamera: true,
+        videoConstraints: {
+          facingMode: { ideal: "environment" },
+        },
       },
       false,
     );
@@ -1388,12 +1349,14 @@ $("#nextBtn").html('Next <span><i class="fa-solid fa-angle-right"></i></span>&nb
         const value = String(decodedText || "").trim();
         if (value) {
           $("#customerAssetId").val(value);
-          setBarcodeStatus("Barcode read successfully.");
           if (window.lookupAssetByValue) {
             window.lookupAssetByValue(value);
           }
-        } else {
-          setBarcodeStatus("Barcode could not be read. Please enter the value manually.", true);
+          if (window.alert) {
+            alert("Barcode read successfully.");
+          }
+        } else if (window.alert) {
+          alert("Barcode could not be read. Please enter the value manually.");
         }
         stopBarcodeScanner();
       },
@@ -1524,14 +1487,9 @@ $("#nextBtn").html('Next <span><i class="fa-solid fa-angle-right"></i></span>&nb
     return "";
   }
 
-  $("#barcodeScanBtn").on("click", async function (e) {
+  $("#barcodeScanBtn").on("click", function (e) {
     e.preventDefault();
-
-    if (navigator.mediaDevices && navigator.mediaDevices.getUserMedia) {
-      showBarcodeChoiceMenu();
-    } else {
-      $("#barcodeFileInput").trigger("click");
-    }
+    $("#barcodeFileInput").trigger("click");
   });
 
   $("#barcodeFileInput").on("change", async function (event) {
@@ -1544,32 +1502,27 @@ $("#nextBtn").html('Next <span><i class="fa-solid fa-angle-right"></i></span>&nb
 
     const fileName = (file.name || "").toLowerCase();
     if (!fileName.match(/\.(png|jpg|jpeg|webp|bmp|gif)$/i)) {
-      setBarcodeStatus("Please choose a valid image file.", true);
       if (window.alert) {
         alert("Please choose a valid image file.");
       }
       return;
     }
 
-    setBarcodeStatus("Scanning barcode…", false);
-
     try {
       const value = await readBarcodeFromImage(file);
       if (value) {
         $("#customerAssetId").val(value);
-        setBarcodeStatus("Barcode read successfully.");
         if (window.lookupAssetByValue) {
           window.lookupAssetByValue(value);
         }
-      } else {
-        setBarcodeStatus("Barcode could not be read from this image. Please enter the value manually.", true);
         if (window.alert) {
-          alert("Barcode could not be read from this image. Please enter the value manually.");
+          console.log("Barcode read successfully.");
         }
+      } else if (window.alert) {
+        alert("Barcode could not be read from this image. Please enter the value manually.");
       }
     } catch (error) {
       console.error("Barcode scan failed:", error);
-      setBarcodeStatus("Barcode scan is not available on this device. Please enter the value manually.", true);
       if (window.alert) {
         alert("Barcode scan is not available in this browser. Please enter the value manually.");
       }
