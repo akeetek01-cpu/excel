@@ -33,7 +33,8 @@ $(function () {
 
   function populateCustomerContacts(contacts) {
     const $select = $("#customerName");
-    const selectedValue = String($select.val() || "").trim();
+    const preferredContactId = String(window.pendingCustomerContactId || $select.val() || "").trim();
+    const selectedValue = preferredContactId || String($select.val() || "").trim();
     const placeholderText = "Select Contact";
 
     $select.find("option").not(':first').remove();
@@ -74,6 +75,10 @@ $(function () {
       $select.val("");
     }
 
+    if (window.pendingCustomerContactId) {
+      window.pendingCustomerContactId = "";
+    }
+
     if ($select.val() && $select.val() !== "other") {
       const selectedContact = window.customerContactsById[$select.val()];
       if (selectedContact) {
@@ -102,12 +107,12 @@ $(function () {
     }
 
     const settings = {
-      url: `https://excel.simprocloud.com/api/v1.0/companies/6/customers/${customerId}/contacts/?search=any&columns=ID,GivenName,FamilyName,Position,Email,WorkPhone,CellPhone&pageSize=250&page=1&limit=100`,
+      url: `${window.SIMPRO_CONFIG.baseUrl}/companies/6/customers/${customerId}/contacts/?search=any&columns=ID,GivenName,FamilyName,Position,Email,WorkPhone,CellPhone&pageSize=250&page=1&limit=100`,
       method: "GET",
       timeout: 0,
       headers: {
         Accept: "application/json",
-        Authorization: "Bearer c9c47eab18f514ad102ae8c78ce2a444e3bc4dab",
+        Authorization: `Bearer ${window.SIMPRO_CONFIG.authToken}`,
       },
     };
 

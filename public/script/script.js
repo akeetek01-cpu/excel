@@ -13,6 +13,7 @@ $(function () {
       notes: "",
       siteContact: "",
       siteContactLabel: "",
+      customerContact: "",
     },
     asset: {
       description: "",
@@ -1301,8 +1302,20 @@ $("#nextBtn").html('Next <span><i class="fa-solid fa-angle-right"></i></span>&nb
   });
 
   $("#barcodeFileInput").on("change", async function (event) {
-    const file = event.target.files && event.target.files[0];
-    if (!file) return;
+    const input = this;
+    const file = event.target?.files?.[0] || event.originalEvent?.dataTransfer?.files?.[0] || null;
+
+    if (!file) {
+      return;
+    }
+
+    const fileName = (file.name || "").toLowerCase();
+    if (!fileName.match(/\.(png|jpg|jpeg|webp|bmp|gif)$/i)) {
+      if (window.alert) {
+        alert("Please choose a valid image file.");
+      }
+      return;
+    }
 
     try {
       const value = await readBarcodeFromImage(file);
@@ -1320,7 +1333,11 @@ $("#nextBtn").html('Next <span><i class="fa-solid fa-angle-right"></i></span>&nb
         alert("Barcode scan is not available in this browser. Please enter the value manually.");
       }
     } finally {
-      $(this).val("");
+      try {
+        input.value = "";
+      } catch (_) {
+        $(input).val("");
+      }
     }
   });
 
@@ -1493,14 +1510,20 @@ $("#nextBtn").html('Next <span><i class="fa-solid fa-angle-right"></i></span>&nb
       const selectedContactValue = String($("#customerName").val() || "").trim();
       const selectedContactLabel = String($("#customerName option:selected").text() || "").trim();
       const manualContactName = String($("#customerNameInput").val() || "").trim();
-      jobData.customer.name = selectedContactValue === "other" ? manualContactName : selectedContactLabel;
+      const selectedContactId = selectedContactValue && selectedContactValue !== "other" ? selectedContactValue : "";
+      jobData.customer.name = selectedContactValue === "other"
+        ? manualContactName
+        : selectedContactValue
+          ? selectedContactLabel
+          : "";
       jobData.customer.phone = String($("#customerPhone").val() || "").trim();
       jobData.customer.email = String($("#customerEmail").val() || "").trim();
       jobData.customer.tenancy = String($("#customerTenancy").val() || "").trim();
       jobData.customer.tenancyLabel = String($("#customerTenancy option:selected").text() || "").trim();
       jobData.customer.notes = String($("#customerNotes").val() || "").trim();
-      jobData.customer.siteContact = String($("#siteContractName").text() || "").trim() || jobData.customer.siteContact;
+      jobData.customer.siteContact = selectedContactId;
       jobData.customer.siteContactLabel = String($("#siteContractName").text() || "").trim() || jobData.customer.siteContactLabel;
+      jobData.customer.customerContact = selectedContactId;
     }
     if (idx === 1) {
       const selectedDescription = $("#assetDescriptionSelect").val();
@@ -1555,44 +1578,48 @@ $("#nextBtn").html('Next <span><i class="fa-solid fa-angle-right"></i></span>&nb
     const customerPhone = String(jobData.customer.phone || "").trim();
     const customerNotes = String(jobData.customer.notes || "").trim();
     const siteValue = String(jobData.customer.tenancy || "").trim();
+    const customerContactId = Number(jobData.customer.customerContact || 0) || 0;
     const siteLabel = String(jobData.customer.tenancyLabel || "").trim();
-    const selectedTags = jobData.estimates.tags || String($("#tagsSelect").val() || "").trim();
     const selectedCostCenter = jobData.estimates.costCenter || String($("#costCenterSelect").val() || "").trim();
-    const tagIds = Array.isArray(selectedTags)
-      ? selectedTags.map((value) => Number(String(value).trim())).filter((value) => Number.isFinite(value))
-      : String(selectedTags || "")
-          .split(",")
-          .map((value) => Number(String(value).trim()))
-          .filter((value) => Number.isFinite(value));
     const description = [jobData.asset.description, ...jobData.faults.map((fault) => fault.description)].filter(Boolean).join(" | ");
-    const notes = [customerNotes, jobData.asset.location, jobData.asset.locationLabel, siteLabel].filter(Boolean).join(" | ");
-    const followUpDate = new Date();
-    followUpDate.setDate(followUpDate.getDate() + 7);
+    const notes = String($("#customerNotes").val() || "").trim();
+  
     const contactNumber = Number(customerPhone.replace(/\D/g, "")) || 0;
+    const userData = localStorage.getItem("user");
+    const user = JSON.parse(userData);
+    console.log("Name:", user);
+
+    const projectManager = String($("#serviceManagerSelect").val() || "").trim();
+    const today = new Date();
+    const yyyy = today.getFullYear(); // Returns a 4-digit number (e.g., 2026)
+    const mm = today.getMonth() + 1 //String(today.getMonth() + 1).padStart(2, '0'); // Ensures a 2-digit format (e.g., '07')
+    const MM1 = String(today.getMonth() + 1).padStart(2, '0'); // Ensures a 2-digit format (e.g., '07')
+    const dd = String(today.getDate()).padStart(2, '0'); // Ensures a 2-digit format (e.g., '17')
+    const yyyyMmDd = `${yyyy}-${MM1}-${dd}`;
 
     return {
       Customer: customerId || 0,
       Site: Number(siteValue) || 0,
-      LeadName: customerName || customerJobNumber || "Lead",
-      CustomerContact: contactNumber || Number(customerJobNumber) || 0,
-      AdditionalContacts: contactNumber ? [contactNumber] : [],
-      SiteContact: contactNumber || Number(customerJobNumber) || 0,
+      LeadName: customerJobNumber,
+      CustomerContact: customerContactId || contactNumber || Number(customerJobNumber) || 0,
+      AdditionalContacts:  [],
+      SiteContact: customerContactId || contactNumber || Number(customerJobNumber) || 0,
       Stage: "Open",
-      FollowUpDate: followUpDate.toISOString().split("T")[0],
+      FollowUpDate: yyyyMmDd,
       Description: description || "",
       Notes: notes || "",
       CostCenter: Number(selectedCostCenter) || 0,
-      Tags: tagIds,
-      Salesperson: 0,
-      ProjectManager: 0,
-      Status: 0,
+      Tags: [380], //691
+      Salesperson: user.ID,
+      ProjectManager: Number(projectManager) || 0,
+      Status: 78,
       Forecast: {
-        EstimatedPrice: Number(jobData.estimates.totalHours || 0),
-        Probability: Number(jobData.estimates.technicians || 0) > 0 ? 100 : 0,
-        ExpectedYear: new Date().getFullYear(),
-        ExpectedMonth: new Date().getMonth() + 1,
+        EstimatedPrice: 0,
+        Probability: 0,
+        ExpectedYear: yyyy,
+        ExpectedMonth: mm,
       },
-      AutoAdjustStatus: Boolean(jobData.estimates.afterHours),
+      AutoAdjustStatus: true,
     };
   }
 
@@ -1602,37 +1629,68 @@ $("#nextBtn").html('Next <span><i class="fa-solid fa-angle-right"></i></span>&nb
     saveStepData(2);
     const payload = buildLeadPayload();
     const json = JSON.stringify(payload, null, 2);
-    $("#modalJobNum").text(jobData.customer.jobNumber || "");
-    $("#modalCustomer").text(jobData.customer.name || "");
-    $("#modalTime").text(new Date().toLocaleString());
-    $("#jsonOutput").text(json);
 
-    const modalElement = document.getElementById("submitModal");
-    if (modalElement) {
-      if (window.bootstrap && typeof window.bootstrap.Modal === "function") {
-        const modal = new window.bootstrap.Modal(modalElement);
-        modal.show();
-      } else {
-        modalElement.classList.add("show");
-        modalElement.style.display = "block";
-        modalElement.setAttribute("aria-hidden", "false");
-        document.body.classList.add("modal-open");
-      }
+
+    if (window.submitLeadToSimpro) {
+      window.submitLeadToSimpro(payload, {
+        onSuccess: function (response) {
+          console.log(response);
+          const leadId = response.ID
+
+          if (leadId && window.uploadLeadAttachments) {
+            window.uploadLeadAttachments(leadId, photoFiles, {
+              onComplete: function () {
+                alert("You successfully created a lead and uploaded the attached images.");
+              },
+              onError: function (error) {
+                console.error("Lead attachment upload failed:", error);
+                alert("Lead created, but one or more image uploads failed.");
+              },
+            });
+          } else {
+            alert("You successfully created a lead.");
+          }
+        },
+        onError: function () {
+          alert("Failed to create lead. Please try again.");
+        },
+      });
+    } else {
+      console.error("submitLeadToSimpro is not available.");
+      alert("Failed to create lead. Please try again.");
     }
 
-    $("#downloadJson")
-      .off("click")
-      .on("click", function () {
-        const blob = new Blob([json], { type: "application/json" });
-        const url = URL.createObjectURL(blob);
-        const a = document.createElement("a");
-        a.href = url;
-        a.download = `${(jobData.customer.jobNumber || "job").replace(/[^a-z0-9\-]/gi, "_")}.json`;
-        document.body.appendChild(a);
-        a.click();
-        a.remove();
-        URL.revokeObjectURL(url);
-      });
+    // $("#modalJobNum").text(jobData.customer.jobNumber || "");
+    // $("#modalCustomer").text(jobData.customer.name || "");
+    // $("#modalTime").text(new Date().toLocaleString());
+    // $("#jsonOutput").text(json);
+
+    // const modalElement = document.getElementById("submitModal");
+    // if (modalElement) {
+    //   if (window.bootstrap && typeof window.bootstrap.Modal === "function") {
+    //     const modal = new window.bootstrap.Modal(modalElement);
+    //     modal.show();
+    //   } else {
+    //     modalElement.classList.add("show");
+    //     modalElement.style.display = "block";
+    //     modalElement.setAttribute("aria-hidden", "false");
+    //     document.body.classList.add("modal-open");
+    //   }
+    // }
+
+    // $("#downloadJson")
+    //   .off("click")
+    //   .on("click", function () {
+    //     const blob = new Blob([json], { type: "application/json" });
+    //     const url = URL.createObjectURL(blob);
+    //     const a = document.createElement("a");
+    //     a.href = url;
+    //     a.download = `${(jobData.customer.jobNumber || "job").replace(/[^a-z0-9\-]/gi, "_")}.json`;
+    //     document.body.appendChild(a);
+    //     a.click();
+    //     a.remove();
+    //     URL.revokeObjectURL(url);
+    //   });
   }
 
   // initialize

@@ -1,12 +1,12 @@
 $(function () {
   function getJobData(jobNumber) {
     const settings = {
-      url: `https://excel.simprocloud.com/api/v1.0/companies/6/jobs/${jobNumber}`,
+      url: `${window.SIMPRO_CONFIG.baseUrl}/companies/6/jobs/${jobNumber}`,
       method: "GET",
       timeout: 0,
       headers: {
         Accept: "application/json",
-        Authorization: "Bearer c9c47eab18f514ad102ae8c78ce2a444e3bc4dab"
+        Authorization: `Bearer ${window.SIMPRO_CONFIG.authToken}`
       }
     };
 
@@ -15,12 +15,12 @@ $(function () {
 
   function getCompanySites(customerID) {
     const settings = {
-      url: `https://excel.simprocloud.com/api/v1.0/companies/6/customers/companies/${customerID}`,
+      url: `${window.SIMPRO_CONFIG.baseUrl}/companies/6/customers/companies/${customerID}`,
       method: "GET",
       timeout: 0,
       headers: {
         Accept: "application/json",
-        Authorization: "Bearer c9c47eab18f514ad102ae8c78ce2a444e3bc4dab"
+        Authorization: `Bearer ${window.SIMPRO_CONFIG.authToken}`
       }
     };
 
@@ -99,12 +99,21 @@ $(function () {
         const customerId = response?.Customer?.ID || response?.CustomerID || response?.ID || "";
         const firstSite = response?.Site;
         const defaultSiteId = firstSite?.ID != null ? String(firstSite.ID) : firstSite?.Name;
+        const customerContact = response?.CustomerContact || response?.Customer?.CustomerContact || null;
+        const customerContactId = customerContact?.ID != null ? String(customerContact.ID) : "";
+        const customerContactName = [customerContact?.GivenName, customerContact?.FamilyName]
+          .filter(Boolean)
+          .join(" ")
+          .trim();
         window.leadCaptureLookup = {
           customerId,
           customerName,
           siteContactName: response?.SiteContact?.GivenName || "",
           defaultSiteId,
+          customerContactId,
+          customerContactName,
         };
+        window.pendingCustomerContactId = customerContactId;
 
         if (customerName) {
           $("#autoJobBtn").text(customerName);
