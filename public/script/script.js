@@ -1258,6 +1258,9 @@ $("#nextBtn").html('Next <span><i class="fa-solid fa-angle-right"></i></span>&nb
     $("#photoInput").trigger("click");
   });
 
+  let barcodeScannerInstance = null;
+  let barcodeScannerActive = false;
+
   function setBarcodeStatus(message, isError = false) {
     const $status = $("#barcodeStatus");
     if (!$status.length) return;
@@ -1266,6 +1269,142 @@ $("#nextBtn").html('Next <span><i class="fa-solid fa-angle-right"></i></span>&nb
       .text(message || "")
       .removeClass("text-muted text-danger text-success")
       .addClass(isError ? "text-danger" : message ? "text-success" : "text-muted");
+  }
+
+  function hideBarcodeChoiceMenu() {
+    $("#barcodeChoiceMenu").remove();
+  }
+
+  function showBarcodeChoiceMenu() {
+    if ($("#barcodeChoiceMenu").length) return;
+
+    const canUseCamera = Boolean(navigator.mediaDevices && navigator.mediaDevices.getUserMedia);
+
+    $("body").append(`
+      <div id="barcodeChoiceMenu" style="position:fixed; inset:0; z-index:99998; background:rgba(0,0,0,0.28); display:flex; align-items:center; justify-content:center; padding:16px;">
+        <div style="width:min(100%, 320px); background:#fff; border-radius:14px; padding:18px; box-shadow:0 12px 32px rgba(0,0,0,0.2);">
+          <div style="font-size:16px; font-weight:600; margin-bottom:12px;">Scan barcode</div>
+          <button type="button" id="barcodeUseCameraBtn" class="btn btn-primary w-100 mb-2" ${canUseCamera ? "" : "disabled"}>Use camera</button>
+          <button type="button" id="barcodeChooseImageBtn" class="btn btn-outline-secondary w-100">Choose image</button>
+        </div>
+      </div>
+    `);
+
+    $("#barcodeChoiceMenu").on("click", function (event) {
+      if (event.target.id === "barcodeChoiceMenu") {
+        hideBarcodeChoiceMenu();
+      }
+    });
+
+    $("#barcodeUseCameraBtn").on("click", async function (event) {
+      event.preventDefault();
+      hideBarcodeChoiceMenu();
+      try {
+        await startBarcodeScanner();
+      } catch (error) {
+        console.warn("Camera scanner failed:", error);
+        setBarcodeStatus("Camera scanning is not available. Please choose an image instead.", true);
+        $("#barcodeFileInput").trigger("click");
+      }
+    });
+
+    $("#barcodeChooseImageBtn").on("click", function (event) {
+      event.preventDefault();
+      hideBarcodeChoiceMenu();
+      $("#barcodeFileInput").trigger("click");
+    });
+  }
+
+  function ensureBarcodeScannerUI() {
+    if ($("#barcodeScannerOverlay").length) return;
+
+    $("body").append(`
+      <div id="barcodeScannerOverlay" style="display:none; position:fixed; inset:0; z-index:99999; background:rgba(0,0,0,0.86); padding:16px; display:flex; align-items:center; justify-content:center;">
+        <div style="width:min(100%, 520px); background:#fff; border-radius:14px; overflow:hidden; box-shadow:0 12px 32px rgba(0,0,0,0.25);">
+          <div style="display:flex; align-items:center; justify-content:space-between; padding:12px 16px; background:#f7f7f7;">
+            <strong>Scan Barcode</strong>
+            <button type="button" id="barcodeScannerCloseBtn" style="border:none; background:transparent; font-size:22px; line-height:1;">×</button>
+          </div>
+          <div id="barcodeScannerContainer" style="min-height:300px;"></div>
+          <div id="barcodeScannerMessage" style="padding:12px 16px; font-size:14px; color:#444;">Point your camera at the barcode.</div>
+        </div>
+      </div>
+    `);
+
+    $("#barcodeScannerCloseBtn").on("click", function (e) {
+      e.preventDefault();
+      stopBarcodeScanner();
+    });
+  }
+
+  function stopBarcodeScanner() {
+    barcodeScannerActive = false;
+    if (barcodeScannerInstance) {
+      Promise.resolve()
+        .then(() => barcodeScannerInstance.clear())
+        .catch(() => {})
+        .finally(() => {
+          barcodeScannerInstance = null;
+        });
+    }
+    $("#barcodeScannerOverlay").hide();
+  }
+
+  async function startBarcodeScanner() {
+    if (!window.Html5QrcodeScanner) {
+      setBarcodeStatus("Camera scanning is not available on this browser. Please upload a photo instead.", true);
+      return;
+    }
+
+    if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) {
+      setBarcodeStatus("Camera access is not available on this device. Please upload a photo instead.", true);
+      return;
+    }
+
+    ensureBarcodeScannerUI();
+    $("#barcodeScannerOverlay").show();
+    $("#barcodeScannerMessage").text("Opening camera…");
+    barcodeScannerActive = true;
+
+    if (barcodeScannerInstance) {
+      try {
+        await barcodeScannerInstance.clear();
+      } catch (_) {}
+    }
+
+    barcodeScannerInstance = new window.Html5QrcodeScanner(
+      "barcodeScannerContainer",
+      {
+        fps: 10,
+        qrbox: { width: 240, height: 240 },
+        aspectRatio: 1.0,
+        showTorchButtonIfSupported: true,
+      },
+      false,
+    );
+
+    await barcodeScannerInstance.render(
+      (decodedText) => {
+        const value = String(decodedText || "").trim();
+        if (value) {
+          $("#customerAssetId").val(value);
+          setBarcodeStatus("Barcode read successfully.");
+          if (window.lookupAssetByValue) {
+            window.lookupAssetByValue(value);
+          }
+        } else {
+          setBarcodeStatus("Barcode could not be read. Please enter the value manually.", true);
+        }
+        stopBarcodeScanner();
+      },
+      (error) => {
+        if (!barcodeScannerActive) return;
+        const message = String(error || "");
+        if (message && !message.toLowerCase().includes("no qr code")) {
+          $("#barcodeScannerMessage").text("Scanning… keep the barcode centered.");
+        }
+      },
+    );
   }
 
   function loadImageElement(src) {
@@ -1385,8 +1524,14 @@ $("#nextBtn").html('Next <span><i class="fa-solid fa-angle-right"></i></span>&nb
     return "";
   }
 
-  $("#barcodeScanBtn").on("click", function () {
-    $("#barcodeFileInput").trigger("click");
+  $("#barcodeScanBtn").on("click", async function (e) {
+    e.preventDefault();
+
+    if (navigator.mediaDevices && navigator.mediaDevices.getUserMedia) {
+      showBarcodeChoiceMenu();
+    } else {
+      $("#barcodeFileInput").trigger("click");
+    }
   });
 
   $("#barcodeFileInput").on("change", async function (event) {
