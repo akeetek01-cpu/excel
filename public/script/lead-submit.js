@@ -49,7 +49,7 @@
         }
 
         if (window.alert) {
-          window.alert("Failed to create lead. Please try again.");
+          window.alert("Failed to create lead. Please try again. Staff not found.");
         }
       });
   }

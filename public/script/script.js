@@ -610,6 +610,15 @@ $("#nextBtn").html('Next <span><i class="fa-solid fa-angle-right"></i></span>&nb
     }
   });
 
+  $("#serviceManagerSelect").on("change blur", function () {
+    const value = $(this).val().trim();
+    if (value === "") {
+      showError("#serviceManagerSelect", "#serviceManagerError", "Service Manager is required.");
+    } else {
+      clearError("#serviceManagerSelect", "#serviceManagerError");
+    }
+  });
+
   $("#costCenterSelect").on("change blur", function () {
     const value = $(this).val().trim();
     if (value === "") {
@@ -1625,7 +1634,10 @@ $("#nextBtn").html('Next <span><i class="fa-solid fa-angle-right"></i></span>&nb
       saveStepData(currentStep);
       showStep(currentStep + 1);
     } else {
-      validateStep(2);
+      if (!validateStep(2)) {
+        e.preventDefault();
+        return false;
+      }
       saveStepData(2);
       submitJob();
     }
@@ -1653,8 +1665,16 @@ $("#nextBtn").html('Next <span><i class="fa-solid fa-angle-right"></i></span>&nb
       const tech = Number($("#technicians").val() || 0);
       const hrs = Number($("#hours").val() || 0);
       const costCenter = String($("#costCenterSelect").val() || "").trim();
-      const tags = String($("#tagsSelect").val() || "").trim();
+      const serviceManager = String($("#serviceManagerSelect").val() || "").trim();
+      //const tags = String($("#tagsSelect").val() || "").trim();
       let valid = true;
+
+      if (serviceManager === "") {
+        showError("#serviceManagerSelect", "#serviceManagerError", "Service Manager is required.");
+        valid = false;
+      } else {
+        clearError("#serviceManagerSelect", "#serviceManagerError");
+      }
 
       if (costCenter === "") {
         showError("#costCenterSelect", "#costCenterError", "Cost Center is required.");
@@ -1663,12 +1683,12 @@ $("#nextBtn").html('Next <span><i class="fa-solid fa-angle-right"></i></span>&nb
         clearError("#costCenterSelect", "#costCenterError");
       }
 
-      if (tags === "") {
-        showError("#tagsSelect", "#tagsError", "Tags is required.");
-        valid = false;
-      } else {
-        clearError("#tagsSelect", "#tagsError");
-      }
+      // if (tags === "") {
+      //   showError("#tagsSelect", "#tagsError", "Tags is required.");
+      //   valid = false;
+      // } else {
+      //   clearError("#tagsSelect", "#tagsError");
+      // }
 
       if (!Number.isInteger(tech) || tech < 1) {
         showError(
@@ -1818,6 +1838,10 @@ $("#nextBtn").html('Next <span><i class="fa-solid fa-angle-right"></i></span>&nb
   }
 
   function submitJob() {
+    if (!validateStep(2)) {
+      return;
+    }
+
     saveStepData(0);
     saveStepData(1);
     saveStepData(2);
@@ -1846,7 +1870,7 @@ $("#nextBtn").html('Next <span><i class="fa-solid fa-angle-right"></i></span>&nb
           }
         },
         onError: function () {
-          alert("Failed to create lead. Please try again.");
+          alert("Failed to create lead. Please try again. Staff not found.");
         },
       });
     } else {
