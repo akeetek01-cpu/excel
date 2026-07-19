@@ -2,7 +2,11 @@
   // Default settings (can be overridden by passing options to initTotalRecovery)
   const DEFAULT = {
     url:
-      `${window.SIMPRO_CONFIG.baseUrl}/companies/6/storageDevices/37/stock/?search=any&pageSize=250&page=1&limit=100`,
+      `${window.SIMPRO_CONFIG.baseUrl}/companies/6/catalogs/?search=any&pageSize=250&page=1&Group.ID=21`,
+    // url:
+    //   `${window.SIMPRO_CONFIG.baseUrl}/companies/6/storageDevices/37/stock/?search=any&pageSize=250&page=1&limit=100`,
+    // url:
+    //   `${window.SIMPRO_CONFIG.baseUrl}/companies/6/storageDeviceStock/?search=any&pageSize=250&page=1&limit=100`,
     method: "GET",
     timeout: 0,
     headers: {
@@ -26,8 +30,15 @@
     const optionHtml = sortedItems
       .map((it) => {
         const name = ((it && it.Catalog && it.Catalog.Name) || it.Name || "").toString();
-        const val = String(name || "");
-        return `<option value="${val}">${val}</option>`;
+        const partNo = ((it && it.Catalog && it.Catalog.PartNo) || it.PartNo || "").toString();
+        if (partNo && name) {
+          return `<option value="${partNo} - ${name}">${partNo} - ${name}</option>`;
+        } else if (name) {
+          return `<option value="${name}">${name}</option>`;
+        } else if (partNo) {
+          return `<option value="${partNo}">${partNo}</option>`;
+        }
+        return "";
       })
       .join("");
 

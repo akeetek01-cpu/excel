@@ -23,7 +23,7 @@
         <div class="logo">
             <img src="images/excel_log.png" alt="Excel Logo">
             <label id="createLeadLabel" class="create-lead-label" style="min-width:100px">
-                
+
             </label>
         </div>
         <div class="mx-auto">
@@ -60,9 +60,8 @@
                                 <div class="col-4 mb-3 align-items-start">
                                     <label class="form-label me-2 mb-0" style="min-width:100px">Job Number</label>
                                     <div class="flex-grow-1">
-                                        <input type="text" id="jobNumber" class="form-control"
-                                            placeholder="Enter" maxlength="6" required inputmode="numeric"
-                                            pattern="[0-9]*">
+                                        <input type="text" id="jobNumber" class="form-control" placeholder="Enter"
+                                            maxlength="6" required inputmode="numeric" pattern="[0-9]*">
 
                                         <div id="jobNumberError" class="invalid-feedback"></div>
                                     </div>
@@ -79,7 +78,7 @@
 
                             </div>
                             <div class="row">
-                                 <div class="col-12 mb-3 align-items-start">
+                                <div class="col-12 mb-3 align-items-start">
                                     <label class="form-label me-2 mb-0" style="min-width:100px">
                                         Site
                                     </label>
@@ -105,7 +104,7 @@
                             </div>
                             <div class="row">
 
-            
+
                                 <div class="col mb-3 align-items-start">
                                     <label class="form-label me-2 mb-0" style="min-width:100px">
                                         Customer Contact Name
@@ -114,14 +113,16 @@
                                     <div class="flex-grow-1">
                                         <div class="row g-2 align-items-start">
                                             <div id="customerNameSelectWrapper" class="col-12">
-                                                <select id="customerName" class="form-select" aria-label="Customer contact name">
+                                                <select id="customerName" class="form-select"
+                                                    aria-label="Customer contact name">
                                                     <option value="" selected disabled>Select Contact</option>
                                                     <option value="other">Other</option>
                                                 </select>
                                                 <div id="customerNameError" class="invalid-feedback"></div>
                                             </div>
                                             <div id="customerNameInputWrapper" class="col-12 d-none">
-                                                <input type="text" id="customerNameInput" class="form-control" maxlength="150" placeholder="Enter customer contact name">
+                                                <input type="text" id="customerNameInput" class="form-control"
+                                                    maxlength="150" placeholder="Enter customer contact name">
                                                 <div id="customerNameInputError" class="invalid-feedback"></div>
                                             </div>
                                         </div>
@@ -180,19 +181,45 @@
                     <div class="card p-3 mb-3 rounded-12">
 
                         <div class="fault-card">
-                               <div class="mb-3 align-items-start">
+                            <div class="mb-3 align-items-start">
                                 <label class="form-label me-2 mb-0" style="min-width:100px">
                                     Customer Asset ID or Excel Barcode</label>
                                 <div class="flex-grow-1 d-flex gap-2 align-items-center">
                                     <input id="customerAssetId" maxlength="150" class="form-control"
                                         placeholder="Enter Customer Asset ID or Excel Barcode">
-                                    <button type="button" id="barcodeScanBtn" class="btn btn-outline-secondary" title="Scan barcode">
+                                    <button type="button" id="barcodeScanBtn" class="btn btn-outline-secondary"
+                                        title="Scan barcode">
                                         <i class="fa-solid fa-barcode"></i>
                                     </button>
-                                    <input type="file" id="barcodeFileInput" accept="image/*" capture="environment" class="d-none">
+                                    <input type="file" id="barcodeFileInput" accept="image/*" capture="environment"
+                                        class="d-none">
                                 </div>
-                                
-                        
+                            </div>
+                            <div class="mb-3 align-items-start">
+                                <label class="form-label me-2 mb-0" style="min-width:100px">
+                                    Make</label>
+                                <div class="flex-grow-1">
+                                    <input id="assertMake" maxlength="150" class="form-control"
+                                        placeholder="Enter Make">
+                                </div>
+                            </div>
+                            <div class="row">
+                                <div class="col mb-3 align-items-start">
+                                    <label class="form-label me-2 mb-0" style="min-width:100px">
+                                        Model (IDU)</label>
+                                    <div class="flex-grow-1">
+                                        <input id="assertModel" maxlength="150" class="form-control"
+                                            placeholder="Enter Model">
+                                    </div>
+                                </div>
+                                <div class="col mb-3 align-items-start">
+                                    <label class="form-label me-2 mb-0" style="min-width:100px">
+                                        Serial Number (IDU)</label>
+                                    <div class="flex-grow-1">
+                                        <input id="assertSerialNumber" maxlength="150" class="form-control"
+                                            placeholder="Enter Serial Number">
+                                    </div>
+                                </div>
                             </div>
                             <div class="mb-3 align-items-start">
                                 <label class="form-label me-2 mb-0" style="min-width:100px">
@@ -210,8 +237,9 @@
                                             <div id="assetDescriptionError" class="invalid-feedback"></div>
                                         </div>
                                         <div id="assetDescriptionInputWrapper" class="col-12 d-none">
-                                            <textarea id="assetDescriptionInput" class="form-control auto-resize" rows="1"
-                                                maxlength="150" placeholder="Enter asset description"></textarea>
+                                            <textarea id="assetDescriptionInput" class="form-control auto-resize"
+                                                rows="1" maxlength="150"
+                                                placeholder="Enter asset description"></textarea>
                                             <div id="assetDescriptionInputError" class="invalid-feedback"></div>
                                         </div>
                                     </div>
@@ -232,7 +260,7 @@
                                 </div>
                             </div>
 
-                         
+
                         </div>
                         <div id="faultList"></div>
 
@@ -284,7 +312,7 @@
                         </div>
                     </div>
 
-                  
+
                     <div class="mt-3 mb-3 photo-upload-card p-3 rounded-12">
                         <div class="photo-upload-header d-flex justify-content-between align-items-start mb-3">
                             <div>
@@ -309,7 +337,7 @@
                             style="display:none;"></div>
                         <div id="uploadStatus" class="photo-status mt-2" style="display:none;"></div>
                     </div>
-                        <div class="summary-title mt-3">Review Summary</div>
+                    <div class="summary-title mt-3">Review Summary</div>
 
                     <div class="summary-estimates">
                         <div class="cards-row mb-1">
@@ -336,9 +364,10 @@
                                 </select>
                                 <div id="costCenterError" class="invalid-feedback"></div>
                             </div>
-                             <div class="col-6">
+                            <div class="col-6">
                                 <label class="form-label">Team</label>
-                                <div id="salesTeamId" class="border border-dashed rounded-3 px-3 py-2" style="min-height: 38px; display: flex; align-items: center;"></div>
+                                <div id="salesTeamId" class="border border-dashed rounded-3 px-3 py-2"
+                                    style="min-height: 38px; display: flex; align-items: center;"></div>
                             </div>
                         </div>
                         <div class="row g-3 align-items-start ms-2 me-2 mb-2">
@@ -349,21 +378,21 @@
                                 </select>
                                 <div id="serviceManagerError" class="invalid-feedback"></div>
                             </div>
- <div class="col-6 d-flex align-items-end afterhrs-container">
-                            <label class="after-hours-label mb-2">After Hours (OT)?</label>
-                            <div class="form-check form-switch">
-                                <!-- <input class="form-check-input" type="checkbox" id="afterHours"> -->
-                                <label class="switch">
-                                    <input type="checkbox" id="afterHours">
-                                    <span class="slider round"></span>
-                                </label>
+                            <div class="col-6 d-flex align-items-end afterhrs-container">
+                                <label class="after-hours-label mb-2">After Hours (OT)?</label>
+                                <div class="form-check form-switch">
+                                    <!-- <input class="form-check-input" type="checkbox" id="afterHours"> -->
+                                    <label class="switch">
+                                        <input type="checkbox" id="afterHours">
+                                        <span class="slider round"></span>
+                                    </label>
+                                </div>
                             </div>
                         </div>
-                        </div>
-                    
+
                     </div>
 
-                    
+
 
                 </div>
             </div>
@@ -430,6 +459,7 @@
     <script src="script/validation.js"></script>
     <script src="script/service-managers.js"></script>
     <script src="script/totalRecovery.js"></script>
+    <script src="script/work-required.js"></script>
 </body>
 
 </html>

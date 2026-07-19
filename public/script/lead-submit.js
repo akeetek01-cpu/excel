@@ -1,12 +1,26 @@
 (function ($) {
+  function setLeadSubmitLoading(isLoading) {
+    const $btn = $("#nextBtn");
+
+    if (!$btn.length) {
+      return;
+    }
+
+    $btn.toggleClass("button--loading", isLoading);
+    $btn.prop("disabled", isLoading);
+  }
+
   function submitLeadToSimpro(payload, options) {
     const config = window.SIMPRO_CONFIG || {};
     const baseUrl = String(config.baseUrl || "").trim();
     const authToken = String(config.authToken || "").trim();
 
+    setLeadSubmitLoading(true);
+
     if (!baseUrl || !authToken) {
       const errorMessage = "SIMPRO configuration is missing.";
       console.error(errorMessage);
+      setLeadSubmitLoading(false);
       if (typeof options?.onError === "function") {
         options.onError(null, "config_error", errorMessage);
       } else if (window.alert) {
@@ -49,8 +63,11 @@
         }
 
         if (window.alert) {
-          window.alert("Failed to create lead. Please try again.");
+          window.alert("Failed to create lead. Please try again. Staff not found.");
         }
+      })
+      .always(function () {
+        setLeadSubmitLoading(false);
       });
   }
 

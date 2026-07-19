@@ -153,6 +153,11 @@ textarea {
   margin: 15px 0 35px;
 }
 
+.btn.button--loading,
+.customer-next-btn.button--loading {
+  position: relative;
+}
+
 .button--loading .button__text {
   visibility: hidden;
   opacity: 0;
