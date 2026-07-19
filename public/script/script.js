@@ -804,7 +804,7 @@ $("#nextBtn").html('Next <span><i class="fa-solid fa-angle-right"></i></span>&nb
             <div class="row-1 g-2">
               <div class="mb-2">
                 <div class="d-flex justify-content-between align-items-center">
-                  <label class="form-label mb-0">Work Required</label>
+                  <label class="form-label mb-0">Work Required (Select script)</label>
                 </div>
                 <select class="form-select work-req work-required-select" aria-label="Work Required">
                   <option value="">Select Work Required</option>
