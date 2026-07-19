@@ -427,11 +427,11 @@ $("#nextBtn").html('Next <span><i class="fa-solid fa-angle-right"></i></span>&nb
           clearError($work, $workError);
         }
 
-        if (cardInvalid) {
-          markFaultCardInvalid($card);
-        } else {
-          clearFaultCardInvalid($card);
-        }
+        // if (cardInvalid) {
+        //   markFaultCardInvalid($card);
+        // } else {
+        //   clearFaultCardInvalid($card);
+        // }
       });
     }
 
@@ -806,7 +806,9 @@ $("#nextBtn").html('Next <span><i class="fa-solid fa-angle-right"></i></span>&nb
                 <div class="d-flex justify-content-between align-items-center">
                   <label class="form-label mb-0">Work Required</label>
                 </div>
-                <input maxlength="150" class="form-control work-req" placeholder="Describe in one line" value="${f.work || ""}">
+                <select class="form-select work-req work-required-select" aria-label="Work Required">
+                  <option value="">Select Work Required</option>
+                </select>
                 <div class="invalid-feedback work-req-error"></div>
               </div>
 
@@ -887,6 +889,9 @@ $("#nextBtn").html('Next <span><i class="fa-solid fa-angle-right"></i></span>&nb
         </div>
       `);
       $list.append($card);
+      if (f.work) {
+        $card.find('.work-req').val(f.work);
+      }
       updateAiLabelState($card);
     });
     calculate();
@@ -1785,6 +1790,88 @@ $("#nextBtn").html('Next <span><i class="fa-solid fa-angle-right"></i></span>&nb
     $("#revMan").text(jobData.estimates.totalHours || "-");
   }
 
+  function buildLeadDescriptionHtml() {
+    const customerName = String(jobData.customer.name || "").trim();
+    const customerPhone = String(jobData.customer.phone || "").trim();
+    const customerEmail = String(jobData.customer.email || "").trim();
+    const siteLabel = String(jobData.customer.tenancyLabel || jobData.customer.tenancy || "").trim();
+    const assetDescription = String(jobData.asset.description || "").trim();
+    const assetLocation = String(jobData.asset.location || "").trim();
+    const customerAssetId = String(jobData.asset.customerAssetId || "").trim();
+    const notes = String($("#customerNotes").val() || "").trim();
+    const technicianCount = Number(jobData.estimates.technicians || 0);
+    const hours = Number(jobData.estimates.hours || 0);
+    const costCenterLabel = String(jobData.estimates.costCenterLabel || "").trim();
+    const serviceManagerLabel = String($("#serviceManagerSelect option:selected").text() || "").trim();
+
+    const userData = (() => {
+      try {
+        const rawUser = localStorage.getItem("user");
+        return rawUser ? JSON.parse(rawUser) : null;
+      } catch (error) {
+        console.warn("Unable to parse user data for lead description.", error);
+        return null;
+      }
+    })();
+
+    const salespersonValue = [
+      userData?.Name || userData?.FullName || "",
+      userData?.FirstName && userData?.LastName ? `${userData.FirstName} ${userData.LastName}` : "",
+      userData?.ID ? `ID: ${userData.ID}` : "",
+    ].filter(Boolean).join(" | ");
+
+    const detailRows = [
+      ["Customer Name", customerName],
+      ["Phone", customerPhone],
+      ["Email", customerEmail],
+      ["Site", siteLabel],
+      ["Asset Description", assetDescription],
+      ["Asset Location", assetLocation],
+      ["Customer Asset ID", customerAssetId],
+      ["Technicians", technicianCount ? String(technicianCount) : ""],
+      ["Hours", hours ? String(hours) : ""],
+      ["Cost Center", costCenterLabel],
+      ["Service Manager", serviceManagerLabel],
+      ["Salesperson", salespersonValue],
+      ["Notes", notes],
+    ].filter(([, value]) => Boolean(value));
+
+    (jobData.faults || []).forEach((fault, index) => {
+      const description = String(fault.description || "").trim();
+      const work = String(fault.work || "").trim();
+      const parts = String(fault.parts || "").trim();
+      const equipment = String(fault.equipment || "").trim();
+      const partsItems = (fault.partsItems || [])
+        .map((item) => `${String(item.name || "").trim()} x ${String(item.qty || "").trim()}`)
+        .join(", ");
+      const equipmentItems = (fault.equipmentItems || [])
+        .map((item) => `${String(item.name || "").trim()} x ${String(item.qty || "").trim()}`)
+        .join(", ");
+      const consumablesItems = (fault.consumablesItems || [])
+        .map((item) => `${String(item.name || "").trim()} x ${String(item.qty || "").trim()}`)
+        .join(", ");
+
+      if (description) detailRows.push([`Fault ${index + 1} - Description`, description]);
+      if (work) detailRows.push([`Fault ${index + 1} - Work Required`, work]);
+      if (parts) detailRows.push([`Fault ${index + 1} - Parts & Material`, parts]);
+      if (partsItems) detailRows.push([`Fault ${index + 1} - Parts Items`, partsItems]);
+      if (equipment) detailRows.push([`Fault ${index + 1} - Equipment`, equipment]);
+      if (equipmentItems) detailRows.push([`Fault ${index + 1} - Equipment Items`, equipmentItems]);
+      if (consumablesItems) detailRows.push([`Fault ${index + 1} - Consumables`, consumablesItems]);
+    });
+
+    const detailTable = detailRows.length
+      ? `<table style="border-collapse: collapse; width: 100%; font-family: Arial, sans-serif; font-size:14px; color:#222; line-height:1.5;">${detailRows.map(([label, value]) => `<tr><td style="border:1px solid #ddd; padding:6px 8px; font-weight:bold; width:35%;">${escapeHtml(label)}</td><td style="border:1px solid #ddd; padding:6px 8px;">${escapeHtml(value)}</td></tr>`).join("")}</table>`
+      : "";
+
+    return [
+      `<div style="font-family: Arial, sans-serif; font-size:14px; color:#222; line-height:1.5;">`,
+      `<p><strong>Lead Details</strong></p>`,
+      detailTable,
+      `</div>`,
+    ].filter(Boolean).join("");
+  }
+
   function buildLeadPayload() {
     const customerJobNumber = String(jobData.customer.jobNumber || "").trim();
     const customerId = Number(jobData.customer.customerId || jobData.customer.id || 0) || Number(customerJobNumber || 0);
@@ -1795,8 +1882,8 @@ $("#nextBtn").html('Next <span><i class="fa-solid fa-angle-right"></i></span>&nb
     const customerContactId = Number(jobData.customer.customerContact || 0) || 0;
     const siteLabel = String(jobData.customer.tenancyLabel || "").trim();
     const selectedCostCenter = jobData.estimates.costCenter || String($("#costCenterSelect").val() || "").trim();
-    const description = [jobData.asset.description, ...jobData.faults.map((fault) => fault.description)].filter(Boolean).join(" | ");
     const notes = String($("#customerNotes").val() || "").trim();
+    const description = buildLeadDescriptionHtml();
   
     const contactNumber = Number(customerPhone.replace(/\D/g, "")) || 0;
     const userData = localStorage.getItem("user");

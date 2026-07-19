@@ -58,6 +58,9 @@ $(function () {
 
     const assetTypeName = getAssetTypeName(asset);
     const assetLocation = getAssetLocationValue(asset);
+    const assetMake = getCustomFieldValue(asset, ["Make"]);;
+    const assetModel = getCustomFieldValue(asset, ["Model (IDU)", "Model"]);;
+    const assetSerialNumber = getCustomFieldValue(asset, ["Serial Number (IDU)", "Serial Number"]);;
 
     if (assetTypeName) {
       ensureAssetDescriptionOption(assetTypeName);
@@ -66,14 +69,29 @@ $(function () {
     if (assetLocation) {
       $("#assetLocation").val(assetLocation);
     }
+
+    if (assetMake) {
+      $("#assertMake").val(assetMake);
+    }
+
+    if (assetModel) {
+      $("#assertModel").val(assetModel);
+    }
+
+    if (assetSerialNumber) {
+      $("#assertSerialNumber").val(assetSerialNumber);
+    }
+
   }
 
   window.lookupAssetByValue = function (value) {
     const normalizedValue = String(value || "").trim();
     if (!normalizedValue) return;
 
+    const siteId = $("#customerTenancy").find("option:selected").attr("data-site-id");
+
     const settings = {
-      url: `${window.SIMPRO_CONFIG.baseUrl}/companies/6/sites/536/assets/?search=any&columns=CustomFields,ID,AssetType&pageSize=100&page=1&orderby=Name&limit=100&CustomFields.Value=${encodeURIComponent(normalizedValue)}`,
+      url: `${window.SIMPRO_CONFIG.baseUrl}/companies/6/sites/${siteId}/assets/?search=any&columns=CustomFields,ID,AssetType&pageSize=100&page=1&orderby=Name&limit=100&CustomFields.Value=${encodeURIComponent(normalizedValue)}`,
       method: "GET",
       timeout: 0,
       headers: {
