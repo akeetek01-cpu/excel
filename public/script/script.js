@@ -1786,7 +1786,15 @@ $("#nextBtn").html('Next <span><i class="fa-solid fa-angle-right"></i></span>&nb
       customerAssetLookupTimer = null;
     }
 
-    if (!value || value.length < 4) {
+    if (!value) {
+      resetAssetFields({ keepCustomerAssetId: true });
+      jobData.asset.customerAssetId = "";
+      return;
+    }
+
+    if (value.length < 4) {
+      resetAssetFields({ keepCustomerAssetId: true });
+      jobData.asset.customerAssetId = value;
       return;
     }
 
