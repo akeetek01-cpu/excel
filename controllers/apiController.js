@@ -122,3 +122,17 @@ exports.changePassword = async (req, res) => {
         });
     }
 };
+
+exports.insertScript = async (req, res) => {
+    const dbRef = ref(db);
+    try {
+        const snapshot = await get(child(dbRef, 'InsertScript'));
+        if (snapshot.exists()) {
+            res.json(snapshot.val());
+        } else {
+            res.json({});
+        }
+    } catch (err) {
+        res.status(500).json({ error: "Error fetching InsertScript" });
+    }
+};

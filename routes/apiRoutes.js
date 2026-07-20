@@ -10,5 +10,7 @@ router.get("/users", controller.getUsers);
 router.post("/login", controller.loginUser);
 router.post("/changePassword", controller.changePassword);
 
+router.get("/InsertScript", controller.insertScript);
+
 
 module.exports = router;
