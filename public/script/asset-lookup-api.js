@@ -1,4 +1,6 @@
 $(function () {
+  let lookupRequestId = 0;
+
   function getCustomFieldValue(asset, fieldNames) {
     const customFields = Array.isArray(asset?.CustomFields) ? asset.CustomFields : [];
     const normalizedFieldNames = fieldNames.map(function (fieldName) {
@@ -88,7 +90,12 @@ $(function () {
     const normalizedValue = String(value || "").trim();
     if (!normalizedValue) return;
 
+    const requestId = ++lookupRequestId;
     const siteId = $("#customerTenancy").find("option:selected").attr("data-site-id");
+
+    if (!siteId) {
+      return;
+    }
 
     const settings = {
       url: `${window.SIMPRO_CONFIG.baseUrl}/companies/6/sites/${siteId}/assets/?search=any&columns=CustomFields,ID,AssetType&pageSize=100&page=1&orderby=Name&limit=100&CustomFields.Value=${encodeURIComponent(normalizedValue)}`,
@@ -102,6 +109,10 @@ $(function () {
 
     $.ajax(settings)
       .done(function (response) {
+        if (requestId !== lookupRequestId) {
+          return;
+        }
+
         const assets = Array.isArray(response) ? response : [];
         const matchingAsset = assets.find(function (asset) {
           const customFields = Array.isArray(asset?.CustomFields) ? asset.CustomFields : [];
@@ -117,12 +128,20 @@ $(function () {
           applyAssetLookupResult(matchingAsset);
         } else {
           const $select = $("#assetDescriptionSelect");
+          const $input = $("#assetDescriptionInput");
           if ($select.length) {
-            $select.val("other").trigger("change");
+            $select.val("").trigger("change");
+            $input.val("").removeClass("is-invalid");
+            $("#assetDescriptionInputError").text("");
+            $("#assetDescriptionInputWrapper").addClass("d-none");
           }
         }
       })
       .fail(function (jqXHR, textStatus, errorThrown) {
+        if (requestId !== lookupRequestId) {
+          return;
+        }
+
         console.error("Asset lookup failed:", textStatus, errorThrown);
       });
   };

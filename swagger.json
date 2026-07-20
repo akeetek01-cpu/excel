@@ -1,131 +1,407 @@
 {
-  "openapi": "3.0.0",
+  "openapi": "3.0.3",
   "info": {
-    "title": "excel API",
+    "title": "Excel API",
     "version": "1.0.0",
-    "description": "API docs for the excel project"
+    "description": "Swagger documentation for the Excel lead-capture application APIs and page routes."
   },
+  "servers": [
+    {
+      "url": "http://localhost:3000",
+      "description": "Local development server"
+    }
+  ],
+  "tags": [
+    {
+      "name": "Auth",
+      "description": "User registration, login, and password update endpoints"
+    },
+    {
+      "name": "Users",
+      "description": "Employee and user data endpoints"
+    },
+    {
+      "name": "Utility",
+      "description": "Utility and lookup endpoints"
+    },
+    {
+      "name": "Web",
+      "description": "Page routes served by the app"
+    }
+  ],
   "paths": {
     "/api/dashboard": {
       "get": {
-        "summary": "Protected API",
+        "tags": ["Utility"],
+        "summary": "Protected dashboard API",
+        "description": "Returns a simple protected API response.",
         "responses": {
-          "200": {"description": "Success"},
-          "401": {"description": "Unauthorized"}
+          "200": {
+            "description": "Success",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/SuccessResponse"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized"
+          }
         }
       }
     },
     "/api/register": {
       "post": {
-        "summary": "Register a new user (Firebase)",
+        "tags": ["Auth"],
+        "summary": "Register a new employee user",
+        "description": "Creates a new employee record in Firebase Realtime Database.",
         "requestBody": {
           "required": true,
           "content": {
             "application/json": {
               "schema": {
-                "type": "object",
-                "properties": {
-                  "name": { "type": "string" },
-                  "email": { "type": "string" },
-                  "password": { "type": "string" }
-                },
-                "required": ["name", "email", "password"]
+                "$ref": "#/components/schemas/RegisterRequest"
               }
             }
           }
         },
         "responses": {
-          "200": { "description": "User registered successfully" },
-          "400": { "description": "Validation error" },
-          "500": { "description": "Server error" }
+          "200": {
+            "description": "User registered successfully",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/SuccessResponse"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Validation error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Server error"
+          }
         }
       }
     },
     "/api/users": {
       "get": {
-        "summary": "Get all users (Firebase)",
+        "tags": ["Users"],
+        "summary": "Get all users",
+        "description": "Fetches all employee records from Firebase Realtime Database.",
         "responses": {
-          "200": { "description": "A list of users" },
-          "500": { "description": "Server error" }
+          "200": {
+            "description": "A list of users",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "additionalProperties": {
+                    "$ref": "#/components/schemas/UserRecord"
+                  }
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Server error"
+          }
         }
       }
     },
     "/api/login": {
       "post": {
-        "summary": "Login with email and password (Firebase)",
+        "tags": ["Auth"],
+        "summary": "Login with email and password",
+        "description": "Authenticates a user using Firebase employee data.",
         "requestBody": {
           "required": true,
           "content": {
             "application/json": {
               "schema": {
-                "type": "object",
-                "properties": {
-                  "email": { "type": "string" },
-                  "password": { "type": "string" }
-                },
-                "required": ["email", "password"]
+                "$ref": "#/components/schemas/LoginRequest"
               }
             }
           }
         },
         "responses": {
-          "200": { "description": "Login successful" },
-          "400": { "description": "Validation error" },
-          "401": { "description": "Invalid credentials" },
-          "500": { "description": "Server error" }
+          "200": {
+            "description": "Login successful",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "message": {
+                      "type": "string"
+                    },
+                    "user": {
+                      "$ref": "#/components/schemas/UserRecord"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Validation error"
+          },
+          "401": {
+            "description": "Invalid credentials"
+          },
+          "500": {
+            "description": "Server error"
+          }
         }
       }
     },
     "/api/changePassword": {
-    "post": {
-      "summary": "Change user password",
-      "requestBody": {
-        "required": true,
-        "content": {
-          "application/json": {
-            "schema": {
-              "type": "object",
-              "properties": {
-                "email": {
-                  "type": "string",
-                  "example": "t.solley@excel.co.nz"
-                },
-                "oldPassword": {
-                  "type": "string",
-                  "example": "t.solley"
-                },
-                "newPassword": {
-                  "type": "string",
-                  "example": "Welcome@123"
-                }
-              },
-              "required": [
-                "email",
-                "oldPassword",
-                "newPassword"
-              ]
+      "post": {
+        "tags": ["Auth"],
+        "summary": "Change user password",
+        "description": "Updates an existing employee password in Firebase Realtime Database.",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ChangePasswordRequest"
+              }
             }
           }
+        },
+        "responses": {
+          "200": {
+            "description": "Password updated successfully",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/SuccessResponse"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Missing required fields"
+          },
+          "401": {
+            "description": "Invalid email or old password"
+          },
+          "404": {
+            "description": "Users not found"
+          },
+          "500": {
+            "description": "Server error"
+          }
         }
-      },
-      "responses": {
-        "200": {
-          "description": "Password updated successfully"
-        },
-        "400": {
-          "description": "Email, old password and new password are required"
-        },
-        "401": {
-          "description": "Invalid email or old password"
-        },
-        "404": {
-          "description": "Users not found"
-        },
-        "500": {
-          "description": "Server error"
+      }
+    },
+    "/api/InsertScript": {
+      "get": {
+        "tags": ["Utility"],
+        "summary": "Get InsertScript data",
+        "description": "Fetches InsertScript values from Firebase Realtime Database.",
+        "responses": {
+          "200": {
+            "description": "InsertScript data returned",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/InsertScriptResponse"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Server error"
+          }
+        }
+      }
+    },
+    "/": {
+      "get": {
+        "tags": ["Web"],
+        "summary": "Home page",
+        "responses": {
+          "200": {
+            "description": "HTML home page"
+          }
+        }
+      }
+    },
+    "/dashboard": {
+      "get": {
+        "tags": ["Web"],
+        "summary": "Dashboard page",
+        "responses": {
+          "200": {
+            "description": "HTML dashboard page"
+          }
+        }
+      }
+    },
+    "/login": {
+      "get": {
+        "tags": ["Web"],
+        "summary": "Login page",
+        "responses": {
+          "200": {
+            "description": "HTML login page"
+          }
+        }
+      }
+    },
+    "/register": {
+      "get": {
+        "tags": ["Web"],
+        "summary": "Registration page",
+        "responses": {
+          "200": {
+            "description": "HTML registration page"
+          }
+        }
+      }
+    },
+    "/forgotPassword": {
+      "get": {
+        "tags": ["Web"],
+        "summary": "Forgot password page",
+        "responses": {
+          "200": {
+            "description": "HTML forgot password page"
+          }
+        }
+      }
+    },
+    "/lead-form": {
+      "get": {
+        "tags": ["Web"],
+        "summary": "Lead form page",
+        "responses": {
+          "200": {
+            "description": "HTML lead form page"
+          }
+        }
+      }
+    },
+    "/lead-form-v1": {
+      "get": {
+        "tags": ["Web"],
+        "summary": "Lead form v1 page",
+        "responses": {
+          "200": {
+            "description": "HTML lead form v1 page"
+          }
         }
       }
     }
-  }
+  },
+  "components": {
+    "schemas": {
+      "SuccessResponse": {
+        "type": "object",
+        "properties": {
+          "message": {
+            "type": "string"
+          }
+        }
+      },
+      "ErrorResponse": {
+        "type": "object",
+        "properties": {
+          "error": {
+            "type": "string"
+          }
+        }
+      },
+      "RegisterRequest": {
+        "type": "object",
+        "required": ["name", "email", "password", "phone"],
+        "properties": {
+          "name": {
+            "type": "string",
+            "example": "John Doe"
+          },
+          "email": {
+            "type": "string",
+            "format": "email",
+            "example": "john.doe@example.com"
+          },
+          "password": {
+            "type": "string",
+            "example": "Password123"
+          },
+          "phone": {
+            "type": "string",
+            "example": "0211234567"
+          }
+        }
+      },
+      "LoginRequest": {
+        "type": "object",
+        "required": ["email", "password"],
+        "properties": {
+          "email": {
+            "type": "string",
+            "format": "email",
+            "example": "john.doe@example.com"
+          },
+          "password": {
+            "type": "string",
+            "example": "Password123"
+          }
+        }
+      },
+      "ChangePasswordRequest": {
+        "type": "object",
+        "required": ["email", "oldPassword", "newPassword"],
+        "properties": {
+          "email": {
+            "type": "string",
+            "format": "email",
+            "example": "john.doe@example.com"
+          },
+          "oldPassword": {
+            "type": "string",
+            "example": "Password123"
+          },
+          "newPassword": {
+            "type": "string",
+            "example": "NewPassword123"
+          }
+        }
+      },
+      "UserRecord": {
+        "type": "object",
+        "properties": {
+          "name": {
+            "type": "string"
+          },
+          "email": {
+            "type": "string"
+          },
+          "password": {
+            "type": "string"
+          },
+          "phone": {
+            "type": "string"
+          }
+        }
+      },
+      "InsertScriptResponse": {
+        "type": "object",
+        "description": "Object returned from the InsertScript endpoint"
+      }
+    }
   }
 }

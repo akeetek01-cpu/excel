@@ -1,6 +1,11 @@
 $(function() {
+    const savedEnv = localStorage.getItem('SIMPRO_ENV') || 'PROD';
+    $('#simproEnvSelect').val(savedEnv);
+
     $('#loginBtn').on('click', function(e) {
         localStorage.removeItem("user");
+        const selectedEnv = $('#simproEnvSelect').val() || 'PROD';
+        localStorage.setItem('SIMPRO_ENV', selectedEnv);
         e.preventDefault();
         $("#errorMsg").css("visibility", "hidden");
          $("#loginBtn").addClass("button--loading");
