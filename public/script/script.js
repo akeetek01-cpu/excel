@@ -680,11 +680,11 @@ $("#nextBtn").html('Next <span><i class="fa-solid fa-angle-right"></i></span>&nb
   });
 
   $("#assetDescriptionSelect").on("change", function () {
+    // Do not move focus automatically. Only toggle visibility of the free-text input when "Other" is selected.
     if ($(this).val() === "other") {
       resetAssetFields({ keepAssetDescription: true });
       $("#assetDescriptionInput").removeClass("d-none");
       $("#assetDescriptionSelect").val("other");
-      $("#assetDescriptionInput").focus();
     } else {
       resetAssetFields({ keepAssetDescription: true });
       $("#assetDescriptionSelect").val($(this).val() || "");
@@ -693,7 +693,6 @@ $("#nextBtn").html('Next <span><i class="fa-solid fa-angle-right"></i></span>&nb
         .removeClass("is-invalid")
         .val("");
       $("#assetDescriptionInputError").text("");
-      $("#assetLocation").focus();
     }
   });
 

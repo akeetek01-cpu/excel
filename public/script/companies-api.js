@@ -48,13 +48,26 @@ $(function() {
     }
 
     function setOtherMode(selectElem, selectWrapperElem, inputWrapperElem) {
-        const selectedValue = selectElem.val();
+        // Keep layout widths unchanged (always full width). Only toggle visibility of the input wrapper.
+        // This function accepts two calling styles in the codebase: some callers pass three args
+        // (selectElem, selectWrapperElem, inputWrapperElem) while others pass two (selectElem, inputWrapperElem).
+        // Handle both safely.
+        const selectedValue = selectElem && typeof selectElem.val === 'function' ? selectElem.val() : null;
+
+        // If only two args were provided, shift parameters so inputWrapperElem is the second arg
+        if (inputWrapperElem === undefined && selectWrapperElem) {
+            inputWrapperElem = selectWrapperElem;
+            selectWrapperElem = null;
+        }
+
         if (selectedValue === "other") {
-            selectWrapperElem.removeClass("col-12").addClass("col-3");
-            inputWrapperElem.removeClass("d-none").removeClass("col-12").addClass("col-9");
+            if (inputWrapperElem && typeof inputWrapperElem.removeClass === 'function') {
+                inputWrapperElem.removeClass("d-none");
+            }
         } else {
-            selectWrapperElem.removeClass("col-3").addClass("col-12");
-            inputWrapperElem.addClass("d-none").removeClass("col-9").addClass("col-12");
+            if (inputWrapperElem && typeof inputWrapperElem.addClass === 'function') {
+                inputWrapperElem.addClass("d-none");
+            }
         }
     }
 
