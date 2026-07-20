@@ -39,6 +39,7 @@ $(function () {
 
   let currentStep = 0;
   const MAX_PHOTOS = 10;
+  let customerAssetLookupTimer = null;
 
   function generateJobNumber() {
     return String(Math.floor(100000 + Math.random() * 900000));
@@ -1778,10 +1779,27 @@ $("#nextBtn").html('Next <span><i class="fa-solid fa-angle-right"></i></span>&nb
 
   $("#customerAssetId").on("input change", function () {
     const value = $(this).val().trim();
-    resetAssetFields()
-    if (value.length >= 4 && window.lookupAssetByValue) {
-      window.lookupAssetByValue(value);
-    } 
+    jobData.asset.customerAssetId = value;
+
+    if (customerAssetLookupTimer) {
+      clearTimeout(customerAssetLookupTimer);
+      customerAssetLookupTimer = null;
+    }
+
+    if (!value || value.length < 4) {
+      return;
+    }
+
+    customerAssetLookupTimer = setTimeout(() => {
+      const currentValue = String($("#customerAssetId").val() || "").trim();
+      if (currentValue !== value) {
+        return;
+      }
+
+      if (window.lookupAssetByValue) {
+        window.lookupAssetByValue(currentValue);
+      }
+    }, 350);
   });
 
   // stop clicks on the input bubbling up (defensive)

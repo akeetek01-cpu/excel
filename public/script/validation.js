@@ -56,7 +56,7 @@ $(function(){
   $('#assetDescriptionSelect').on('change', function(){
     const val = $(this).val();
     if(val === 'other'){
-      $('#assetDescriptionInput').removeClass('d-none').focus();
+      $('#assetDescriptionInput').removeClass('d-none');
     } else {
       $('#assetDescriptionInput').addClass('d-none').val('');
       // if you keep a jobData model, store selected asset:
@@ -73,8 +73,7 @@ $(function(){
   $('#assetDescriptionSelect').on('change', function () {
             if ($(this).val() === 'other') {
                 $('#assetDescriptionInput')
-                    .removeClass('d-none')
-                    .focus();
+                    .removeClass('d-none');
             } else {
                 $('#assetDescriptionInput')
                     .addClass('d-none')
