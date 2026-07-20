@@ -228,6 +228,14 @@ $("#nextBtn").html('Next <span><i class="fa-solid fa-angle-right"></i></span>&nb
     $("#previewGrid").empty();
     $("#uploadStatus").hide().text("");
     $("#jsonOutput").text("");
+    $("#customerName").val("");
+    $("#customerNameInput").val("");
+    $("#customerPhone").val("");
+    $("#customerEmail").val("");
+    $("#customerNameInputWrapper").addClass("d-none");
+    $("#customerNameInputError").text("");
+    $("#customerPhoneError").text("");
+    $("#customerEmailError").text("");
     $("#modalJobNum, #modalCustomer, #modalTime").text("");
     $(
       "#revJob, #revCustomer, #revAsset, #revFaults, #revTech, #revHours, #revMan",
@@ -246,6 +254,47 @@ $("#nextBtn").html('Next <span><i class="fa-solid fa-angle-right"></i></span>&nb
     const $error = $(errorId);
     $field.addClass("is-invalid");
     $error.text(message);
+  }
+
+  function resetAssetFields({ keepAssetDescription = false, keepCustomerAssetId = false } = {}) {
+    const clearValue = (selector) => {
+      const $field = $(selector);
+      if ($field.length) {
+        $field.val("").removeClass("is-invalid");
+      }
+    };
+
+    clearValue("#assertMake");
+    clearValue("#assertModel");
+    clearValue("#assertSerialNumber");
+
+    if (!keepAssetDescription) {
+      clearValue("#assetDescriptionSelect");
+      clearValue("#assetDescriptionInput");
+      $("#assetDescriptionInput").addClass("d-none");
+      $("#assetDescriptionInputError").text("");
+    } else {
+      clearValue("#assetDescriptionInput");
+      $("#assetDescriptionInput").removeClass("is-invalid");
+      $("#assetDescriptionInputError").text("");
+    }
+
+    clearValue("#assetLocation");
+    clearValue("#assetLocationInput");
+    $("#assetLocationInput").addClass("d-none");
+    $("#assetLocationInputError").text("");
+
+    if (!keepCustomerAssetId) {
+     // clearValue("#customerAssetId");
+    }
+
+    jobData.asset.description = "";
+    jobData.asset.descriptionLabel = "";
+    jobData.asset.location = "";
+    jobData.asset.locationLabel = "";
+    if (!keepCustomerAssetId) {
+      jobData.asset.customerAssetId = "";
+    }
   }
 
   function clearError(field, errorId) {
@@ -285,8 +334,11 @@ $("#nextBtn").html('Next <span><i class="fa-solid fa-angle-right"></i></span>&nb
     }
     const customerNameValue = String($("#customerName").val() || "").trim();
     const customerNameInput = String($("#customerNameInput").val() || "").trim();
+    const customerPhoneValue = String($("#customerPhone").val() || "").trim();
+    const customerEmailValue = String($("#customerEmail").val() || "").trim();
+    const isOtherContact = customerNameValue === "other";
 
-    if (customerNameValue === "other") {
+    if (isOtherContact) {
       if (customerNameInput === "") {
         showError(
           "#customerNameInput",
@@ -304,6 +356,27 @@ $("#nextBtn").html('Next <span><i class="fa-solid fa-angle-right"></i></span>&nb
       } else {
         clearError("#customerNameInput", "#customerNameInputError");
       }
+
+      if (customerPhoneValue === "") {
+        showError("#customerPhone", "#customerPhoneError", "Phone is required.");
+        valid = false;
+      } else if (!/^\d{8,12}$/.test(customerPhoneValue.replace(/\D/g, ""))) {
+        showError("#customerPhone", "#customerPhoneError", "Please enter a valid phone number.");
+        valid = false;
+      } else {
+        clearError("#customerPhone", "#customerPhoneError");
+      }
+
+      if (customerEmailValue === "") {
+        showError("#customerEmail", "#customerEmailError", "Email is required.");
+        valid = false;
+      } else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(customerEmailValue)) {
+        showError("#customerEmail", "#customerEmailError", "Please enter a valid email address.");
+        valid = false;
+      } else {
+        clearError("#customerEmail", "#customerEmailError");
+      }
+
       clearError("#customerName", "#customerNameError");
     } else if (customerNameValue === "") {
       showError(
@@ -315,10 +388,9 @@ $("#nextBtn").html('Next <span><i class="fa-solid fa-angle-right"></i></span>&nb
     } else {
       clearError("#customerName", "#customerNameError");
       clearError("#customerNameInput", "#customerNameInputError");
+      clearError("#customerPhone", "#customerPhoneError");
+      clearError("#customerEmail", "#customerEmailError");
     }
-
-    clearError("#customerPhone", "#customerPhoneError");
-    clearError("#customerEmail", "#customerEmailError");
 
     if ($("#customerTenancy").val().trim() === "") {
       showError(
@@ -502,6 +574,36 @@ $("#nextBtn").html('Next <span><i class="fa-solid fa-angle-right"></i></span>&nb
   //   }
   // });
 
+  $("#customerName").on("change", function () {
+    const value = $(this).val().trim();
+    const isOther = value === "other";
+
+    if (isOther) {
+      $("#customerNameInputWrapper").removeClass("d-none");
+      $("#customerNameInput").val("").removeClass("is-invalid");
+      $("#customerNameInputError").text("");
+    } else {
+      $("#customerNameInputWrapper").addClass("d-none");
+      $("#customerNameInput").val("").removeClass("is-invalid");
+      $("#customerNameInputError").text("");
+    }
+
+    $("#customerPhone").val("").removeClass("is-invalid");
+    $("#customerEmail").val("").removeClass("is-invalid");
+    $("#customerPhoneError").text("");
+    $("#customerEmailError").text("");
+
+    if (value === "") {
+      showError(
+        "#customerName",
+        "#customerNameError",
+        "Customer Contact Name is required.",
+      );
+    } else {
+      clearError("#customerName", "#customerNameError");
+    }
+  });
+
   $("#customerName").on("blur", function () {
     const value = $(this).val().trim();
     if (value === "") {
@@ -539,11 +641,29 @@ $("#nextBtn").html('Next <span><i class="fa-solid fa-angle-right"></i></span>&nb
   });
 
   $("#customerPhone").on("blur", function () {
-    clearError("#customerPhone", "#customerPhoneError");
+    const value = $(this).val().trim();
+    const isOther = $("#customerName").val() === "other";
+
+    if (isOther && value === "") {
+      showError("#customerPhone", "#customerPhoneError", "Phone is required.");
+    } else if (isOther && !/^\d{8,12}$/.test(value.replace(/\D/g, ""))) {
+      showError("#customerPhone", "#customerPhoneError", "Please enter a valid phone number.");
+    } else {
+      clearError("#customerPhone", "#customerPhoneError");
+    }
   });
 
   $("#customerEmail").on("blur", function () {
-    clearError("#customerEmail", "#customerEmailError");
+    const value = $(this).val().trim();
+    const isOther = $("#customerName").val() === "other";
+
+    if (isOther && value === "") {
+      showError("#customerEmail", "#customerEmailError", "Email is required.");
+    } else if (isOther && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(value)) {
+      showError("#customerEmail", "#customerEmailError", "Please enter a valid email address.");
+    } else {
+      clearError("#customerEmail", "#customerEmailError");
+    }
   });
 
   $("#customerTenancy").on("blur", function () {
@@ -560,9 +680,14 @@ $("#nextBtn").html('Next <span><i class="fa-solid fa-angle-right"></i></span>&nb
   });
 
   $("#assetDescriptionSelect").on("change", function () {
+    // Do not move focus automatically. Only toggle visibility of the free-text input when "Other" is selected.
     if ($(this).val() === "other") {
+      resetAssetFields({ keepAssetDescription: true });
       $("#assetDescriptionInput").removeClass("d-none");
+      $("#assetDescriptionSelect").val("other");
     } else {
+      resetAssetFields({ keepAssetDescription: true });
+      $("#assetDescriptionSelect").val($(this).val() || "");
       $("#assetDescriptionInput")
         .addClass("d-none")
         .removeClass("is-invalid")
@@ -1306,7 +1431,9 @@ $("#nextBtn").html('Next <span><i class="fa-solid fa-angle-right"></i></span>&nb
 
   function stopBarcodeScanner() {
     barcodeScannerActive = false;
-    if (barcodeScannerInstance) {
+
+    // Stop html5-qrcode instance if present
+    if (barcodeScannerInstance && typeof barcodeScannerInstance.clear === 'function') {
       Promise.resolve()
         .then(() => barcodeScannerInstance.clear())
         .catch(() => {})
@@ -1314,16 +1441,23 @@ $("#nextBtn").html('Next <span><i class="fa-solid fa-angle-right"></i></span>&nb
           barcodeScannerInstance = null;
         });
     }
+
+    // Stop Quagga if it's running
+    if (window.Quagga && window.Quagga.stop && window.Quagga.offDetected) {
+      try {
+        window.Quagga.offDetected();
+      } catch (_) {}
+      try {
+        window.Quagga.stop();
+      } catch (_) {}
+    }
+
     $("#barcodeScannerOverlay").hide();
   }
 
   async function startBarcodeScanner() {
-    if (!window.Html5QrcodeScanner) {
-      if (window.alert) {
-        alert("Camera scanning is not available on this browser.");
-      }
-      return;
-    }
+    // prefer Html5Qrcode, but fall back to Quagga on iOS or when Html5Qrcode isn't available/working
+    const isIOS = /iP(ad|hone|od)/.test(navigator.userAgent || '');
 
     if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) {
       if (window.alert) {
@@ -1337,6 +1471,99 @@ $("#nextBtn").html('Next <span><i class="fa-solid fa-angle-right"></i></span>&nb
     $("#barcodeScannerMessage").text("Opening camera…");
     barcodeScannerActive = true;
 
+    // If on iOS or Html5Qrcode is not available, try Quagga first
+    if (isIOS || !window.Html5QrcodeScanner) {
+      if (window.Quagga) {
+        try {
+          // Configure Quagga for live stream
+          const constraints = {
+            width: { min: 320 },
+            height: { min: 240 },
+            facingMode: 'environment',
+          };
+
+          window.Quagga.init(
+            {
+              inputStream: {
+                type: 'LiveStream',
+                target: document.querySelector('#barcodeScannerContainer'),
+                constraints: constraints,
+                singleChannel: false,
+              },
+              decoder: {
+                readers: [
+                  'code_128_reader',
+                  'ean_reader',
+                  'ean_8_reader',
+                  'code_39_reader',
+                  'upc_reader',
+                  'upc_e_reader',
+                ],
+                multiple: false,
+              },
+              locate: true,
+              frequency: 10,
+            },
+            function (err) {
+              if (err) {
+                console.warn('Quagga init failed, falling back to Html5Qrcode if available', err);
+                // fallback to Html5Qrcode if available
+                if (window.Html5QrcodeScanner) {
+                  startHtml5QrcodeScanner().catch(() => {
+                    if (window.alert) alert('Camera scanning is not available on this browser.');
+                  });
+                } else {
+                  if (window.alert) alert('Camera scanning is not available on this browser.');
+                }
+                return;
+              }
+
+              try {
+                window.Quagga.start();
+              } catch (e) {
+                console.warn('Quagga start failed', e);
+                if (window.Html5QrcodeScanner) {
+                  startHtml5QrcodeScanner().catch(() => {
+                    if (window.alert) alert('Camera scanning is not available on this browser.');
+                  });
+                }
+                return;
+              }
+
+              window.Quagga.onDetected(function (result) {
+                try {
+                  const code = (result && result.codeResult && result.codeResult.code) || null;
+                  if (code) {
+                    $("#customerAssetId").val(String(code).trim());
+                    if (window.lookupAssetByValue) window.lookupAssetByValue(code);
+                    if (window.alert) alert('Barcode read successfully.');
+                    stopBarcodeScanner();
+                  }
+                } catch (e) {
+                  console.warn('Error handling Quagga detection', e);
+                }
+              });
+            },
+          );
+
+          return; // Quagga started (or initializing), exit function
+        } catch (e) {
+          console.warn('Quagga init threw', e);
+          // fall through to Html5Qrcode below
+        }
+      }
+    }
+
+    // Default path: use Html5Qrcode
+    if (window.Html5QrcodeScanner) {
+      return startHtml5QrcodeScanner();
+    }
+
+    if (window.alert) alert('Camera scanning is not available on this browser.');
+  }
+
+  // Extracted helper to start Html5Qrcode scanner so it can be called from fallback paths
+  async function startHtml5QrcodeScanner() {
     if (barcodeScannerInstance) {
       try {
         await barcodeScannerInstance.clear();
@@ -1344,7 +1571,7 @@ $("#nextBtn").html('Next <span><i class="fa-solid fa-angle-right"></i></span>&nb
     }
 
     barcodeScannerInstance = new window.Html5QrcodeScanner(
-      "barcodeScannerContainer",
+      'barcodeScannerContainer',
       {
         fps: 10,
         qrbox: { width: 240, height: 240 },
@@ -1352,7 +1579,7 @@ $("#nextBtn").html('Next <span><i class="fa-solid fa-angle-right"></i></span>&nb
         showTorchButtonIfSupported: true,
         rememberLastUsedCamera: true,
         videoConstraints: {
-          facingMode: { ideal: "environment" },
+          facingMode: { ideal: 'environment' },
         },
       },
       false,
@@ -1360,25 +1587,25 @@ $("#nextBtn").html('Next <span><i class="fa-solid fa-angle-right"></i></span>&nb
 
     await barcodeScannerInstance.render(
       (decodedText) => {
-        const value = String(decodedText || "").trim();
+        const value = String(decodedText || '').trim();
         if (value) {
-          $("#customerAssetId").val(value);
+          $('#customerAssetId').val(value);
           if (window.lookupAssetByValue) {
             window.lookupAssetByValue(value);
           }
           if (window.alert) {
-            alert("Barcode read successfully.");
+            alert('Barcode read successfully.');
           }
         } else if (window.alert) {
-          alert("Barcode could not be read. Please enter the value manually.");
+          alert('Barcode could not be read. Please enter the value manually.');
         }
         stopBarcodeScanner();
       },
       (error) => {
         if (!barcodeScannerActive) return;
-        const message = String(error || "");
-        if (message && !message.toLowerCase().includes("no qr code")) {
-          $("#barcodeScannerMessage").text("Scanning… keep the barcode centered.");
+        const message = String(error || '');
+        if (message && !message.toLowerCase().includes('no qr code')) {
+          $('#barcodeScannerMessage').text('Scanning… keep the barcode centered.');
         }
       },
     );
@@ -1551,9 +1778,10 @@ $("#nextBtn").html('Next <span><i class="fa-solid fa-angle-right"></i></span>&nb
 
   $("#customerAssetId").on("input change", function () {
     const value = $(this).val().trim();
+    resetAssetFields()
     if (value.length >= 4 && window.lookupAssetByValue) {
       window.lookupAssetByValue(value);
-    }
+    } 
   });
 
   // stop clicks on the input bubbling up (defensive)
