@@ -1655,13 +1655,15 @@ $("#nextBtn").html('Next <span><i class="fa-solid fa-angle-right"></i></span>&nb
     if (!file) return "";
 
     const fileName = (file.name || "").toLowerCase();
-    if (/(heic|heif)$/i.test(fileName) || /heic|heif/i.test(file.type || "")) {
-      throw new Error("HEIC/HEIF images are not supported for barcode scanning on this device.");
-    }
+    const isHeicOrHeif = /(heic|heif)$/i.test(fileName) || /heic|heif/i.test(file.type || "");
 
     const apiValue = await readBarcodeFromImageWithApi(file);
     if (apiValue) {
       return apiValue;
+    }
+
+    if (isHeicOrHeif) {
+      console.warn("HEIC/HEIF image detected; trying browser-based fallback decoding.");
     }
 
     if (window.Html5Qrcode) {
@@ -1766,7 +1768,10 @@ $("#nextBtn").html('Next <span><i class="fa-solid fa-angle-right"></i></span>&nb
 
   $("#barcodeScanBtn").on("click", function (e) {
     e.preventDefault();
-    $("#barcodeFileInput").trigger("click");
+    const $fileInput = $("#barcodeFileInput");
+    $fileInput.attr("accept", "image/*");
+    $fileInput.attr("capture", "environment");
+    $fileInput.trigger("click");
   });
 
   $("#barcodeFileInput").on("change", async function (event) {
