@@ -1621,12 +1621,47 @@ $("#nextBtn").html('Next <span><i class="fa-solid fa-angle-right"></i></span>&nb
     });
   }
 
+  async function readBarcodeFromImageWithApi(file) {
+    if (!file) return "";
+
+    const formData = new FormData();
+    formData.append("file", file, file.name || "barcode-image");
+
+    try {
+      const response = await fetch("https://api.qrserver.com/v1/read-qr-code/", {
+        method: "POST",
+        body: formData,
+        mode: "cors",
+      });
+
+      if (!response.ok) {
+        throw new Error(`Barcode API returned ${response.status}`);
+      }
+
+      const data = await response.json();
+      const firstSymbol = Array.isArray(data?.symbol) ? data.symbol[0] : null;
+      const value = String(firstSymbol?.data || data?.decodedText || data?.data || "").trim();
+      if (value) {
+        return value;
+      }
+    } catch (error) {
+      console.warn("Public barcode API failed:", error);
+    }
+
+    return "";
+  }
+
   async function readBarcodeFromImage(file) {
     if (!file) return "";
 
     const fileName = (file.name || "").toLowerCase();
     if (/(heic|heif)$/i.test(fileName) || /heic|heif/i.test(file.type || "")) {
       throw new Error("HEIC/HEIF images are not supported for barcode scanning on this device.");
+    }
+
+    const apiValue = await readBarcodeFromImageWithApi(file);
+    if (apiValue) {
+      return apiValue;
     }
 
     if (window.Html5Qrcode) {
@@ -1731,17 +1766,6 @@ $("#nextBtn").html('Next <span><i class="fa-solid fa-angle-right"></i></span>&nb
 
   $("#barcodeScanBtn").on("click", function (e) {
     e.preventDefault();
-
-    const isMobile = /Android|iP(ad|hone|od)/i.test(navigator.userAgent || "");
-    if (isMobile) {
-      startBarcodeScanner().catch(() => {
-        if (window.alert) {
-          alert("Camera access is required on mobile. Please allow camera permission and try again.");
-        }
-      });
-      return;
-    }
-
     $("#barcodeFileInput").trigger("click");
   });
 
