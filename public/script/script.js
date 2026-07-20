@@ -1731,6 +1731,17 @@ $("#nextBtn").html('Next <span><i class="fa-solid fa-angle-right"></i></span>&nb
 
   $("#barcodeScanBtn").on("click", function (e) {
     e.preventDefault();
+
+    const isMobile = /Android|iP(ad|hone|od)/i.test(navigator.userAgent || "");
+    if (isMobile) {
+      startBarcodeScanner().catch(() => {
+        if (window.alert) {
+          alert("Camera access is required on mobile. Please allow camera permission and try again.");
+        }
+      });
+      return;
+    }
+
     $("#barcodeFileInput").trigger("click");
   });
 
