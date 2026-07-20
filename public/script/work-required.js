@@ -8,6 +8,26 @@
       .replace(/'/g, "&#39;");
   }
 
+  function normalizeInsertScriptItems(response) {
+    if (Array.isArray(response)) {
+      return response;
+    }
+
+    if (response && typeof response === "object") {
+      return Object.keys(response)
+        .map((key) => {
+          const item = response[key] || {};
+          return {
+            key: String(key),
+            name: String(item.name || item.Name || "").trim(),
+          };
+        })
+        .filter((item) => item.name);
+    }
+
+    return [];
+  }
+
   function buildOptions(items) {
     const placeholder = '<option value="">Select Work Required</option>';
     if (!Array.isArray(items) || items.length === 0) {
@@ -54,12 +74,13 @@
     }
 
     return $.ajax({
-      url: options.url || "data/work_required.json",
+      url: "/api/InsertScript",
       method: "GET",
       dataType: "json",
     })
       .done(function (response) {
-        populateWorkRequiredSelects(Array.isArray(response) ? response : []);
+        const normalizedItems = normalizeInsertScriptItems(response);
+        populateWorkRequiredSelects(normalizedItems);
       })
       .fail(function () {
         populateWorkRequiredSelects([]);
