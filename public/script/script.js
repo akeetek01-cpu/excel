@@ -228,6 +228,14 @@ $("#nextBtn").html('Next <span><i class="fa-solid fa-angle-right"></i></span>&nb
     $("#previewGrid").empty();
     $("#uploadStatus").hide().text("");
     $("#jsonOutput").text("");
+    $("#customerName").val("");
+    $("#customerNameInput").val("");
+    $("#customerPhone").val("");
+    $("#customerEmail").val("");
+    $("#customerNameInputWrapper").addClass("d-none");
+    $("#customerNameInputError").text("");
+    $("#customerPhoneError").text("");
+    $("#customerEmailError").text("");
     $("#modalJobNum, #modalCustomer, #modalTime").text("");
     $(
       "#revJob, #revCustomer, #revAsset, #revFaults, #revTech, #revHours, #revMan",
@@ -246,6 +254,47 @@ $("#nextBtn").html('Next <span><i class="fa-solid fa-angle-right"></i></span>&nb
     const $error = $(errorId);
     $field.addClass("is-invalid");
     $error.text(message);
+  }
+
+  function resetAssetFields({ keepAssetDescription = false, keepCustomerAssetId = false } = {}) {
+    const clearValue = (selector) => {
+      const $field = $(selector);
+      if ($field.length) {
+        $field.val("").removeClass("is-invalid");
+      }
+    };
+
+    clearValue("#assertMake");
+    clearValue("#assertModel");
+    clearValue("#assertSerialNumber");
+
+    if (!keepAssetDescription) {
+      clearValue("#assetDescriptionSelect");
+      clearValue("#assetDescriptionInput");
+      $("#assetDescriptionInput").addClass("d-none");
+      $("#assetDescriptionInputError").text("");
+    } else {
+      clearValue("#assetDescriptionInput");
+      $("#assetDescriptionInput").removeClass("is-invalid");
+      $("#assetDescriptionInputError").text("");
+    }
+
+    clearValue("#assetLocation");
+    clearValue("#assetLocationInput");
+    $("#assetLocationInput").addClass("d-none");
+    $("#assetLocationInputError").text("");
+
+    if (!keepCustomerAssetId) {
+     // clearValue("#customerAssetId");
+    }
+
+    jobData.asset.description = "";
+    jobData.asset.descriptionLabel = "";
+    jobData.asset.location = "";
+    jobData.asset.locationLabel = "";
+    if (!keepCustomerAssetId) {
+      jobData.asset.customerAssetId = "";
+    }
   }
 
   function clearError(field, errorId) {
@@ -285,8 +334,11 @@ $("#nextBtn").html('Next <span><i class="fa-solid fa-angle-right"></i></span>&nb
     }
     const customerNameValue = String($("#customerName").val() || "").trim();
     const customerNameInput = String($("#customerNameInput").val() || "").trim();
+    const customerPhoneValue = String($("#customerPhone").val() || "").trim();
+    const customerEmailValue = String($("#customerEmail").val() || "").trim();
+    const isOtherContact = customerNameValue === "other";
 
-    if (customerNameValue === "other") {
+    if (isOtherContact) {
       if (customerNameInput === "") {
         showError(
           "#customerNameInput",
@@ -304,6 +356,27 @@ $("#nextBtn").html('Next <span><i class="fa-solid fa-angle-right"></i></span>&nb
       } else {
         clearError("#customerNameInput", "#customerNameInputError");
       }
+
+      if (customerPhoneValue === "") {
+        showError("#customerPhone", "#customerPhoneError", "Phone is required.");
+        valid = false;
+      } else if (!/^\d{8,12}$/.test(customerPhoneValue.replace(/\D/g, ""))) {
+        showError("#customerPhone", "#customerPhoneError", "Please enter a valid phone number.");
+        valid = false;
+      } else {
+        clearError("#customerPhone", "#customerPhoneError");
+      }
+
+      if (customerEmailValue === "") {
+        showError("#customerEmail", "#customerEmailError", "Email is required.");
+        valid = false;
+      } else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(customerEmailValue)) {
+        showError("#customerEmail", "#customerEmailError", "Please enter a valid email address.");
+        valid = false;
+      } else {
+        clearError("#customerEmail", "#customerEmailError");
+      }
+
       clearError("#customerName", "#customerNameError");
     } else if (customerNameValue === "") {
       showError(
@@ -315,10 +388,9 @@ $("#nextBtn").html('Next <span><i class="fa-solid fa-angle-right"></i></span>&nb
     } else {
       clearError("#customerName", "#customerNameError");
       clearError("#customerNameInput", "#customerNameInputError");
+      clearError("#customerPhone", "#customerPhoneError");
+      clearError("#customerEmail", "#customerEmailError");
     }
-
-    clearError("#customerPhone", "#customerPhoneError");
-    clearError("#customerEmail", "#customerEmailError");
 
     if ($("#customerTenancy").val().trim() === "") {
       showError(
@@ -502,6 +574,36 @@ $("#nextBtn").html('Next <span><i class="fa-solid fa-angle-right"></i></span>&nb
   //   }
   // });
 
+  $("#customerName").on("change", function () {
+    const value = $(this).val().trim();
+    const isOther = value === "other";
+
+    if (isOther) {
+      $("#customerNameInputWrapper").removeClass("d-none");
+      $("#customerNameInput").val("").removeClass("is-invalid");
+      $("#customerNameInputError").text("");
+    } else {
+      $("#customerNameInputWrapper").addClass("d-none");
+      $("#customerNameInput").val("").removeClass("is-invalid");
+      $("#customerNameInputError").text("");
+    }
+
+    $("#customerPhone").val("").removeClass("is-invalid");
+    $("#customerEmail").val("").removeClass("is-invalid");
+    $("#customerPhoneError").text("");
+    $("#customerEmailError").text("");
+
+    if (value === "") {
+      showError(
+        "#customerName",
+        "#customerNameError",
+        "Customer Contact Name is required.",
+      );
+    } else {
+      clearError("#customerName", "#customerNameError");
+    }
+  });
+
   $("#customerName").on("blur", function () {
     const value = $(this).val().trim();
     if (value === "") {
@@ -539,11 +641,29 @@ $("#nextBtn").html('Next <span><i class="fa-solid fa-angle-right"></i></span>&nb
   });
 
   $("#customerPhone").on("blur", function () {
-    clearError("#customerPhone", "#customerPhoneError");
+    const value = $(this).val().trim();
+    const isOther = $("#customerName").val() === "other";
+
+    if (isOther && value === "") {
+      showError("#customerPhone", "#customerPhoneError", "Phone is required.");
+    } else if (isOther && !/^\d{8,12}$/.test(value.replace(/\D/g, ""))) {
+      showError("#customerPhone", "#customerPhoneError", "Please enter a valid phone number.");
+    } else {
+      clearError("#customerPhone", "#customerPhoneError");
+    }
   });
 
   $("#customerEmail").on("blur", function () {
-    clearError("#customerEmail", "#customerEmailError");
+    const value = $(this).val().trim();
+    const isOther = $("#customerName").val() === "other";
+
+    if (isOther && value === "") {
+      showError("#customerEmail", "#customerEmailError", "Email is required.");
+    } else if (isOther && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(value)) {
+      showError("#customerEmail", "#customerEmailError", "Please enter a valid email address.");
+    } else {
+      clearError("#customerEmail", "#customerEmailError");
+    }
   });
 
   $("#customerTenancy").on("blur", function () {
@@ -561,13 +681,19 @@ $("#nextBtn").html('Next <span><i class="fa-solid fa-angle-right"></i></span>&nb
 
   $("#assetDescriptionSelect").on("change", function () {
     if ($(this).val() === "other") {
+      resetAssetFields({ keepAssetDescription: true });
       $("#assetDescriptionInput").removeClass("d-none");
+      $("#assetDescriptionSelect").val("other");
+      $("#assetDescriptionInput").focus();
     } else {
+      resetAssetFields({ keepAssetDescription: true });
+      $("#assetDescriptionSelect").val($(this).val() || "");
       $("#assetDescriptionInput")
         .addClass("d-none")
         .removeClass("is-invalid")
         .val("");
       $("#assetDescriptionInputError").text("");
+      $("#assetLocation").focus();
     }
   });
 
@@ -1551,9 +1677,10 @@ $("#nextBtn").html('Next <span><i class="fa-solid fa-angle-right"></i></span>&nb
 
   $("#customerAssetId").on("input change", function () {
     const value = $(this).val().trim();
+    resetAssetFields()
     if (value.length >= 4 && window.lookupAssetByValue) {
       window.lookupAssetByValue(value);
-    }
+    } 
   });
 
   // stop clicks on the input bubbling up (defensive)
