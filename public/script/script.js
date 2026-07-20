@@ -1431,7 +1431,9 @@ $("#nextBtn").html('Next <span><i class="fa-solid fa-angle-right"></i></span>&nb
 
   function stopBarcodeScanner() {
     barcodeScannerActive = false;
-    if (barcodeScannerInstance) {
+
+    // Stop html5-qrcode instance if present
+    if (barcodeScannerInstance && typeof barcodeScannerInstance.clear === 'function') {
       Promise.resolve()
         .then(() => barcodeScannerInstance.clear())
         .catch(() => {})
@@ -1439,16 +1441,23 @@ $("#nextBtn").html('Next <span><i class="fa-solid fa-angle-right"></i></span>&nb
           barcodeScannerInstance = null;
         });
     }
+
+    // Stop Quagga if it's running
+    if (window.Quagga && window.Quagga.stop && window.Quagga.offDetected) {
+      try {
+        window.Quagga.offDetected();
+      } catch (_) {}
+      try {
+        window.Quagga.stop();
+      } catch (_) {}
+    }
+
     $("#barcodeScannerOverlay").hide();
   }
 
   async function startBarcodeScanner() {
-    if (!window.Html5QrcodeScanner) {
-      if (window.alert) {
-        alert("Camera scanning is not available on this browser.");
-      }
-      return;
-    }
+    // prefer Html5Qrcode, but fall back to Quagga on iOS or when Html5Qrcode isn't available/working
+    const isIOS = /iP(ad|hone|od)/.test(navigator.userAgent || '');
 
     if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) {
       if (window.alert) {
@@ -1462,6 +1471,99 @@ $("#nextBtn").html('Next <span><i class="fa-solid fa-angle-right"></i></span>&nb
     $("#barcodeScannerMessage").text("Opening camera…");
     barcodeScannerActive = true;
 
+    // If on iOS or Html5Qrcode is not available, try Quagga first
+    if (isIOS || !window.Html5QrcodeScanner) {
+      if (window.Quagga) {
+        try {
+          // Configure Quagga for live stream
+          const constraints = {
+            width: { min: 320 },
+            height: { min: 240 },
+            facingMode: 'environment',
+          };
+
+          window.Quagga.init(
+            {
+              inputStream: {
+                type: 'LiveStream',
+                target: document.querySelector('#barcodeScannerContainer'),
+                constraints: constraints,
+                singleChannel: false,
+              },
+              decoder: {
+                readers: [
+                  'code_128_reader',
+                  'ean_reader',
+                  'ean_8_reader',
+                  'code_39_reader',
+                  'upc_reader',
+                  'upc_e_reader',
+                ],
+                multiple: false,
+              },
+              locate: true,
+              frequency: 10,
+            },
+            function (err) {
+              if (err) {
+                console.warn('Quagga init failed, falling back to Html5Qrcode if available', err);
+                // fallback to Html5Qrcode if available
+                if (window.Html5QrcodeScanner) {
+                  startHtml5QrcodeScanner().catch(() => {
+                    if (window.alert) alert('Camera scanning is not available on this browser.');
+                  });
+                } else {
+                  if (window.alert) alert('Camera scanning is not available on this browser.');
+                }
+                return;
+              }
+
+              try {
+                window.Quagga.start();
+              } catch (e) {
+                console.warn('Quagga start failed', e);
+                if (window.Html5QrcodeScanner) {
+                  startHtml5QrcodeScanner().catch(() => {
+                    if (window.alert) alert('Camera scanning is not available on this browser.');
+                  });
+                }
+                return;
+              }
+
+              window.Quagga.onDetected(function (result) {
+                try {
+                  const code = (result && result.codeResult && result.codeResult.code) || null;
+                  if (code) {
+                    $("#customerAssetId").val(String(code).trim());
+                    if (window.lookupAssetByValue) window.lookupAssetByValue(code);
+                    if (window.alert) alert('Barcode read successfully.');
+                    stopBarcodeScanner();
+                  }
+                } catch (e) {
+                  console.warn('Error handling Quagga detection', e);
+                }
+              });
+            },
+          );
+
+          return; // Quagga started (or initializing), exit function
+        } catch (e) {
+          console.warn('Quagga init threw', e);
+          // fall through to Html5Qrcode below
+        }
+      }
+    }
+
+    // Default path: use Html5Qrcode
+    if (window.Html5QrcodeScanner) {
+      return startHtml5QrcodeScanner();
+    }
+
+    if (window.alert) alert('Camera scanning is not available on this browser.');
+  }
+
+  // Extracted helper to start Html5Qrcode scanner so it can be called from fallback paths
+  async function startHtml5QrcodeScanner() {
     if (barcodeScannerInstance) {
       try {
         await barcodeScannerInstance.clear();
@@ -1469,7 +1571,7 @@ $("#nextBtn").html('Next <span><i class="fa-solid fa-angle-right"></i></span>&nb
     }
 
     barcodeScannerInstance = new window.Html5QrcodeScanner(
-      "barcodeScannerContainer",
+      'barcodeScannerContainer',
       {
         fps: 10,
         qrbox: { width: 240, height: 240 },
@@ -1477,7 +1579,7 @@ $("#nextBtn").html('Next <span><i class="fa-solid fa-angle-right"></i></span>&nb
         showTorchButtonIfSupported: true,
         rememberLastUsedCamera: true,
         videoConstraints: {
-          facingMode: { ideal: "environment" },
+          facingMode: { ideal: 'environment' },
         },
       },
       false,
@@ -1485,25 +1587,25 @@ $("#nextBtn").html('Next <span><i class="fa-solid fa-angle-right"></i></span>&nb
 
     await barcodeScannerInstance.render(
       (decodedText) => {
-        const value = String(decodedText || "").trim();
+        const value = String(decodedText || '').trim();
         if (value) {
-          $("#customerAssetId").val(value);
+          $('#customerAssetId').val(value);
           if (window.lookupAssetByValue) {
             window.lookupAssetByValue(value);
           }
           if (window.alert) {
-            alert("Barcode read successfully.");
+            alert('Barcode read successfully.');
           }
         } else if (window.alert) {
-          alert("Barcode could not be read. Please enter the value manually.");
+          alert('Barcode could not be read. Please enter the value manually.');
         }
         stopBarcodeScanner();
       },
       (error) => {
         if (!barcodeScannerActive) return;
-        const message = String(error || "");
-        if (message && !message.toLowerCase().includes("no qr code")) {
-          $("#barcodeScannerMessage").text("Scanning… keep the barcode centered.");
+        const message = String(error || '');
+        if (message && !message.toLowerCase().includes('no qr code')) {
+          $('#barcodeScannerMessage').text('Scanning… keep the barcode centered.');
         }
       },
     );
