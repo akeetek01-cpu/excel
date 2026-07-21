@@ -52,7 +52,7 @@
 
         console.log(response);
         if (window.alert) {
-          window.alert("You successfully created a lead.");
+          window.alert("Lead created successfully.");
         }
       })
       .fail(function (xhr, status, error) {
