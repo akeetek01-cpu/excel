@@ -2109,11 +2109,7 @@ $("#nextBtn").html('Next <span><i class="fa-solid fa-angle-right"></i></span>&nb
       }
     })();
 
-    const salespersonValue = [
-      userData?.Name || userData?.FullName || "",
-      userData?.FirstName && userData?.LastName ? `${userData.FirstName} ${userData.LastName}` : "",
-      userData?.ID ? `ID: ${userData.ID}` : "",
-    ].filter(Boolean).join(" | ");
+    const salespersonValue = userData?.Name
 
     const detailRows = [
       ["Customer Name", customerName],
@@ -2162,7 +2158,7 @@ $("#nextBtn").html('Next <span><i class="fa-solid fa-angle-right"></i></span>&nb
 
     return [
       `<div style="font-family: Arial, sans-serif; font-size:14px; color:#222; line-height:1.5;">`,
-      `<p><strong>Lead Details: Created by ${user.Name}, Job#${jobData.customer.jobNumber}</strong></p>`,
+      `<p><strong>Lead Details: Created by ${salespersonValue}, Job#${jobData.customer.jobNumber}</strong></p>`,
       detailTable,
       `</div>`,
     ].filter(Boolean).join("");
