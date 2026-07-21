@@ -62,7 +62,7 @@ $(function () {
     const assetLocation = getAssetLocationValue(asset);
     const assetMake = getCustomFieldValue(asset, ["Make"]);;
     const assetModel = getCustomFieldValue(asset, ["Model (IDU)", "Model"]);;
-    const assetSerialNumber = getCustomFieldValue(asset, ["Serial Number (IDU)", "Serial Number"]);;
+    const assetSerialNumber = getCustomFieldValue(asset, ["Serial Number (IDU)", "Serial Number", "Serial #."]);;
 
     if (assetTypeName) {
       ensureAssetDescriptionOption(assetTypeName);
