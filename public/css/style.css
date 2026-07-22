@@ -363,6 +363,7 @@ color: var(--teal)!important;
 
 .form-control {
   flex: 1;
+  font-size: 13px;
 }
 
 #assetDescriptionInput {

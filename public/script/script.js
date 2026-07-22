@@ -172,6 +172,8 @@ $("#nextBtn").html('Next <span><i class="fa-solid fa-angle-right"></i></span>&nb
     $("#faultList").empty();
     $("#assetDescriptionSelect").val("");
     $("#assetLocation").val("");
+    $("#autoJobBtn").text("");
+    
     $("#assetDescriptionInput")
       .val("")
       .addClass("d-none")
