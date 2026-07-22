@@ -74,7 +74,11 @@ $(function() {
 
     function populateAssetFields(asset) {
         if (!asset) {
-            $("#customerAssetId, #assertMake, #assertModel, #assertSerialNumber").val("");
+            if(asset==null){
+                $("#assertMake, #assertModel, #assertSerialNumber").val("");
+            }else {
+                 $("#customerAssetId, #assertMake, #assertModel, #assertSerialNumber").val("");
+            }
             return;
         }
 
@@ -85,7 +89,7 @@ $(function() {
         const assetSerialNumber = getCustomFieldValue(asset, ["Serial Number (IDU)", "Serial Number", "Serial #.", "Serial #"]);
         const assetLocation = getCustomFieldValue(asset, ["Location"]);
 
-        $("#customerAssetId").val(customerAssetNumber || excelBarcode || "");
+        $("#customerAssetId").val(excelBarcode || "");
         $("#assertMake").val(assetMake || "");
         $("#assertModel").val(assetModel || "");
         $("#assertSerialNumber").val(assetSerialNumber || "");
