@@ -144,7 +144,7 @@ email:-webkit-autofill {
 }
 
 textarea {
-  text-transform: capitalize;
+  text-transform: none;
 }
 
 .welcome {

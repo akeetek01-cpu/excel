@@ -1965,7 +1965,7 @@ $("#nextBtn").html('Next <span><i class="fa-solid fa-angle-right"></i></span>&nb
       const hrs = Number($("#hours").val() || 0);
       const costCenter = String($("#costCenterSelect").val() || "").trim();
       const serviceManager = String($("#serviceManagerSelect").val() || "").trim();
-      //const tags = String($("#tagsSelect").val() || "").trim();
+      const tags = String($("#tagsSelect").val() || "").trim();
       let valid = true;
 
       if (serviceManager === "") {
@@ -1982,12 +1982,12 @@ $("#nextBtn").html('Next <span><i class="fa-solid fa-angle-right"></i></span>&nb
         clearError("#costCenterSelect", "#costCenterError");
       }
 
-      // if (tags === "") {
-      //   showError("#tagsSelect", "#tagsError", "Tags is required.");
-      //   valid = false;
-      // } else {
-      //   clearError("#tagsSelect", "#tagsError");
-      // }
+      if (tags === "") {
+        showError("#tagsSelect", "#tagsError", "Tags is required.");
+        valid = false;
+      } else {
+        clearError("#tagsSelect", "#tagsError");
+      }
 
       if (!Number.isInteger(tech) || tech < 1) {
         showError(
@@ -2097,6 +2097,7 @@ $("#nextBtn").html('Next <span><i class="fa-solid fa-angle-right"></i></span>&nb
     const hours = Number(jobData.estimates.hours || 0);
     const costCenterLabel = String(jobData.estimates.costCenterLabel || "").trim();
     const serviceManagerLabel = String($("#serviceManagerSelect option:selected").text() || "").trim();
+    const tagLabel = String($("#tagsSelect option:selected").text() || "").trim();
 
     const userData = (() => {
       try {
@@ -2108,11 +2109,7 @@ $("#nextBtn").html('Next <span><i class="fa-solid fa-angle-right"></i></span>&nb
       }
     })();
 
-    const salespersonValue = [
-      userData?.Name || userData?.FullName || "",
-      userData?.FirstName && userData?.LastName ? `${userData.FirstName} ${userData.LastName}` : "",
-      userData?.ID ? `ID: ${userData.ID}` : "",
-    ].filter(Boolean).join(" | ");
+    const salespersonValue = userData?.Name
 
     const detailRows = [
       ["Customer Name", customerName],
@@ -2126,6 +2123,7 @@ $("#nextBtn").html('Next <span><i class="fa-solid fa-angle-right"></i></span>&nb
       ["Hours", hours ? String(hours) : ""],
       ["Cost Center", costCenterLabel],
       ["Service Manager", serviceManagerLabel],
+      ["Tag", tagLabel],
       ["Salesperson", salespersonValue],
       ["Notes", notes],
     ].filter(([, value]) => Boolean(value));
@@ -2160,7 +2158,7 @@ $("#nextBtn").html('Next <span><i class="fa-solid fa-angle-right"></i></span>&nb
 
     return [
       `<div style="font-family: Arial, sans-serif; font-size:14px; color:#222; line-height:1.5;">`,
-      `<p><strong>Lead Details</strong></p>`,
+      `<p><strong>Lead Details: Created by ${salespersonValue}, Job#${jobData.customer.jobNumber}</strong></p>`,
       detailTable,
       `</div>`,
     ].filter(Boolean).join("");
@@ -2176,6 +2174,8 @@ $("#nextBtn").html('Next <span><i class="fa-solid fa-angle-right"></i></span>&nb
     const customerContactId = Number(jobData.customer.customerContact || 0) || 0;
     const siteLabel = String(jobData.customer.tenancyLabel || "").trim();
     const selectedCostCenter = jobData.estimates.costCenter || String($("#costCenterSelect").val() || "").trim();
+    const selectedTagValue = String($("#tagsSelect").val() || "").trim();
+    const selectedTagId = Number(selectedTagValue) || 0;
     const notes = String($("#customerNotes").val() || "").trim();
     const description = buildLeadDescriptionHtml();
   
@@ -2192,6 +2192,13 @@ $("#nextBtn").html('Next <span><i class="fa-solid fa-angle-right"></i></span>&nb
     const dd = String(today.getDate()).padStart(2, '0'); // Ensures a 2-digit format (e.g., '17')
     const yyyyMmDd = `${yyyy}-${MM1}-${dd}`;
 
+    const customFields = [
+      { CustomField: 7, Value: "QUOTE Request - LEAD Form" },
+      { CustomField: 4, Value: user.Name || "" },
+      { CustomField: 6, Value: user.col3 || "" },
+      { CustomField: 5, Value: user.TeamName || "" },
+    ].filter((field) => String(field.Value || "").trim() !== "");
+
     return {
       Customer: customerId || 0,
       Site: Number(siteValue) || 0,
@@ -2204,7 +2211,7 @@ $("#nextBtn").html('Next <span><i class="fa-solid fa-angle-right"></i></span>&nb
       Description: description || "",
       Notes: notes || "",
       CostCenter: Number(selectedCostCenter) || 0,
-      Tags: [380], //691
+      Tags: [380, selectedTagId], //691
       Salesperson: user.ID,
       ProjectManager: Number(projectManager) || 0,
       Status: 78,
@@ -2214,7 +2221,8 @@ $("#nextBtn").html('Next <span><i class="fa-solid fa-angle-right"></i></span>&nb
         ExpectedYear: yyyy,
         ExpectedMonth: mm,
       },
-      AutoAdjustStatus: true,
+      AutoAdjustStatus: true
+      //CustomFields: customFields,
     };
   }
 
@@ -2234,12 +2242,13 @@ $("#nextBtn").html('Next <span><i class="fa-solid fa-angle-right"></i></span>&nb
       window.submitLeadToSimpro(payload, {
         onSuccess: function (response) {
           console.log(response);
-          const leadId = response.ID
+          const leadId = response.ID;
+          const hasPhotos = Array.isArray(photoFiles) && photoFiles.length > 0;
 
-          if (leadId && window.uploadLeadAttachments) {
+          if (leadId && hasPhotos && typeof window.uploadLeadAttachments === "function") {
             window.uploadLeadAttachments(leadId, photoFiles, {
               onComplete: function () {
-                alert("You successfully created a lead and uploaded the attached images.");
+                alert("Lead created successfully. Your images have been uploaded.");
               },
               onError: function (error) {
                 console.error("Lead attachment upload failed:", error);
@@ -2247,7 +2256,8 @@ $("#nextBtn").html('Next <span><i class="fa-solid fa-angle-right"></i></span>&nb
               },
             });
           } else {
-            alert("You successfully created a lead.");
+            // No photos attached or upload function unavailable
+            alert("Lead created successfully.");
           }
         },
         onError: function () {

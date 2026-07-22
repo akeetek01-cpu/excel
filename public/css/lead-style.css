@@ -570,7 +570,7 @@ textarea {
 }
 .submit-btn {
     padding-left: 20%;
-    margin: 0 4%;
+    margin: 0 10%;
     padding-right: 20%;
 }
 @media (min-width: 768px) {

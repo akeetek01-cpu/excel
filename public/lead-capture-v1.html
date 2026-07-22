@@ -364,19 +364,26 @@
                                 </select>
                                 <div id="costCenterError" class="invalid-feedback"></div>
                             </div>
-                            <div class="col-6">
+                            <div class="col-6" style="display: none;">
                                 <label class="form-label">Team</label>
                                 <div id="salesTeamId" class="border border-dashed rounded-3 px-3 py-2"
                                     style="min-height: 38px; display: flex; align-items: center;"></div>
                             </div>
-                        </div>
-                        <div class="row g-3 align-items-start ms-2 me-2 mb-2">
                             <div class="col-6">
                                 <label class="form-label">Service Manager</label>
                                 <select id="serviceManagerSelect" class="form-select" aria-label="Service Manager">
                                     <option value="">Select Service Manager</option>
                                 </select>
                                 <div id="serviceManagerError" class="invalid-feedback"></div>
+                            </div>
+                        </div>
+                        <div class="row g-3 align-items-start ms-2 me-2 mb-2">
+                            <div class="col-6">
+                                <label class="form-label">Tags</label>
+                                <select id="tagsSelect" class="form-select" aria-label="Tags">
+                                    <option value="">Select Tags</option>
+                                </select>
+                                <div id="tagsError" class="invalid-feedback"></div>
                             </div>
                             <div class="col-6 d-flex align-items-end afterhrs-container">
                                 <label class="after-hours-label mb-2">After Hours (OT)?</label>
@@ -462,6 +469,7 @@
     <script src="script/service-managers.js"></script>
     <script src="script/totalRecovery.js"></script>
     <script src="script/work-required.js"></script>
+    <script src="script/tags-api.js"></script>
 </body>
 
 </html>
