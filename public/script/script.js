@@ -2192,6 +2192,13 @@ $("#nextBtn").html('Next <span><i class="fa-solid fa-angle-right"></i></span>&nb
     const dd = String(today.getDate()).padStart(2, '0'); // Ensures a 2-digit format (e.g., '17')
     const yyyyMmDd = `${yyyy}-${MM1}-${dd}`;
 
+    const customFields = [
+      { CustomField: 7, Value: "QUOTE Request - LEAD Form" },
+      { CustomField: 4, Value: user.Name || "" },
+      { CustomField: 6, Value: user.col3 || "" },
+      { CustomField: 5, Value: user.TeamName || "" },
+    ].filter((field) => String(field.Value || "").trim() !== "");
+
     return {
       Customer: customerId || 0,
       Site: Number(siteValue) || 0,
@@ -2214,7 +2221,8 @@ $("#nextBtn").html('Next <span><i class="fa-solid fa-angle-right"></i></span>&nb
         ExpectedYear: yyyy,
         ExpectedMonth: mm,
       },
-      AutoAdjustStatus: true,
+      AutoAdjustStatus: true
+      //CustomFields: customFields,
     };
   }
 
@@ -2234,9 +2242,10 @@ $("#nextBtn").html('Next <span><i class="fa-solid fa-angle-right"></i></span>&nb
       window.submitLeadToSimpro(payload, {
         onSuccess: function (response) {
           console.log(response);
-          const leadId = response.ID
+          const leadId = response.ID;
+          const hasPhotos = Array.isArray(photoFiles) && photoFiles.length > 0;
 
-          if (leadId && window.uploadLeadAttachments) {
+          if (leadId && hasPhotos && typeof window.uploadLeadAttachments === "function") {
             window.uploadLeadAttachments(leadId, photoFiles, {
               onComplete: function () {
                 alert("Lead created successfully. Your images have been uploaded.");
@@ -2247,6 +2256,7 @@ $("#nextBtn").html('Next <span><i class="fa-solid fa-angle-right"></i></span>&nb
               },
             });
           } else {
+            // No photos attached or upload function unavailable
             alert("Lead created successfully.");
           }
         },
