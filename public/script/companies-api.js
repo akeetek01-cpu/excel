@@ -8,23 +8,58 @@ $(function() {
 
     let assetResponse = [];
     let assetDescriptions = [];
+    let assetDetailsByTypeId = new Map();
+    let assetDetailsByTypeName = new Map();
+
+    function normalizeFieldName(value) {
+        return String(value || "").trim().toLowerCase().replace(/[^a-z0-9]+/g, "");
+    }
+
+    function getCustomFieldValue(asset, fieldNames) {
+        const customFields = Array.isArray(asset?.CustomFields) ? asset.CustomFields : [];
+        const normalizedFieldNames = fieldNames.map(function(fieldName) {
+            return normalizeFieldName(fieldName);
+        });
+
+        for (let i = 0; i < customFields.length; i += 1) {
+            const field = customFields[i]?.CustomField || customFields[i] || {};
+            const fieldName = normalizeFieldName(field?.Name || customFields[i]?.Name || "");
+            const value = String(customFields[i]?.Value || field?.Value || "").trim();
+
+            if (normalizedFieldNames.indexOf(fieldName) !== -1 && value) {
+                return value;
+            }
+        }
+
+        return "";
+    }
 
     function mapResponse(data) {
         const descriptions = new Map();
+        const detailsByTypeId = new Map();
+        const detailsByTypeName = new Map();
 
         data.forEach(item => {
             if (!item || !item.AssetType) {
                 return;
             }
 
-            const typeId = item.AssetType.ID;
-            const typeName = item.AssetType.Name;
+            const typeId = String(item.AssetType.ID || "");
+            const typeName = String(item.AssetType.Name || "").trim();
 
             if (!descriptions.has(typeId)) {
                 descriptions.set(typeId, {
                     id: typeId,
                     name: typeName
                 });
+            }
+
+            if (typeId && !detailsByTypeId.has(typeId)) {
+                detailsByTypeId.set(typeId, item);
+            }
+
+            if (typeName && !detailsByTypeName.has(normalizeFieldName(typeName))) {
+                detailsByTypeName.set(normalizeFieldName(typeName), item);
             }
         });
 
@@ -33,6 +68,38 @@ $(function() {
             const nameB = (b && b.name) || "";
             return nameA.localeCompare(nameB, undefined, { sensitivity: "base" });
         });
+        assetDetailsByTypeId = detailsByTypeId;
+        assetDetailsByTypeName = detailsByTypeName;
+    }
+
+    function populateAssetFields(asset) {
+        if (!asset) {
+            $("#customerAssetId, #assertMake, #assertModel, #assertSerialNumber").val("");
+            return;
+        }
+
+        const customerAssetNumber = getCustomFieldValue(asset, ["Customer Asset Number", "Cust. Asset No.", "Customer Asset No."]);
+        const excelBarcode = getCustomFieldValue(asset, ["EXCEL Barcode", "Excel Asset ID", "Excel Barcode", "Barcode"]);
+        const assetMake = getCustomFieldValue(asset, ["Make"]);
+        const assetModel = getCustomFieldValue(asset, ["Model (IDU)", "Model"]);
+        const assetSerialNumber = getCustomFieldValue(asset, ["Serial Number (IDU)", "Serial Number", "Serial #.", "Serial #"]);
+
+        $("#customerAssetId").val(customerAssetNumber || excelBarcode || "");
+        $("#assertMake").val(assetMake || "");
+        $("#assertModel").val(assetModel || "");
+        $("#assertSerialNumber").val(assetSerialNumber || "");
+    }
+
+    function applySelectedAssetDetails() {
+        const selectedValue = String(assetDescriptionSelect.val() || "").trim();
+
+        if (!selectedValue || selectedValue === "other") {
+            populateAssetFields(null);
+            return;
+        }
+
+        const asset = assetDetailsByTypeId.get(selectedValue) || assetDetailsByTypeName.get(normalizeFieldName(selectedValue));
+        populateAssetFields(asset || null);
     }
 
     function renderAssetDescriptions() {
@@ -41,10 +108,14 @@ $(function() {
             `<option value="other">Other</option>`
         );
         assetDescriptions.forEach(entry => {
+            const asset = assetDetailsByTypeId.get(String(entry.id)) || null;
+            const excelBarcode = getCustomFieldValue(asset, ["EXCEL Barcode", "Excel Asset ID", "Excel Barcode", "Barcode"]);
+            const label = excelBarcode ? `${entry.name} - ${excelBarcode}` : entry.name;
             assetDescriptionSelect.append(
-                `<option value="${entry.id}">${entry.name}</option>`
+                `<option value="${entry.id}">${label}</option>`
             );
         });
+        applySelectedAssetDetails();
     }
 
     function setOtherMode(selectElem, selectWrapperElem, inputWrapperElem) {
@@ -60,6 +131,7 @@ $(function() {
 
     assetDescriptionSelect.on("change", function() {
         setOtherMode($(this), assetDescriptionSelectWrapper, assetDescriptionInputWrapper);
+        applySelectedAssetDetails();
     });
 
     assetLocationSelect.on("change", function() {
@@ -82,7 +154,7 @@ $(function() {
 
     function fetchAssetData(siteId) {
         $.ajax({
-            url: `${window.SIMPRO_CONFIG.baseUrl}/companies/6/sites/${siteId}/assets/?search=any&pageSize=50&page=1&orderby=Name&limit=100`,
+            url: `${window.SIMPRO_CONFIG.baseUrl}/companies/6/sites/${siteId}/assets/?search=any&columns=CustomFields,ID,AssetType&pageSize=50&page=1&orderby=Name&limit=100`,
             method: "GET",
             timeout: 0,
             headers: {

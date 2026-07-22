@@ -2223,8 +2223,8 @@ $("#nextBtn").html('Next <span><i class="fa-solid fa-angle-right"></i></span>&nb
         ExpectedYear: yyyy,
         ExpectedMonth: mm,
       },
-      AutoAdjustStatus: true
-      //CustomFields: customFields,
+      AutoAdjustStatus: true,
+      CustomFields: customFields,
     };
   }
 
