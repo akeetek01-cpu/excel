@@ -195,6 +195,31 @@
                                         class="d-none">
                                 </div>
                             </div>
+                             <div class="mb-3 align-items-start">
+                                <label class="form-label me-2 mb-0" style="min-width:100px">
+                                    Asset Description
+                                </label>
+
+                                <div class="flex-grow-1">
+                                    <div class="row g-3 align-items-start">
+                                        <div id="assetDescriptionSelectWrapper" class="col-12">
+                                            <select id="assetDescriptionSelect" class="form-select"
+                                                aria-label="Asset description">
+                                                <option value="" selected disabled>Select / Enter</option>
+                                                <option value="other">Other</option>
+                                            </select>
+                                            <div id="assetDescriptionError" class="invalid-feedback"></div>
+                                        </div>
+                                        <div id="assetDescriptionInputWrapper" class="col-12 d-none">
+                                            <textarea id="assetDescriptionInput" class="form-control auto-resize"
+                                                rows="1" maxlength="150"
+                                                placeholder="Enter asset description"></textarea>
+                                            <div id="assetDescriptionInputError" class="invalid-feedback"></div>
+                                        </div>
+                                    </div>
+                                </div>
+
+                            </div>
                             <div class="mb-3 align-items-start">
                                 <label class="form-label me-2 mb-0" style="min-width:100px">
                                     Make</label>
@@ -221,31 +246,7 @@
                                     </div>
                                 </div>
                             </div>
-                            <div class="mb-3 align-items-start">
-                                <label class="form-label me-2 mb-0" style="min-width:100px">
-                                    Asset Description
-                                </label>
-
-                                <div class="flex-grow-1">
-                                    <div class="row g-3 align-items-start">
-                                        <div id="assetDescriptionSelectWrapper" class="col-12">
-                                            <select id="assetDescriptionSelect" class="form-select"
-                                                aria-label="Asset description">
-                                                <option value="" selected disabled>Select / Enter</option>
-                                                <option value="other">Other</option>
-                                            </select>
-                                            <div id="assetDescriptionError" class="invalid-feedback"></div>
-                                        </div>
-                                        <div id="assetDescriptionInputWrapper" class="col-12 d-none">
-                                            <textarea id="assetDescriptionInput" class="form-control auto-resize"
-                                                rows="1" maxlength="150"
-                                                placeholder="Enter asset description"></textarea>
-                                            <div id="assetDescriptionInputError" class="invalid-feedback"></div>
-                                        </div>
-                                    </div>
-                                </div>
-
-                            </div>
+                           
 
                             <div class="mb-3 align-items-start">
                                 <label class="form-label me-2 mb-0" style="min-width:100px">
