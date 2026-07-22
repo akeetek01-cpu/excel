@@ -83,11 +83,13 @@ $(function() {
         const assetMake = getCustomFieldValue(asset, ["Make"]);
         const assetModel = getCustomFieldValue(asset, ["Model (IDU)", "Model"]);
         const assetSerialNumber = getCustomFieldValue(asset, ["Serial Number (IDU)", "Serial Number", "Serial #.", "Serial #"]);
+        const assetLocation = getCustomFieldValue(asset, ["Location"]);
 
         $("#customerAssetId").val(customerAssetNumber || excelBarcode || "");
         $("#assertMake").val(assetMake || "");
         $("#assertModel").val(assetModel || "");
         $("#assertSerialNumber").val(assetSerialNumber || "");
+        $("#assetLocation").val(assetLocation || "");
     }
 
     function applySelectedAssetDetails() {
@@ -141,11 +143,18 @@ $(function() {
     $("#customerTenancy").on("change", function() {
         const siteId = $(this).find("option:selected").attr("data-site-id");
 
+        $("#customerAssetId, #assertMake, #assertModel, #assertSerialNumber").val("");
+        assetDescriptionSelect.find("option:gt(0)").remove();
+        assetDescriptionSelect.append(`<option value="other">Other</option>`);
+        assetDescriptionSelect.val("other").trigger("change");
+        assetLocationSelect.val("");
+        assetLocationInput.val("").addClass("d-none");
+        $("#assetLocationInputError").text("");
+        $("#assetDescriptionInput").val("").removeClass("is-invalid");
+        $("#assetDescriptionInputError").text("");
+        $("#assetLocationError").text("");
+
         if (!siteId) {
-            assetDescriptionSelect.find("option:gt(0)").remove();
-            assetDescriptionSelect.append(`<option value="other">Other</option>`);
-            assetLocationSelect.val("");
-            assetLocationInput.addClass("d-none");
             return;
         }
 
