@@ -2250,7 +2250,7 @@ $("#nextBtn").html('Next <span><i class="fa-solid fa-angle-right"></i></span>&nb
           if (leadId && hasPhotos && typeof window.uploadLeadAttachments === "function") {
             window.uploadLeadAttachments(leadId, photoFiles, {
               onComplete: function () {
-                alert("Lead created successfully. Your images have been uploaded.");
+                alert("Lead created successfully.");
               },
               onError: function (error) {
                 console.error("Lead attachment upload failed:", error);
