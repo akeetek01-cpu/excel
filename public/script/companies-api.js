@@ -40,11 +40,16 @@ $(function() {
         const detailsByTypeName = new Map();
 
         data.forEach(item => {
-            if (!item || !item.AssetType) {
+            if (!item) {
                 return;
             }
 
-            const typeId = String(item.AssetType.ID || "");
+            const excelBarcode = getCustomFieldValue(item, ["EXCEL Barcode", "Excel Asset ID", "Excel Barcode", "Barcode"]);
+            if (!excelBarcode) {
+                return;
+            }
+
+            const typeId = String(item.ID || "");
             const typeName = String(item.AssetType.Name || "").trim();
 
             if (!descriptions.has(typeId)) {
@@ -116,7 +121,7 @@ $(function() {
         assetDescriptions.forEach(entry => {
             const asset = assetDetailsByTypeId.get(String(entry.id)) || null;
             const excelBarcode = getCustomFieldValue(asset, ["EXCEL Barcode", "Excel Asset ID", "Excel Barcode", "Barcode"]);
-            const label = excelBarcode ? `${entry.name} - ${excelBarcode}` : entry.name;
+            const label = excelBarcode ? `${excelBarcode} - ${entry.name}` : entry.name;
             assetDescriptionSelect.append(
                 `<option value="${entry.id}">${label}</option>`
             );
@@ -167,7 +172,7 @@ $(function() {
 
     function fetchAssetData(siteId) {
         $.ajax({
-            url: `${window.SIMPRO_CONFIG.baseUrl}/companies/6/sites/${siteId}/assets/?search=any&columns=CustomFields,ID,AssetType&pageSize=50&page=1&orderby=Name&limit=100`,
+            url: `${window.SIMPRO_CONFIG.baseUrl}/companies/6/sites/${siteId}/assets/?search=any&columns=CustomFields,ID,AssetType&pageSize=250&page=1&orderby=Name&limit=100`,
             method: "GET",
             timeout: 0,
             headers: {

@@ -1820,36 +1820,36 @@ $("#nextBtn").html('Next <span><i class="fa-solid fa-angle-right"></i></span>&nb
   });
 
   $("#customerAssetId").on("input change", function () {
-    const value = $(this).val().trim();
-    jobData.asset.customerAssetId = value;
+    // const value = $(this).val().trim();
+    // jobData.asset.customerAssetId = value;
 
-    if (customerAssetLookupTimer) {
-      clearTimeout(customerAssetLookupTimer);
-      customerAssetLookupTimer = null;
-    }
+    // if (customerAssetLookupTimer) {
+    //   clearTimeout(customerAssetLookupTimer);
+    //   customerAssetLookupTimer = null;
+    // }
 
-    if (!value) {
-      resetAssetFields({ keepCustomerAssetId: true });
-      jobData.asset.customerAssetId = "";
-      return;
-    }
+    // if (!value) {
+    //   resetAssetFields({ keepCustomerAssetId: true });
+    //   jobData.asset.customerAssetId = "";
+    //   return;
+    // }
 
-    if (value.length < 4) {
-      resetAssetFields({ keepCustomerAssetId: true });
-      jobData.asset.customerAssetId = value;
-      return;
-    }
+    // if (value.length < 4) {
+    //   resetAssetFields({ keepCustomerAssetId: true });
+    //   jobData.asset.customerAssetId = value;
+    //   return;
+    // }
 
-    customerAssetLookupTimer = setTimeout(() => {
-      const currentValue = String($("#customerAssetId").val() || "").trim();
-      if (currentValue !== value) {
-        return;
-      }
+    // customerAssetLookupTimer = setTimeout(() => {
+    //   const currentValue = String($("#customerAssetId").val() || "").trim();
+    //   if (currentValue !== value) {
+    //     return;
+    //   }
 
-      if (window.lookupAssetByValue) {
-        window.lookupAssetByValue(currentValue);
-      }
-    }, 350);
+    //   if (window.lookupAssetByValue) {
+    //     window.lookupAssetByValue(currentValue);
+    //   }
+    // }, 350);
   });
 
   // stop clicks on the input bubbling up (defensive)
