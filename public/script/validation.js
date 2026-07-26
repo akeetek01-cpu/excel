@@ -56,30 +56,30 @@ $(function(){
   $('#assetDescriptionSelect').on('change', function(){
     const val = $(this).val();
     if(val === 'other'){
-      $('#assetDescriptionInput').removeClass('d-none');
+      //$('#assetDescriptionInput').removeClass('d-none');
     } else {
-      $('#assetDescriptionInput').addClass('d-none').val('');
+      //$('#assetDescriptionInput').addClass('d-none').val('');
       // if you keep a jobData model, store selected asset:
       if(typeof jobData !== 'undefined') jobData.asset = val || '';
     }
   });
 
   // Sync free text into model when user types
-  $('#assetDescriptionInput').on('input', function(){
-    if(typeof jobData !== 'undefined') jobData.asset = $(this).val();
-  });
+  // $('#assetDescriptionInput').on('input', function(){
+  //   if(typeof jobData !== 'undefined') jobData.asset = $(this).val();
+  // });
 
 
-  $('#assetDescriptionSelect').on('change', function () {
-            if ($(this).val() === 'other') {
-                $('#assetDescriptionInput')
-                    .removeClass('d-none');
-            } else {
-                $('#assetDescriptionInput')
-                    .addClass('d-none')
-                    .val('');
-            }
-        });
+  // $('#assetDescriptionSelect').on('change', function () {
+  //           if ($(this).val() === 'other') {
+  //               $('#assetDescriptionInput')
+  //                   .removeClass('d-none');
+  //           } else {
+  //               $('#assetDescriptionInput')
+  //                   .addClass('d-none')
+  //                   .val('');
+  //           }
+  //       });
 
         $('#assetLocation').on('change', function () {
             if ($(this).val() === 'other') {

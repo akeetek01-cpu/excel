@@ -167,27 +167,50 @@ $("#nextBtn").html('Next <span><i class="fa-solid fa-angle-right"></i></span>&nb
     }
   }
 
-  function resetWizard() {
+  function resetWizard(options = {}) {
+    const preserveCustomerDetails = !!(options && options.preserveCustomerDetails);
+    const preservedCustomer = preserveCustomerDetails ? {
+      jobNumber: String(jobData.customer.jobNumber || "#jobNumber" in window ? "" : "").trim(),
+      name: String(jobData.customer.name || "").trim(),
+      phone: String(jobData.customer.phone || "").trim(),
+      email: String(jobData.customer.email || "").trim(),
+      tenancy: String(jobData.customer.tenancy || "").trim(),
+      tenancyLabel: String(jobData.customer.tenancyLabel || "").trim(),
+      notes: String(jobData.customer.notes || "").trim(),
+      customerNameValue: String($("#customerName").val() || "").trim(),
+      customerNameInputValue: String($("#customerNameInput").val() || "").trim(),
+      customerPhoneValue: String($("#customerPhone").val() || "").trim(),
+      customerEmailValue: String($("#customerEmail").val() || "").trim(),
+      customerTenancyValue: String($("#customerTenancy").val() || "").trim(),
+      customerNotesValue: String($("#customerNotes").val() || "").trim(),
+      jobNumberValue: String($("#jobNumber").val() || "").trim(),
+    } : null;
+
     $("#form-customer")[0].reset();
     $("#faultList").empty();
-    $("#assetDescriptionSelect").val("");
+    $("#assetDescriptionInput").val("");
     $("#assetLocation").val("");
+    $("#assertMake").val("");
+    $("#assertModel").val("");
+    $("#assertSerialNumber").val("");
+    $("#customerAssetId").val("");
+    $("#customerAssetIdInput").val("");
+    $("#customerAssetIdInputWrapper").addClass("d-none");
+    $("#customerAssetIdSelectWrapper").removeClass("d-none");
+    $("#customerAssetId").prop("disabled", false);
     $("#autoJobBtn").val("");
-    
+
     $("#assetDescriptionInput")
-      .val("")
-      .addClass("d-none")
       .removeClass("is-invalid");
     $("#assetLocationInput")
       .val("")
       .addClass("d-none")
       .removeClass("is-invalid");
     $(
-      "#assetDescriptionError, #assetDescriptionInputError, #assetLocationError, #assetLocationInputError",
+      "#assetDescriptionError, #assetDescriptionInputError, #assetLocationError, #assetLocationInputError, #customerAssetIdInputError",
     ).text("");
     $("#customerNameInput").val("");
     $("#customerNameInputWrapper").addClass("d-none");
-    $("#customerAssetId").val("");
     $("#costCenterSelect").val("");
     $("#tagsSelect").val("");
     $("#technicians").val(1);
@@ -197,13 +220,13 @@ $("#nextBtn").html('Next <span><i class="fa-solid fa-angle-right"></i></span>&nb
     jobData.customer = {
       customerId: "",
       id: "",
-      jobNumber: "",
-      name: "",
-      phone: "",
-      email: "",
-      tenancy: "",
-      tenancyLabel: "",
-      notes: "",
+      jobNumber: preservedCustomer?.jobNumber || preservedCustomer?.jobNumberValue || "",
+      name: preservedCustomer?.name || "",
+      phone: preservedCustomer?.phone || "",
+      email: preservedCustomer?.email || "",
+      tenancy: preservedCustomer?.tenancy || "",
+      tenancyLabel: preservedCustomer?.tenancyLabel || "",
+      notes: preservedCustomer?.notes || "",
       siteContact: "",
       siteContactLabel: "",
     };
@@ -231,14 +254,33 @@ $("#nextBtn").html('Next <span><i class="fa-solid fa-angle-right"></i></span>&nb
     $("#previewGrid").empty();
     $("#uploadStatus").hide().text("");
     $("#jsonOutput").text("");
-    $("#customerName").val("");
-    $("#customerNameInput").val("");
-    $("#customerPhone").val("");
-    $("#customerEmail").val("");
-    $("#customerNameInputWrapper").addClass("d-none");
-    $("#customerNameInputError").text("");
-    $("#customerPhoneError").text("");
-    $("#customerEmailError").text("");
+
+    if (preserveCustomerDetails) {
+      $("#jobNumber").val(preservedCustomer?.jobNumberValue || preservedCustomer?.jobNumber || "");
+      $("#customerName").val(preservedCustomer?.customerNameValue || "");
+      $("#customerNameInput").val(preservedCustomer?.customerNameInputValue || "");
+      $("#customerPhone").val(preservedCustomer?.customerPhoneValue || "");
+      $("#customerEmail").val(preservedCustomer?.customerEmailValue || "");
+      $("#customerTenancy").val(preservedCustomer?.customerTenancyValue || "");
+      $("#customerNotes").val(preservedCustomer?.customerNotesValue || "");
+      $("#customerNameInputWrapper").toggleClass("d-none", String(preservedCustomer?.customerNameValue || "") !== "other");
+      $("#customerNameInputError").text("");
+      $("#customerPhoneError").text("");
+      $("#customerEmailError").text("");
+    } else {
+      $("#jobNumber").val("");
+      $("#customerName").val("");
+      $("#customerNameInput").val("");
+      $("#customerPhone").val("");
+      $("#customerEmail").val("");
+      $("#customerTenancy").val("");
+      $("#customerNotes").val("");
+      $("#customerNameInputWrapper").addClass("d-none");
+      $("#customerNameInputError").text("");
+      $("#customerPhoneError").text("");
+      $("#customerEmailError").text("");
+    }
+
     $("#modalJobNum, #modalCustomer, #modalTime").text("");
     $(
       "#revJob, #revCustomer, #revAsset, #revFaults, #revTech, #revHours, #revMan",
@@ -250,6 +292,61 @@ $("#nextBtn").html('Next <span><i class="fa-solid fa-angle-right"></i></span>&nb
     addFault();
     showStep(0);
     calculate();
+  }
+
+  function completeCreateNewLeadChoice(preserveCustomerDetails) {
+    $("#createNewConfirmModal").remove();
+
+    submitJob({
+      onSuccess: function () {
+        resetWizard({ preserveCustomerDetails: !!preserveCustomerDetails });
+      },
+      onError: function () {
+        resetWizard({ preserveCustomerDetails: !!preserveCustomerDetails });
+      },
+    });
+  }
+
+  function showCreateNewConfirm() {
+    if ($("#createNewConfirmModal").length) {
+      $("#createNewConfirmModal").remove();
+    }
+
+    $("body").append(`
+      <div id="createNewConfirmModal" style="position:fixed; inset:0; background:rgba(0,0,0,0.4); display:flex; align-items:center; justify-content:center; z-index:99999;">
+        <div style="background:#fff; border-radius:10px; width:min(92vw, 420px); box-shadow:0 10px 30px rgba(0,0,0,0.2); padding:20px;">
+          <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:12px;">
+            <h5 style="margin:0; color:#222;">Create New Lead?</h5>
+            <button type="button" class="confirm-close" aria-label="Close" style="border:none; background:transparent; font-size:24px; line-height:1; color:#666; cursor:pointer; padding:0;">×</button>
+          </div>
+          <p style="margin:0 0 16px; color:#555;">Do you want to keep the customer details and start a new lead with the rest cleared?</p>
+          <div style="display:flex; justify-content:flex-end; gap:10px;">
+            <button type="button" class="btn btn-outline-secondary confirm-no">No</button>
+            <button type="button" class="btn btn-primary confirm-yes">Yes</button>
+          </div>
+        </div>
+      </div>
+    `);
+
+    $("#createNewConfirmModal").on("click", function (e) {
+      if (e.target.id === "createNewConfirmModal") {
+        $(this).remove();
+      }
+    });
+
+    $("#createNewConfirmModal .confirm-close").on("click", function () {
+      $("#createNewConfirmModal").remove();
+    });
+
+    $("#createNewConfirmModal .confirm-no").on("click", function (e) {
+      e.preventDefault();
+      completeCreateNewLeadChoice(false);
+    });
+
+    $("#createNewConfirmModal .confirm-yes").on("click", function (e) {
+      e.preventDefault();
+      completeCreateNewLeadChoice(true);
+    });
   }
 
   function showError(field, errorId, message) {
@@ -274,11 +371,11 @@ $("#nextBtn").html('Next <span><i class="fa-solid fa-angle-right"></i></span>&nb
     if (!keepAssetDescription) {
       clearValue("#assetDescriptionSelect");
       clearValue("#assetDescriptionInput");
-      $("#assetDescriptionInput").addClass("d-none");
+      //$("#assetDescriptionInput").addClass("d-none");
       $("#assetDescriptionInputError").text("");
     } else {
       clearValue("#assetDescriptionInput");
-      $("#assetDescriptionInput").removeClass("is-invalid");
+      //$("#assetDescriptionInput").removeClass("is-invalid");
       $("#assetDescriptionInputError").text("");
     }
 
@@ -686,15 +783,15 @@ $("#nextBtn").html('Next <span><i class="fa-solid fa-angle-right"></i></span>&nb
     // Do not move focus automatically. Only toggle visibility of the free-text input when "Other" is selected.
     if ($(this).val() === "other") {
       resetAssetFields({ keepAssetDescription: true });
-      $("#assetDescriptionInput").removeClass("d-none");
+      //$("#assetDescriptionInput").removeClass("d-none");
       $("#assetDescriptionSelect").val("other");
     } else {
       resetAssetFields({ keepAssetDescription: true });
       $("#assetDescriptionSelect").val($(this).val() || "");
-      $("#assetDescriptionInput")
-        .addClass("d-none")
-        .removeClass("is-invalid")
-        .val("");
+      // $("#assetDescriptionInput")
+      //   .addClass("d-none")
+      //   .removeClass("is-invalid")
+      //   .val("");
       $("#assetDescriptionInputError").text("");
     }
   });
@@ -1019,6 +1116,9 @@ $("#nextBtn").html('Next <span><i class="fa-solid fa-angle-right"></i></span>&nb
       $list.append($card);
       if (f.work) {
         $card.find('.work-req').val(f.work);
+      }
+      if (window.populateWorkRequiredSelects) {
+        window.populateWorkRequiredSelects(window.workRequiredItems || []);
       }
       updateAiLabelState($card);
     });
@@ -1950,8 +2050,9 @@ $("#nextBtn").html('Next <span><i class="fa-solid fa-angle-right"></i></span>&nb
     }
   });
 
-  $("#createNewBtn").on("click", function () {
-    resetWizard();
+  $("#createNewBtn").on("click", function (e) {
+    e.preventDefault();
+    showCreateNewConfirm();
   });
 
   $(".step").click(function () {
@@ -2228,7 +2329,9 @@ $("#nextBtn").html('Next <span><i class="fa-solid fa-angle-right"></i></span>&nb
     };
   }
 
-  function submitJob() {
+  function submitJob(options = {}) {
+    const { onSuccess, onError } = options || {};
+
     if (!validateStep(2)) {
       return;
     }
@@ -2239,13 +2342,19 @@ $("#nextBtn").html('Next <span><i class="fa-solid fa-angle-right"></i></span>&nb
     const payload = buildLeadPayload();
     const json = JSON.stringify(payload, null, 2);
 
-
     if (window.submitLeadToSimpro) {
       window.submitLeadToSimpro(payload, {
         onSuccess: function (response) {
           console.log(response);
           const leadId = response.ID;
           const hasPhotos = Array.isArray(photoFiles) && photoFiles.length > 0;
+
+          if (typeof onSuccess === "function") {
+            onSuccess(response, payload, json);
+            return;
+          }
+
+          resetWizard();
 
           if (leadId && hasPhotos && typeof window.uploadLeadAttachments === "function") {
             window.uploadLeadAttachments(leadId, photoFiles, {
@@ -2262,12 +2371,21 @@ $("#nextBtn").html('Next <span><i class="fa-solid fa-angle-right"></i></span>&nb
             alert("Lead created successfully.");
           }
         },
-        onError: function () {
+        onError: function (error) {
+          if (typeof onError === "function") {
+            onError(error, payload, json);
+            return;
+          }
+
           alert("Failed to create lead. Please try again. Staff not found.");
         },
       });
     } else {
       console.error("submitLeadToSimpro is not available.");
+      if (typeof onError === "function") {
+        onError(null, payload, json);
+        return;
+      }
       alert("Failed to create lead. Please try again.");
     }
 
