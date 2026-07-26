@@ -133,7 +133,7 @@ $(function () {
             $select.val("").trigger("change");
             $input.val("").removeClass("is-invalid");
             $("#assetDescriptionInputError").text("");
-            $("#assetDescriptionInputWrapper").addClass("d-none");
+            //$("#assetDescriptionInputWrapper").addClass("d-none");
           }
         }
       })

@@ -46,7 +46,7 @@ $(function () {
   window.clearJobNumberDependentFields = function () {
     const $siteSelect = $("#customerTenancy");
     clearSiteSelection($siteSelect);
-    $("#autoJobBtn").text("");
+    $("#autoJobBtn").val("");
   };
 
   // populate sites and optionally select a default by ID or name
@@ -116,7 +116,7 @@ $(function () {
         window.pendingCustomerContactId = customerContactId;
 
         if (customerName) {
-          $("#autoJobBtn").text(customerName);
+          $("#autoJobBtn").val(customerName);
         }
 
         const siteContractName = response?.SiteContact?.GivenName || "";

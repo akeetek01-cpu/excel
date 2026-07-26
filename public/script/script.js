@@ -172,7 +172,7 @@ $("#nextBtn").html('Next <span><i class="fa-solid fa-angle-right"></i></span>&nb
     $("#faultList").empty();
     $("#assetDescriptionSelect").val("");
     $("#assetLocation").val("");
-    $("#autoJobBtn").text("");
+    $("#autoJobBtn").val("");
     
     $("#assetDescriptionInput")
       .val("")
@@ -523,7 +523,7 @@ $("#nextBtn").html('Next <span><i class="fa-solid fa-angle-right"></i></span>&nb
         if (window.clearJobNumberDependentFields) {
           window.clearJobNumberDependentFields();
         } else {
-          $("#autoJobBtn").text("");
+          $("#autoJobBtn").val("");
           $("#customerTenancy").val("").trigger("change");
         }
       }
@@ -534,7 +534,7 @@ $("#nextBtn").html('Next <span><i class="fa-solid fa-angle-right"></i></span>&nb
         if (window.clearJobNumberDependentFields) {
           window.clearJobNumberDependentFields();
         } else {
-          $("#autoJobBtn").text("");
+          $("#autoJobBtn").val("");
           $("#customerTenancy").val("").trigger("change");
         }
         showError("#jobNumber", "#jobNumberError", "Job Number is required.");
@@ -914,7 +914,7 @@ $("#nextBtn").html('Next <span><i class="fa-solid fa-angle-right"></i></span>&nb
         <div class="fault-card ${expanded ? "expanded" : "collapsed"}" data-idx="${idx}">
           <div class="fault-header" role="button" tabindex="0" aria-expanded="${expanded}">
             <div>
-              <span class="badge fault-badge">${num}</span>
+              <span class="badge fault-badge d-none">${num}</span>
               Fault
             </div>
             <div class="d-flex align-items-center gap-2">
@@ -1068,29 +1068,29 @@ $("#nextBtn").html('Next <span><i class="fa-solid fa-angle-right"></i></span>&nb
   $(document).on("input", ".fault-desc", function () {
     const text = $(this).val().trim().toLowerCase();
 
-    if (text === "leak") {
-      const idx = Number($(this).closest(".fault-card").data("idx"));
-      if (!isNaN(idx)) {
-        const autoDescription = "Leak from valve causing water ingress.";
-        const autoWork = "Replace valve and test system.";
-        const autoParts = "Valve assembly, sealant";
-        const autoEquipment = "Socket set, pressure tester";
+    // if (text === "leak") {
+    //   const idx = Number($(this).closest(".fault-card").data("idx"));
+    //   if (!isNaN(idx)) {
+    //     const autoDescription = "Leak from valve causing water ingress.";
+    //     const autoWork = "Replace valve and test system.";
+    //     const autoParts = "Valve assembly, sealant";
+    //     const autoEquipment = "Socket set, pressure tester";
 
-        jobData.faults[idx].description = autoDescription;
-        jobData.faults[idx].work = autoWork;
-        jobData.faults[idx].parts = autoParts;
-        jobData.faults[idx].equipment = autoEquipment;
+    //     jobData.faults[idx].description = autoDescription;
+    //     jobData.faults[idx].work = autoWork;
+    //     jobData.faults[idx].parts = autoParts;
+    //     jobData.faults[idx].equipment = autoEquipment;
 
-        const $card = $(this).closest(".fault-card");
-        $card.find(".fault-desc").val(autoDescription);
-        $card.find(".work-req").val(autoWork);
-        $card.find(".parts").val(autoParts);
-        $card.find(".equipment").val(autoEquipment);
+    //     const $card = $(this).closest(".fault-card");
+    //     $card.find(".fault-desc").val(autoDescription);
+    //     $card.find(".work-req").val(autoWork);
+    //     $card.find(".parts").val(autoParts);
+    //     $card.find(".equipment").val(autoEquipment);
 
-        updateAiLabelState($card);
-        $card.find(".fault-desc").trigger("input");
-      }
-    }
+    //     updateAiLabelState($card);
+    //     $card.find(".fault-desc").trigger("input");
+    //   }
+    // }
   });
 
   // $(document).on('click','.auto-fill',function(){

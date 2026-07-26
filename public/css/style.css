@@ -370,13 +370,13 @@ color: var(--teal)!important;
       font-size: 13px;
 }
 
-#assetDescriptionInput.border-dashed {
+#assetDescriptionInput.border-dashed, #autoJobBtn.border-dashed {
       font-size: 13px;
     border: 1px dashed #12c8c0 !important;
     background: transparent;
     color: gray;
 }
-#assetDescriptionInput.border-dashed::placeholder {
+#assetDescriptionInput.border-dashed::placeholder, #autoJobBtn.border-dashed::placeholder {
   color: gray;   /* Changes the text color */
   opacity: 1;       /* Ensures full opacity, mostly for Firefox */
 }

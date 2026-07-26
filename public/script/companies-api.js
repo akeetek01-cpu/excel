@@ -43,16 +43,19 @@ $(function() {
         const selectedValue = String($("#customerAssetId").val() || "").trim();
         const customerAssetIdInputWrapper = $("#customerAssetIdInputWrapper");
         const customerAssetIdInput = $("#customerAssetIdInput");
+        const customerAssetIdSelectWrapper = $("#customerAssetIdSelectWrapper");
 
         if (selectedValue === "other") {
-            customerAssetIdInputWrapper.removeClass("d-none");
+            customerAssetIdSelectWrapper.removeClass("col-12").addClass("col-3");
+            customerAssetIdInputWrapper.removeClass("d-none").removeClass("col-12").addClass("col-9");
             customerAssetIdInput.removeClass("is-invalid").val("");
             clearAssetFields();
             assetDescriptionInput.removeClass("border-dashed").prop("readonly", false).val("");
             return;
         }
 
-        customerAssetIdInputWrapper.addClass("d-none");
+        customerAssetIdSelectWrapper.removeClass("col-3").addClass("col-12");
+        customerAssetIdInputWrapper.addClass("d-none").removeClass("col-9").addClass("col-12");
         customerAssetIdInput.val("").removeClass("is-invalid");
 
         if (!selectedValue) {
