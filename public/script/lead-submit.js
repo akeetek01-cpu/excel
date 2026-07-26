@@ -126,7 +126,7 @@
         }
       })
       .fail(function (xhr, status, error) {
-        console.error("Lead submission failed:", status, error, xhr);
+        //console.error("Lead submission failed:", status, error, xhr);
         if (typeof options?.onError === "function") {
           options.onError(xhr, status, error);
           return;
