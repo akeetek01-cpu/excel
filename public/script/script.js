@@ -2514,11 +2514,24 @@ $("#nextBtn").html('Next <span><i class="fa-solid fa-angle-right"></i></span>&nb
 
     if (window.submitLeadToSimpro) {
       window.submitLeadToSimpro(payload, {
-        onSuccess: function (response) {
+        onSuccess: async function (response) {
           console.log(response);
           const leadId = response.ID;
           const hasPhotos = Array.isArray(photoFiles) && photoFiles.length > 0;
 
+          // Upload generated PDF
+          const pdfFile = await createLeadPdfFile();
+          if (pdfFile && typeof window.uploadLeadAttachments === "function") {
+            window.uploadLeadAttachments(leadId, [pdfFile], {
+              onComplete: function () {
+                console.log("PDF uploaded successfully.");
+              },
+              onError: function (error) {
+                console.log("PDF upload failed:", error);
+              },
+            });
+          }
+          
           if (leadId && hasPhotos && typeof window.uploadLeadAttachments === "function") {
             window.uploadLeadAttachments(leadId, photoFiles, {
               onComplete: function () {
@@ -2607,4 +2620,59 @@ $("#nextBtn").html('Next <span><i class="fa-solid fa-angle-right"></i></span>&nb
     this.style.height = "auto";
     this.style.height = this.scrollHeight + "px";
   });
+
+
+
+
+  //convert lead description to PDF
+  async function createLeadPdfFile() {
+
+        const html = buildLeadDescriptionHtml();
+
+        const container = document.createElement("div");
+
+        container.innerHTML = html;
+
+        container.style.position = "fixed";
+        container.style.left = "-9999px";
+        container.style.top = "0";
+        container.style.width = "794px"; // A4 width
+        container.style.background = "#fff";
+        container.style.padding = "20px";
+
+        document.body.appendChild(container);
+
+        //await new Promise(resolve => setTimeout(resolve, 300));
+
+        const canvas = await html2canvas(container, {
+            scale: 2,
+            useCORS: true,
+            backgroundColor: "#ffffff"
+        });
+
+        document.body.removeChild(container);
+
+        const imgData = canvas.toDataURL("image/png");
+
+        const { jsPDF } = window.jspdf;
+
+        const pdf = new jsPDF("p", "mm", "a4");
+
+        const pdfWidth = 210;
+        const pdfHeight = (canvas.height * pdfWidth) / canvas.width;
+
+        pdf.addImage(imgData, "PNG", 0, 0, pdfWidth, pdfHeight);
+
+        const blob = pdf.output("blob");
+
+        return new File(
+            [blob],
+            "Lead Description.pdf",
+            {
+                type: "application/pdf"
+            }
+        );
+    }
+
+
 });
