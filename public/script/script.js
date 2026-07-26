@@ -304,8 +304,66 @@ $("#nextBtn").html('Next <span><i class="fa-solid fa-angle-right"></i></span>&nb
     calculate();
   }
 
+  function dismissCustomDialog() {
+    $("#createNewConfirmModal").hide();
+  }
+
+  function showCustomDialog(options = {}) {
+    const {
+      title = "Notice",
+      message = "",
+      confirmText = "OK",
+      cancelText = "",
+      showCancel = false,
+      onConfirm,
+      onCancel,
+    } = options || {};
+
+    $("#createNewConfirmModalTitle").text(title);
+    $("#createNewConfirmModalMessage").text(message);
+    $("#createNewConfirmModal .confirm-yes").text(confirmText);
+
+    const $cancelButton = $("#createNewConfirmModal .confirm-no");
+    if (showCancel && cancelText) {
+      $cancelButton.text(cancelText).show();
+    } else {
+      $cancelButton.hide();
+    }
+
+    $("#createNewConfirmModal .confirm-yes")
+      .off("click")
+      .on("click", function (e) {
+        e.preventDefault();
+        dismissCustomDialog();
+        if (typeof onConfirm === "function") {
+          onConfirm();
+        }
+      });
+
+    $cancelButton
+      .off("click")
+      .on("click", function (e) {
+        e.preventDefault();
+        dismissCustomDialog();
+        if (typeof onCancel === "function") {
+          onCancel();
+        }
+      });
+
+    $("#createNewConfirmModal").css("display", "flex");
+  }
+
+  function showAlertDialog(message, title = "Notice") {
+    showCustomDialog({
+      title,
+      message,
+      confirmText: "OK",
+      showCancel: false,
+    });
+  }
+
   function completeCreateNewLeadChoice(preserveCustomerDetails) {
-    $("#createNewConfirmModal").remove();
+    dismissCustomDialog();
 
     submitJob({
       onSuccess: function () {
@@ -318,44 +376,18 @@ $("#nextBtn").html('Next <span><i class="fa-solid fa-angle-right"></i></span>&nb
   }
 
   function showCreateNewConfirm() {
-    if ($("#createNewConfirmModal").length) {
-      $("#createNewConfirmModal").remove();
-    }
-
-    $("body").append(`
-      <div id="createNewConfirmModal" style="position:fixed; inset:0; background:rgba(0,0,0,0.4); display:flex; align-items:center; justify-content:center; z-index:99999;">
-        <div style="background:#fff; border-radius:10px; width:min(92vw, 420px); box-shadow:0 10px 30px rgba(0,0,0,0.2); padding:20px;">
-          <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:12px;">
-            <h5 style="margin:0; color:#222;">Create New Lead?</h5>
-            <button type="button" class="confirm-close" aria-label="Close" style="border:none; background:transparent; font-size:24px; line-height:1; color:#666; cursor:pointer; padding:0;">×</button>
-          </div>
-          <p style="margin:0 0 16px; color:#555;">Do you want to keep the customer details and start a new lead with the rest cleared?</p>
-          <div style="display:flex; justify-content:flex-end; gap:10px;">
-            <button type="button" class="btn btn-outline-secondary confirm-no">No</button>
-            <button type="button" class="btn btn-primary confirm-yes">Yes</button>
-          </div>
-        </div>
-      </div>
-    `);
-
-    $("#createNewConfirmModal").on("click", function (e) {
-      if (e.target.id === "createNewConfirmModal") {
-        $(this).remove();
-      }
-    });
-
-    $("#createNewConfirmModal .confirm-close").on("click", function () {
-      $("#createNewConfirmModal").remove();
-    });
-
-    $("#createNewConfirmModal .confirm-no").on("click", function (e) {
-      e.preventDefault();
-      completeCreateNewLeadChoice(false);
-    });
-
-    $("#createNewConfirmModal .confirm-yes").on("click", function (e) {
-      e.preventDefault();
-      completeCreateNewLeadChoice(true);
+    showCustomDialog({
+      title: "Create New Lead?",
+      message: "Do you want to keep the customer details and start a new lead with the rest cleared?",
+      confirmText: "Yes",
+      cancelText: "No",
+      showCancel: true,
+      onConfirm: function () {
+        completeCreateNewLeadChoice(true);
+      },
+      onCancel: function () {
+        completeCreateNewLeadChoice(false);
+      },
     });
   }
 
@@ -1609,7 +1641,7 @@ $("#nextBtn").html('Next <span><i class="fa-solid fa-angle-right"></i></span>&nb
 
     if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) {
       if (window.alert) {
-        alert("Camera access is not available on this device.");
+        showAlertDialog("Camera access is not available on this device.");
       }
       return;
     }
@@ -1658,10 +1690,10 @@ $("#nextBtn").html('Next <span><i class="fa-solid fa-angle-right"></i></span>&nb
                 // fallback to Html5Qrcode if available
                 if (window.Html5QrcodeScanner) {
                   startHtml5QrcodeScanner().catch(() => {
-                    if (window.alert) alert('Camera scanning is not available on this browser.');
+                    if (window.alert) showAlertDialog('Camera scanning is not available on this browser.');
                   });
                 } else {
-                  if (window.alert) alert('Camera scanning is not available on this browser.');
+                  if (window.alert) showAlertDialog('Camera scanning is not available on this browser.');
                 }
                 return;
               }
@@ -1672,7 +1704,7 @@ $("#nextBtn").html('Next <span><i class="fa-solid fa-angle-right"></i></span>&nb
                 console.warn('Quagga start failed', e);
                 if (window.Html5QrcodeScanner) {
                   startHtml5QrcodeScanner().catch(() => {
-                    if (window.alert) alert('Camera scanning is not available on this browser.');
+                    if (window.alert) showAlertDialog('Camera scanning is not available on this browser.');
                   });
                 }
                 return;
@@ -1684,7 +1716,7 @@ $("#nextBtn").html('Next <span><i class="fa-solid fa-angle-right"></i></span>&nb
                   if (code) {
                     $("#customerAssetId").val(String(code).trim());
                     if (window.lookupAssetByValue) window.lookupAssetByValue(code);
-                    if (window.alert) alert('Barcode read successfully.');
+                    if (window.alert) showAlertDialog('Barcode read successfully.');
                     stopBarcodeScanner();
                   }
                 } catch (e) {
@@ -1707,7 +1739,7 @@ $("#nextBtn").html('Next <span><i class="fa-solid fa-angle-right"></i></span>&nb
       return startHtml5QrcodeScanner();
     }
 
-    if (window.alert) alert('Camera scanning is not available on this browser.');
+    if (window.alert) showAlertDialog('Camera scanning is not available on this browser.');
   }
 
   // Extracted helper to start Html5Qrcode scanner so it can be called from fallback paths
@@ -1742,10 +1774,10 @@ $("#nextBtn").html('Next <span><i class="fa-solid fa-angle-right"></i></span>&nb
             window.lookupAssetByValue(value);
           }
           if (window.alert) {
-            alert('Barcode read successfully.');
+            showAlertDialog('Barcode read successfully.');
           }
         } else if (window.alert) {
-          alert('Barcode could not be read. Please enter the value manually.');
+          showAlertDialog('Barcode could not be read. Please enter the value manually.');
         }
         stopBarcodeScanner();
       },
@@ -1932,7 +1964,7 @@ $("#nextBtn").html('Next <span><i class="fa-solid fa-angle-right"></i></span>&nb
     const fileName = (file.name || "").toLowerCase();
     if (!fileName.match(/\.(png|jpg|jpeg|webp|bmp|gif)$/i)) {
       if (window.alert) {
-        alert("Please choose a valid image file.");
+        showAlertDialog("Please choose a valid image file.");
       }
       return;
     }
@@ -1948,12 +1980,12 @@ $("#nextBtn").html('Next <span><i class="fa-solid fa-angle-right"></i></span>&nb
           console.log("Barcode read successfully.");
         }
       } else if (window.alert) {
-        alert("Barcode could not be read from this image. Please enter the value manually.");
+        showAlertDialog("Barcode could not be read from this image. Please enter the value manually.");
       }
     } catch (error) {
       console.error("Barcode scan failed:", error);
       if (window.alert) {
-        alert("Barcode scan is not available in this browser. Please enter the value manually.");
+        showAlertDialog("Barcode scan is not available in this browser. Please enter the value manually.");
       }
     } finally {
       try {
@@ -2019,13 +2051,13 @@ $("#nextBtn").html('Next <span><i class="fa-solid fa-angle-right"></i></span>&nb
 
     const spaceLeft = MAX_PHOTOS - photoFiles.length;
     if (spaceLeft <= 0) {
-      alert(`Only ${MAX_PHOTOS} images allowed`);
+      showAlertDialog(`Only ${MAX_PHOTOS} images allowed`);
       clearInput();
       return;
     }
 
     if (files.length > spaceLeft) {
-      alert(`Only ${spaceLeft} more image(s) can be added (max ${MAX_PHOTOS})`);
+      showAlertDialog(`Only ${spaceLeft} more image(s) can be added (max ${MAX_PHOTOS})`);
     }
 
     const allowed = files.slice(0, spaceLeft);
@@ -2108,6 +2140,16 @@ $("#nextBtn").html('Next <span><i class="fa-solid fa-angle-right"></i></span>&nb
     }
 
     showCreateNewConfirm();
+  });
+
+  $("#createNewConfirmModal").on("click", function (e) {
+    if (e.target.id === "createNewConfirmModal") {
+      dismissCustomDialog();
+    }
+  });
+
+  $("#createNewConfirmModal .confirm-close").on("click", function () {
+    dismissCustomDialog();
   });
 
   $(".step").click(function () {
@@ -2414,16 +2456,16 @@ $("#nextBtn").html('Next <span><i class="fa-solid fa-angle-right"></i></span>&nb
           if (leadId && hasPhotos && typeof window.uploadLeadAttachments === "function") {
             window.uploadLeadAttachments(leadId, photoFiles, {
               onComplete: function () {
-                alert("Lead created successfully.");
+                showAlertDialog("Lead created successfully.");
               },
               onError: function (error) {
                 console.error("Lead attachment upload failed:", error);
-                alert("Lead created, but one or more image uploads failed.");
+                showAlertDialog("Lead created, but one or more image uploads failed.");
               },
             });
           } else {
             // No photos attached or upload function unavailable
-            alert("Lead created successfully.");
+            showAlertDialog("Lead created successfully.");
           }
         },
         onError: function (error) {
@@ -2432,7 +2474,7 @@ $("#nextBtn").html('Next <span><i class="fa-solid fa-angle-right"></i></span>&nb
             return;
           }
 
-          alert("Failed to create lead. Please try again. Staff not found.");
+          showAlertDialog("Failed to create lead. Please try again. Staff not found.");
         },
       });
     } else {
@@ -2441,7 +2483,7 @@ $("#nextBtn").html('Next <span><i class="fa-solid fa-angle-right"></i></span>&nb
         onError(null, payload, json);
         return;
       }
-      alert("Failed to create lead. Please try again.");
+      showAlertDialog("Failed to create lead. Please try again.");
     }
 
     // $("#modalJobNum").text(jobData.customer.jobNumber || "");
