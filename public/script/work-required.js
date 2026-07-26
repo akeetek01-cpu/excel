@@ -52,7 +52,11 @@
   }
 
   function populateWorkRequiredSelects(items) {
-    const optionsHtml = buildOptions(items);
+    const normalizedItems = Array.isArray(items) ? items : [];
+    global.workRequiredItems = normalizedItems;
+    window.workRequiredItems = normalizedItems;
+
+    const optionsHtml = buildOptions(normalizedItems);
     $(document)
       .find("select.work-required-select")
       .each(function () {

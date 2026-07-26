@@ -14,6 +14,7 @@ $(function () {
       siteContact: "",
       siteContactLabel: "",
       customerContact: "",
+      contactName: "",
     },
     asset: {
       description: "",
@@ -21,6 +22,9 @@ $(function () {
       location: "",
       locationLabel: "",
       customerAssetId: "",
+      make: "",
+      model: "",
+      serialNumber: "",
     },  
     faults: [],
     estimates: {
@@ -167,27 +171,52 @@ $("#nextBtn").html('Next <span><i class="fa-solid fa-angle-right"></i></span>&nb
     }
   }
 
-  function resetWizard() {
+  function resetWizard(options = {}) {
+    const preserveCustomerDetails = !!(options && options.preserveCustomerDetails);
+    const preservedCustomer = preserveCustomerDetails ? {
+      jobNumber: String(jobData.customer.jobNumber || "#jobNumber" in window ? "" : "").trim(),
+      name: String(jobData.customer.name || "").trim(),
+      phone: String(jobData.customer.phone || "").trim(),
+      email: String(jobData.customer.email || "").trim(),
+      tenancy: String(jobData.customer.tenancy || "").trim(),
+      tenancyLabel: String(jobData.customer.tenancyLabel || "").trim(),
+      notes: String(jobData.customer.notes || "").trim(),
+      autoJobBtnValue: String($("#autoJobBtn").val() || "").trim(),
+      customerNameValue: String($("#customerName").val() || "").trim(),
+      customerNameInputValue: String($("#customerNameInput").val() || "").trim(),
+      customerPhoneValue: String($("#customerPhone").val() || "").trim(),
+      customerEmailValue: String($("#customerEmail").val() || "").trim(),
+      customerTenancyValue: String($("#customerTenancy").val() || "").trim(),
+      customerNotesValue: String($("#customerNotes").val() || "").trim(),
+      jobNumberValue: String($("#jobNumber").val() || "").trim(),
+    } : null;
+
     $("#form-customer")[0].reset();
     $("#faultList").empty();
-    $("#assetDescriptionSelect").val("");
+    $("#assetDescriptionInput").val("");
     $("#assetLocation").val("");
-    $("#autoJobBtn").text("");
-    
+    $("#assertMake").val("");
+    $("#assertModel").val("");
+    $("#assertSerialNumber").val("");
+    $("#customerAssetId").val("");
+    $("#customerAssetIdInput").val("");
+    $("#customerAssetIdInputWrapper").addClass("d-none");
+    $("#customerAssetIdSelectWrapper").removeClass("d-none");
+    $("#customerAssetId").prop("disabled", false);
+    $("#autoJobBtn").val("");
+
     $("#assetDescriptionInput")
-      .val("")
-      .addClass("d-none")
       .removeClass("is-invalid");
     $("#assetLocationInput")
       .val("")
       .addClass("d-none")
       .removeClass("is-invalid");
     $(
-      "#assetDescriptionError, #assetDescriptionInputError, #assetLocationError, #assetLocationInputError",
+      "#assetDescriptionError, #assetDescriptionInputError, #assetLocationError, #assetLocationInputError, #customerAssetIdInputError",
     ).text("");
     $("#customerNameInput").val("");
     $("#customerNameInputWrapper").addClass("d-none");
-    $("#customerAssetId").val("");
+    $("#serviceManagerSelect").val("");
     $("#costCenterSelect").val("");
     $("#tagsSelect").val("");
     $("#technicians").val(1);
@@ -197,15 +226,17 @@ $("#nextBtn").html('Next <span><i class="fa-solid fa-angle-right"></i></span>&nb
     jobData.customer = {
       customerId: "",
       id: "",
-      jobNumber: "",
-      name: "",
-      phone: "",
-      email: "",
-      tenancy: "",
-      tenancyLabel: "",
-      notes: "",
+      jobNumber: preservedCustomer?.jobNumber || preservedCustomer?.jobNumberValue || "",
+      name: preservedCustomer?.name || "",
+      phone: preservedCustomer?.phone || "",
+      email: preservedCustomer?.email || "",
+      tenancy: preservedCustomer?.tenancy || "",
+      tenancyLabel: preservedCustomer?.tenancyLabel || "",
+      notes: preservedCustomer?.notes || "",
       siteContact: "",
       siteContactLabel: "",
+      customerContact: "",
+      contactName: "",
     };
     jobData.asset = {
       description: "",
@@ -213,6 +244,9 @@ $("#nextBtn").html('Next <span><i class="fa-solid fa-angle-right"></i></span>&nb
       location: "",
       locationLabel: "",
       customerAssetId: "",
+      make: "",
+      model: "",
+      serialNumber: "",
     };
     jobData.faults = [];
     jobData.estimates = {
@@ -228,17 +262,44 @@ $("#nextBtn").html('Next <span><i class="fa-solid fa-angle-right"></i></span>&nb
     };
     jobData.photos = [];
     photoFiles = [];
-    $("#previewGrid").empty();
+    $("#photoInput").val("");
+    renderPreviews();
+    $(".totalRecovery-select").val("");
+    $(".equipment-select").val("");
+    $(".parts-select").val("");
+    $(".equipment-qty, .parts-qty, .consumables-qty").val(0);
+    $(".equipment-list, .parts-list, .consumables-list").empty();
     $("#uploadStatus").hide().text("");
     $("#jsonOutput").text("");
-    $("#customerName").val("");
-    $("#customerNameInput").val("");
-    $("#customerPhone").val("");
-    $("#customerEmail").val("");
-    $("#customerNameInputWrapper").addClass("d-none");
-    $("#customerNameInputError").text("");
-    $("#customerPhoneError").text("");
-    $("#customerEmailError").text("");
+
+    if (preserveCustomerDetails) {
+      $("#jobNumber").val(preservedCustomer?.jobNumberValue || preservedCustomer?.jobNumber || "");
+      $("#autoJobBtn").val(preservedCustomer?.autoJobBtnValue || "");
+      $("#customerName").val(preservedCustomer?.customerNameValue || "");
+      $("#customerNameInput").val(preservedCustomer?.customerNameInputValue || "");
+      $("#customerPhone").val(preservedCustomer?.customerPhoneValue || "");
+      $("#customerEmail").val(preservedCustomer?.customerEmailValue || "");
+      $("#customerTenancy").val(preservedCustomer?.customerTenancyValue || "");
+      $("#customerNotes").val(preservedCustomer?.customerNotesValue || "");
+      $("#customerNameInputWrapper").toggleClass("d-none", String(preservedCustomer?.customerNameValue || "") !== "other");
+      $("#customerNameInputError").text("");
+      $("#customerPhoneError").text("");
+      $("#customerEmailError").text("");
+    } else {
+      $("#jobNumber").val("");
+      $("#autoJobBtn").val("");
+      $("#customerName").val("");
+      $("#customerNameInput").val("");
+      $("#customerPhone").val("");
+      $("#customerEmail").val("");
+      $("#customerTenancy").val("");
+      $("#customerNotes").val("");
+      $("#customerNameInputWrapper").addClass("d-none");
+      $("#customerNameInputError").text("");
+      $("#customerPhoneError").text("");
+      $("#customerEmailError").text("");
+    }
+
     $("#modalJobNum, #modalCustomer, #modalTime").text("");
     $(
       "#revJob, #revCustomer, #revAsset, #revFaults, #revTech, #revHours, #revMan",
@@ -250,6 +311,93 @@ $("#nextBtn").html('Next <span><i class="fa-solid fa-angle-right"></i></span>&nb
     addFault();
     showStep(0);
     calculate();
+  }
+
+  function dismissCustomDialog() {
+    $("#createNewConfirmModal").hide();
+  }
+
+  function showCustomDialog(options = {}) {
+    const {
+      title = "Notice",
+      message = "",
+      confirmText = "OK",
+      cancelText = "",
+      showCancel = false,
+      onConfirm,
+      onCancel,
+    } = options || {};
+
+    $("#createNewConfirmModalTitle").text(title);
+    $("#createNewConfirmModalMessage").text(message);
+    $("#createNewConfirmModal .confirm-yes").text(confirmText);
+
+    const $cancelButton = $("#createNewConfirmModal .confirm-no");
+    if (showCancel && cancelText) {
+      $cancelButton.text(cancelText).show();
+    } else {
+      $cancelButton.hide();
+    }
+
+    $("#createNewConfirmModal .confirm-yes")
+      .off("click")
+      .on("click", function (e) {
+        e.preventDefault();
+        dismissCustomDialog();
+        if (typeof onConfirm === "function") {
+          onConfirm();
+        }
+      });
+
+    $cancelButton
+      .off("click")
+      .on("click", function (e) {
+        e.preventDefault();
+        dismissCustomDialog();
+        if (typeof onCancel === "function") {
+          onCancel();
+        }
+      });
+
+    $("#createNewConfirmModal").css("display", "flex");
+  }
+
+  function showAlertDialog(message, title = "Notice") {
+    showCustomDialog({
+      title,
+      message,
+      confirmText: "OK",
+      showCancel: false,
+    });
+  }
+
+  function completeCreateNewLeadChoice(preserveCustomerDetails) {
+    dismissCustomDialog();
+
+    submitJob({
+      onSuccess: function () {
+        resetWizard({ preserveCustomerDetails: !!preserveCustomerDetails });
+      },
+      onError: function () {
+        resetWizard({ preserveCustomerDetails: !!preserveCustomerDetails });
+      },
+    });
+  }
+
+  function showCreateNewConfirm() {
+    showCustomDialog({
+      title: "Create New Lead?",
+      message: "Do you want to keep the customer details and start a new lead with the rest cleared?",
+      confirmText: "Yes",
+      cancelText: "No",
+      showCancel: true,
+      onConfirm: function () {
+        completeCreateNewLeadChoice(true);
+      },
+      onCancel: function () {
+        completeCreateNewLeadChoice(false);
+      },
+    });
   }
 
   function showError(field, errorId, message) {
@@ -274,11 +422,11 @@ $("#nextBtn").html('Next <span><i class="fa-solid fa-angle-right"></i></span>&nb
     if (!keepAssetDescription) {
       clearValue("#assetDescriptionSelect");
       clearValue("#assetDescriptionInput");
-      $("#assetDescriptionInput").addClass("d-none");
+      //$("#assetDescriptionInput").addClass("d-none");
       $("#assetDescriptionInputError").text("");
     } else {
       clearValue("#assetDescriptionInput");
-      $("#assetDescriptionInput").removeClass("is-invalid");
+      //$("#assetDescriptionInput").removeClass("is-invalid");
       $("#assetDescriptionInputError").text("");
     }
 
@@ -523,7 +671,7 @@ $("#nextBtn").html('Next <span><i class="fa-solid fa-angle-right"></i></span>&nb
         if (window.clearJobNumberDependentFields) {
           window.clearJobNumberDependentFields();
         } else {
-          $("#autoJobBtn").text("");
+          $("#autoJobBtn").val("");
           $("#customerTenancy").val("").trigger("change");
         }
       }
@@ -534,7 +682,7 @@ $("#nextBtn").html('Next <span><i class="fa-solid fa-angle-right"></i></span>&nb
         if (window.clearJobNumberDependentFields) {
           window.clearJobNumberDependentFields();
         } else {
-          $("#autoJobBtn").text("");
+          $("#autoJobBtn").val("");
           $("#customerTenancy").val("").trigger("change");
         }
         showError("#jobNumber", "#jobNumberError", "Job Number is required.");
@@ -686,15 +834,15 @@ $("#nextBtn").html('Next <span><i class="fa-solid fa-angle-right"></i></span>&nb
     // Do not move focus automatically. Only toggle visibility of the free-text input when "Other" is selected.
     if ($(this).val() === "other") {
       resetAssetFields({ keepAssetDescription: true });
-      $("#assetDescriptionInput").removeClass("d-none");
+      //$("#assetDescriptionInput").removeClass("d-none");
       $("#assetDescriptionSelect").val("other");
     } else {
       resetAssetFields({ keepAssetDescription: true });
       $("#assetDescriptionSelect").val($(this).val() || "");
-      $("#assetDescriptionInput")
-        .addClass("d-none")
-        .removeClass("is-invalid")
-        .val("");
+      // $("#assetDescriptionInput")
+      //   .addClass("d-none")
+      //   .removeClass("is-invalid")
+      //   .val("");
       $("#assetDescriptionInputError").text("");
     }
   });
@@ -896,6 +1044,20 @@ $("#nextBtn").html('Next <span><i class="fa-solid fa-angle-right"></i></span>&nb
     }
   });
 
+  function syncSelectDisplayText($select) {
+    const $field = $select instanceof jQuery ? $select : $("#" + $select);
+    const selectedText = $field.find("option:selected").text().trim();
+    $field.attr("title", selectedText || "");
+  }
+
+  $(document).on("change", "select", function () {
+    syncSelectDisplayText($(this));
+  });
+
+  $("select").each(function () {
+    syncSelectDisplayText($(this));
+  });
+
   // Faults
   function updateAiLabelState($card) {
     const workVal = ($card.find(".work-req").val() || "").trim();
@@ -903,6 +1065,52 @@ $("#nextBtn").html('Next <span><i class="fa-solid fa-angle-right"></i></span>&nb
     const equipmentVal = ($card.find(".equipment").val() || $card.find('.equipment-select').val() || "").trim();
     const hasAutoFilled = workVal !== "" || partsVal !== "" || equipmentVal !== "";
     $card.find(".ai-pre-fill").toggleClass("is-filled", hasAutoFilled);
+  }
+
+  function refreshWorkRequiredOptions($card) {
+    if (window.populateWorkRequiredSelects) {
+      const items = Array.isArray(window.workRequiredItems) ? window.workRequiredItems : [];
+      window.populateWorkRequiredSelects(items);
+      if ($card && $card.length) {
+        const selectedValue = $card.find(".work-req").val() || "";
+        if (selectedValue) {
+          $card.find(".work-req").val(selectedValue);
+        }
+      }
+      return true;
+    }
+
+    if (window.initWorkRequired) {
+      window.initWorkRequired().catch(() => {});
+      return true;
+    }
+
+    return false;
+  }
+
+  function refreshToolRecoveryOptions($card) {
+    const $selects = $card && $card.length
+      ? $card.find("select.totalRecovery-select")
+      : $("select.totalRecovery-select");
+
+    if (!$selects.length) {
+      return false;
+    }
+
+    const optionsHtml = typeof window.getTotalRecoveryOptionsHtml === "function"
+      ? window.getTotalRecoveryOptionsHtml(window.totalRecoveryItems)
+      : '<option value="">Select equipment</option>';
+
+    $selects.each(function () {
+      const $select = $(this);
+      const selectedValue = String($select.val() || "").trim();
+      $select.empty().append(optionsHtml);
+      if (selectedValue) {
+        $select.val(selectedValue);
+      }
+    });
+
+    return true;
   }
 
   function renderFaults() {
@@ -914,7 +1122,7 @@ $("#nextBtn").html('Next <span><i class="fa-solid fa-angle-right"></i></span>&nb
         <div class="fault-card ${expanded ? "expanded" : "collapsed"}" data-idx="${idx}">
           <div class="fault-header" role="button" tabindex="0" aria-expanded="${expanded}">
             <div>
-              <span class="badge fault-badge">${num}</span>
+              <span class="badge fault-badge d-none">${num}</span>
               Fault
             </div>
             <div class="d-flex align-items-center gap-2">
@@ -947,19 +1155,9 @@ $("#nextBtn").html('Next <span><i class="fa-solid fa-angle-right"></i></span>&nb
                       <label class="form-label">Tool Recovery (Special Equipments & Consumables)</label>
                       <div class="d-flex align-items-center gap-2">
                         <select class="form-select equipment-select totalRecovery-select" aria-label="Select equipment">
-                          ${
-                            (window.totalRecoveryItems && window.totalRecoveryItems.length)
-                              ? window.totalRecoveryItems
-                                  .map((it) => {
-                                    const name = (it && it.Catalog && it.Catalog.Name) || it.Name || "";
-                                    const val = escapeHtml(name);
-                                    return `<option value="${val}">${val}</option>`;
-                                  })
-                                  .join("")
-                              : `<option value="">Select equipment</option>`
-                          }
+                          <option value="">Select equipment</option>
                         </select>
-                        <input type="number" min="1" class="form-control equipment-qty" value="0" style="max-width:65px;">
+                        <input type="text" inputmode="numeric" maxlength="2" class="form-control equipment-qty" value="0" style="max-width:65px;">
                         <button type="button" class="btn btn-outline-primary add-equipment-btn">Add</button>
                       </div>
                       <div class="equipment-list mb-2">
@@ -981,7 +1179,7 @@ $("#nextBtn").html('Next <span><i class="fa-solid fa-angle-right"></i></span>&nb
                       <label class="form-label">Parts & Material Required</label>
                       <div class="d-flex align-items-center gap-2">
                         <input id="partsMeterial" maxlength="150" class="form-control form-select parts-select" placeholder="Enter">
-                        <input type="number" min="1" class="form-control parts-qty" value="0" style="max-width:65px;">
+                        <input type="text" inputmode="numeric" maxlength="2" class="form-control parts-qty" value="0" style="max-width:65px;">
                         <button type="button" class="btn btn-outline-primary add-part-btn">Add</button>
                       </div>
                       <div class="parts-list mb-2" aria-live="polite">
@@ -1020,6 +1218,8 @@ $("#nextBtn").html('Next <span><i class="fa-solid fa-angle-right"></i></span>&nb
       if (f.work) {
         $card.find('.work-req').val(f.work);
       }
+      refreshToolRecoveryOptions($card);
+      refreshWorkRequiredOptions($card);
       updateAiLabelState($card);
     });
     calculate();
@@ -1068,29 +1268,29 @@ $("#nextBtn").html('Next <span><i class="fa-solid fa-angle-right"></i></span>&nb
   $(document).on("input", ".fault-desc", function () {
     const text = $(this).val().trim().toLowerCase();
 
-    if (text === "leak") {
-      const idx = Number($(this).closest(".fault-card").data("idx"));
-      if (!isNaN(idx)) {
-        const autoDescription = "Leak from valve causing water ingress.";
-        const autoWork = "Replace valve and test system.";
-        const autoParts = "Valve assembly, sealant";
-        const autoEquipment = "Socket set, pressure tester";
+    // if (text === "leak") {
+    //   const idx = Number($(this).closest(".fault-card").data("idx"));
+    //   if (!isNaN(idx)) {
+    //     const autoDescription = "Leak from valve causing water ingress.";
+    //     const autoWork = "Replace valve and test system.";
+    //     const autoParts = "Valve assembly, sealant";
+    //     const autoEquipment = "Socket set, pressure tester";
 
-        jobData.faults[idx].description = autoDescription;
-        jobData.faults[idx].work = autoWork;
-        jobData.faults[idx].parts = autoParts;
-        jobData.faults[idx].equipment = autoEquipment;
+    //     jobData.faults[idx].description = autoDescription;
+    //     jobData.faults[idx].work = autoWork;
+    //     jobData.faults[idx].parts = autoParts;
+    //     jobData.faults[idx].equipment = autoEquipment;
 
-        const $card = $(this).closest(".fault-card");
-        $card.find(".fault-desc").val(autoDescription);
-        $card.find(".work-req").val(autoWork);
-        $card.find(".parts").val(autoParts);
-        $card.find(".equipment").val(autoEquipment);
+    //     const $card = $(this).closest(".fault-card");
+    //     $card.find(".fault-desc").val(autoDescription);
+    //     $card.find(".work-req").val(autoWork);
+    //     $card.find(".parts").val(autoParts);
+    //     $card.find(".equipment").val(autoEquipment);
 
-        updateAiLabelState($card);
-        $card.find(".fault-desc").trigger("input");
-      }
-    }
+    //     updateAiLabelState($card);
+    //     $card.find(".fault-desc").trigger("input");
+    //   }
+    // }
   });
 
   // $(document).on('click','.auto-fill',function(){
@@ -1131,9 +1331,26 @@ $("#nextBtn").html('Next <span><i class="fa-solid fa-angle-right"></i></span>&nb
   }
 
   function clampQtyValue($qtyInput) {
-    const parsedValue = Number($qtyInput.val());
+    const rawValue = String($qtyInput.val() || "").replace(/\D/g, "");
+    if (!rawValue) {
+      $qtyInput.val(1);
+      return;
+    }
+
+    const parsedValue = Number(rawValue);
     if (!Number.isFinite(parsedValue) || parsedValue < 1) {
       $qtyInput.val(1);
+    } else {
+      $qtyInput.val(Math.min(99, parsedValue));
+    }
+  }
+
+  function limitQtyInput($qtyInput) {
+    const rawValue = String($qtyInput.val() || "").replace(/\D/g, "");
+    const trimmedValue = rawValue.slice(0, 2);
+    $qtyInput.val(trimmedValue);
+    if (trimmedValue) {
+      clampQtyValue($qtyInput);
     }
   }
 
@@ -1141,6 +1358,16 @@ $("#nextBtn").html('Next <span><i class="fa-solid fa-angle-right"></i></span>&nb
     const $card = $(this).closest('.fault-card');
     const $qtyInput = $card.find('.equipment-qty');
     syncQtyOnSelection($(this), $qtyInput);
+  });
+
+  $(document).on('focus', '.equipment-select, .parts-select', function () {
+    const $field = $(this);
+    if ($field.is('select')) {
+      $field.val('');
+      $field.find('option[value=""]').prop('selected', true);
+    } else {
+      $field.val('');
+    }
   });
 
   $(document).on('input change', '.parts-select', function () {
@@ -1153,6 +1380,10 @@ $("#nextBtn").html('Next <span><i class="fa-solid fa-angle-right"></i></span>&nb
     const $card = $(this).closest('.fault-card');
     const $qtyInput = $card.find('.consumables-qty');
     syncQtyOnSelection($(this), $qtyInput);
+  });
+
+  $(document).on('input', '.equipment-qty, .parts-qty, .consumables-qty', function () {
+    limitQtyInput($(this));
   });
 
   $(document).on('blur', '.equipment-qty, .parts-qty, .consumables-qty', function () {
@@ -1464,7 +1695,7 @@ $("#nextBtn").html('Next <span><i class="fa-solid fa-angle-right"></i></span>&nb
 
     if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) {
       if (window.alert) {
-        alert("Camera access is not available on this device.");
+        showAlertDialog("Camera access is not available on this device.");
       }
       return;
     }
@@ -1513,10 +1744,10 @@ $("#nextBtn").html('Next <span><i class="fa-solid fa-angle-right"></i></span>&nb
                 // fallback to Html5Qrcode if available
                 if (window.Html5QrcodeScanner) {
                   startHtml5QrcodeScanner().catch(() => {
-                    if (window.alert) alert('Camera scanning is not available on this browser.');
+                    if (window.alert) showAlertDialog('Camera scanning is not available on this browser.');
                   });
                 } else {
-                  if (window.alert) alert('Camera scanning is not available on this browser.');
+                  if (window.alert) showAlertDialog('Camera scanning is not available on this browser.');
                 }
                 return;
               }
@@ -1527,7 +1758,7 @@ $("#nextBtn").html('Next <span><i class="fa-solid fa-angle-right"></i></span>&nb
                 console.warn('Quagga start failed', e);
                 if (window.Html5QrcodeScanner) {
                   startHtml5QrcodeScanner().catch(() => {
-                    if (window.alert) alert('Camera scanning is not available on this browser.');
+                    if (window.alert) showAlertDialog('Camera scanning is not available on this browser.');
                   });
                 }
                 return;
@@ -1539,7 +1770,7 @@ $("#nextBtn").html('Next <span><i class="fa-solid fa-angle-right"></i></span>&nb
                   if (code) {
                     $("#customerAssetId").val(String(code).trim());
                     if (window.lookupAssetByValue) window.lookupAssetByValue(code);
-                    if (window.alert) alert('Barcode read successfully.');
+                    if (window.alert) showAlertDialog('Barcode read successfully.');
                     stopBarcodeScanner();
                   }
                 } catch (e) {
@@ -1562,7 +1793,7 @@ $("#nextBtn").html('Next <span><i class="fa-solid fa-angle-right"></i></span>&nb
       return startHtml5QrcodeScanner();
     }
 
-    if (window.alert) alert('Camera scanning is not available on this browser.');
+    if (window.alert) showAlertDialog('Camera scanning is not available on this browser.');
   }
 
   // Extracted helper to start Html5Qrcode scanner so it can be called from fallback paths
@@ -1597,10 +1828,10 @@ $("#nextBtn").html('Next <span><i class="fa-solid fa-angle-right"></i></span>&nb
             window.lookupAssetByValue(value);
           }
           if (window.alert) {
-            alert('Barcode read successfully.');
+            showAlertDialog('Barcode read successfully.');
           }
         } else if (window.alert) {
-          alert('Barcode could not be read. Please enter the value manually.');
+          showAlertDialog('Barcode could not be read. Please enter the value manually.');
         }
         stopBarcodeScanner();
       },
@@ -1768,13 +1999,13 @@ $("#nextBtn").html('Next <span><i class="fa-solid fa-angle-right"></i></span>&nb
     return "";
   }
 
-  $("#barcodeScanBtn").on("click", function (e) {
-    e.preventDefault();
-    const $fileInput = $("#barcodeFileInput");
-    $fileInput.attr("accept", "image/*");
-    $fileInput.attr("capture", "environment");
-    $fileInput.trigger("click");
-  });
+  // $("#barcodeScanBtn").on("click", function (e) {
+  //   e.preventDefault();
+  //   const $fileInput = $("#barcodeFileInput");
+  //   $fileInput.attr("accept", "image/*");
+  //   $fileInput.attr("capture", "environment");
+  //   $fileInput.trigger("click");
+  // });
 
   $("#barcodeFileInput").on("change", async function (event) {
     const input = this;
@@ -1787,7 +2018,7 @@ $("#nextBtn").html('Next <span><i class="fa-solid fa-angle-right"></i></span>&nb
     const fileName = (file.name || "").toLowerCase();
     if (!fileName.match(/\.(png|jpg|jpeg|webp|bmp|gif)$/i)) {
       if (window.alert) {
-        alert("Please choose a valid image file.");
+        showAlertDialog("Please choose a valid image file.");
       }
       return;
     }
@@ -1803,12 +2034,12 @@ $("#nextBtn").html('Next <span><i class="fa-solid fa-angle-right"></i></span>&nb
           console.log("Barcode read successfully.");
         }
       } else if (window.alert) {
-        alert("Barcode could not be read from this image. Please enter the value manually.");
+        showAlertDialog("Barcode could not be read from this image. Please enter the value manually.");
       }
     } catch (error) {
       console.error("Barcode scan failed:", error);
       if (window.alert) {
-        alert("Barcode scan is not available in this browser. Please enter the value manually.");
+        showAlertDialog("Barcode scan is not available in this browser. Please enter the value manually.");
       }
     } finally {
       try {
@@ -1820,36 +2051,36 @@ $("#nextBtn").html('Next <span><i class="fa-solid fa-angle-right"></i></span>&nb
   });
 
   $("#customerAssetId").on("input change", function () {
-    const value = $(this).val().trim();
-    jobData.asset.customerAssetId = value;
+    // const value = $(this).val().trim();
+    // jobData.asset.customerAssetId = value;
 
-    if (customerAssetLookupTimer) {
-      clearTimeout(customerAssetLookupTimer);
-      customerAssetLookupTimer = null;
-    }
+    // if (customerAssetLookupTimer) {
+    //   clearTimeout(customerAssetLookupTimer);
+    //   customerAssetLookupTimer = null;
+    // }
 
-    if (!value) {
-      resetAssetFields({ keepCustomerAssetId: true });
-      jobData.asset.customerAssetId = "";
-      return;
-    }
+    // if (!value) {
+    //   resetAssetFields({ keepCustomerAssetId: true });
+    //   jobData.asset.customerAssetId = "";
+    //   return;
+    // }
 
-    if (value.length < 4) {
-      resetAssetFields({ keepCustomerAssetId: true });
-      jobData.asset.customerAssetId = value;
-      return;
-    }
+    // if (value.length < 4) {
+    //   resetAssetFields({ keepCustomerAssetId: true });
+    //   jobData.asset.customerAssetId = value;
+    //   return;
+    // }
 
-    customerAssetLookupTimer = setTimeout(() => {
-      const currentValue = String($("#customerAssetId").val() || "").trim();
-      if (currentValue !== value) {
-        return;
-      }
+    // customerAssetLookupTimer = setTimeout(() => {
+    //   const currentValue = String($("#customerAssetId").val() || "").trim();
+    //   if (currentValue !== value) {
+    //     return;
+    //   }
 
-      if (window.lookupAssetByValue) {
-        window.lookupAssetByValue(currentValue);
-      }
-    }, 350);
+    //   if (window.lookupAssetByValue) {
+    //     window.lookupAssetByValue(currentValue);
+    //   }
+    // }, 350);
   });
 
   // stop clicks on the input bubbling up (defensive)
@@ -1874,13 +2105,15 @@ $("#nextBtn").html('Next <span><i class="fa-solid fa-angle-right"></i></span>&nb
 
     const spaceLeft = MAX_PHOTOS - photoFiles.length;
     if (spaceLeft <= 0) {
-      alert(`Only ${MAX_PHOTOS} images allowed`);
+      showAlertDialog(`Only ${MAX_PHOTOS} images allowed`);
       clearInput();
       return;
     }
 
     if (files.length > spaceLeft) {
-      alert(`Only ${spaceLeft} more image(s) can be added (max ${MAX_PHOTOS})`);
+      showAlertDialog(`Only ${spaceLeft} more image(s) can be added (max ${MAX_PHOTOS})`);
+      clearInput();
+      return;
     }
 
     const allowed = files.slice(0, spaceLeft);
@@ -1909,7 +2142,16 @@ $("#nextBtn").html('Next <span><i class="fa-solid fa-angle-right"></i></span>&nb
     const dt = e.originalEvent.dataTransfer;
     if (dt && dt.files) {
       const files = Array.from(dt.files);
-      const allowed = files.slice(0, MAX_PHOTOS - photoFiles.length);
+      const spaceLeft = MAX_PHOTOS - photoFiles.length;
+      if (spaceLeft <= 0) {
+        showAlertDialog(`Only ${MAX_PHOTOS} images allowed`);
+        return;
+      }
+      if (files.length > spaceLeft) {
+        showAlertDialog(`Only ${spaceLeft} more image(s) can be added (max ${MAX_PHOTOS})`);
+        return;
+      }
+      const allowed = files.slice(0, spaceLeft);
       allowed.forEach((f) => photoFiles.push(f));
       jobData.photos = photoFiles.slice();
       renderPreviews();
@@ -1950,8 +2192,29 @@ $("#nextBtn").html('Next <span><i class="fa-solid fa-angle-right"></i></span>&nb
     }
   });
 
-  $("#createNewBtn").on("click", function () {
-    resetWizard();
+  $("#createNewBtn").on("click", function (e) {
+    e.preventDefault();
+
+    saveStepData(0);
+    saveStepData(1);
+    saveStepData(2);
+
+    const isValid = validateStep(0) && validateStep(1) && validateStep(2);
+    if (!isValid) {
+      return false;
+    }
+
+    showCreateNewConfirm();
+  });
+
+  $("#createNewConfirmModal").on("click", function (e) {
+    if (e.target.id === "createNewConfirmModal") {
+      dismissCustomDialog();
+    }
+  });
+
+  $("#createNewConfirmModal .confirm-close").on("click", function () {
+    dismissCustomDialog();
   });
 
   $(".step").click(function () {
@@ -2026,11 +2289,7 @@ $("#nextBtn").html('Next <span><i class="fa-solid fa-angle-right"></i></span>&nb
       const selectedContactLabel = String($("#customerName option:selected").text() || "").trim();
       const manualContactName = String($("#customerNameInput").val() || "").trim();
       const selectedContactId = selectedContactValue && selectedContactValue !== "other" ? selectedContactValue : "";
-      jobData.customer.name = selectedContactValue === "other"
-        ? manualContactName
-        : selectedContactValue
-          ? selectedContactLabel
-          : "";
+      jobData.customer.name = String($("#autoJobBtn").val() || "").trim();
       jobData.customer.phone = String($("#customerPhone").val() || "").trim();
       jobData.customer.email = String($("#customerEmail").val() || "").trim();
       jobData.customer.tenancy = String($("#customerTenancy").val() || "").trim();
@@ -2039,21 +2298,25 @@ $("#nextBtn").html('Next <span><i class="fa-solid fa-angle-right"></i></span>&nb
       jobData.customer.siteContact = selectedContactId;
       jobData.customer.siteContactLabel = String($("#siteContractName").text() || "").trim() || jobData.customer.siteContactLabel;
       jobData.customer.customerContact = selectedContactId;
+      jobData.customer.contactName = selectedContactValue === "other"
+        ? manualContactName
+        : selectedContactValue
+          ? selectedContactLabel
+          : "";
     }
     if (idx === 1) {
-      const selectedDescription = $("#assetDescriptionSelect").val();
-      const selectedLocation = $("#assetLocation").val();
-      jobData.asset.description =
-        selectedDescription === "other"
-          ? String($("#assetDescriptionInput").val() || "").trim()
-          : String(selectedDescription || "").trim();
-      jobData.asset.descriptionLabel = String($("#assetDescriptionSelect option:selected").text() || "").trim();
-      jobData.asset.location =
-        selectedLocation === "other"
-          ? String($("#assetLocationInput").val() || "").trim()
-          : String(selectedLocation || "").trim();
-      jobData.asset.locationLabel = String($("#assetLocation option:selected").text() || "").trim();
-      jobData.asset.customerAssetId = String($("#customerAssetId").val() || "").trim();
+      const customerAssetIdSelectValue = String($("#customerAssetId").val() || "").trim();
+      const customerAssetIdInputValue = String($("#customerAssetIdInput").val() || "").trim();
+      const assetDescriptionValue = String($("#assetDescriptionInput").val() || "").trim();
+      const assetLocationValue = String($("#assetLocation").val() || "").trim();
+      jobData.asset.description = assetDescriptionValue;
+      jobData.asset.descriptionLabel = assetDescriptionValue;
+      jobData.asset.location = assetLocationValue;
+      jobData.asset.locationLabel = assetLocationValue;
+      jobData.asset.customerAssetId = customerAssetIdInputValue || (customerAssetIdSelectValue && customerAssetIdSelectValue !== "other" ? customerAssetIdSelectValue : "");
+      jobData.asset.make = String($("#assertMake").val() || "").trim();
+      jobData.asset.model = String($("#assertModel").val() || "").trim();
+      jobData.asset.serialNumber = String($("#assertSerialNumber").val() || "").trim();
       // faults already bound
     }
     if (idx === 2) {
@@ -2088,12 +2351,16 @@ $("#nextBtn").html('Next <span><i class="fa-solid fa-angle-right"></i></span>&nb
 
   function buildLeadDescriptionHtml() {
     const customerName = String(jobData.customer.name || "").trim();
+    const customerContactName = String(jobData.customer.contactName || "").trim();
     const customerPhone = String(jobData.customer.phone || "").trim();
     const customerEmail = String(jobData.customer.email || "").trim();
     const siteLabel = String(jobData.customer.tenancyLabel || jobData.customer.tenancy || "").trim();
     const assetDescription = String(jobData.asset.description || "").trim();
     const assetLocation = String(jobData.asset.location || "").trim();
     const customerAssetId = String(jobData.asset.customerAssetId || "").trim();
+    const assetMake = String(jobData.asset.make || "").trim();
+    const assetModel = String(jobData.asset.model || "").trim();
+    const assetSerialNumber = String(jobData.asset.serialNumber || "").trim();
     const notes = String($("#customerNotes").val() || "").trim();
     const technicianCount = Number(jobData.estimates.technicians || 0);
     const hours = Number(jobData.estimates.hours || 0);
@@ -2115,12 +2382,16 @@ $("#nextBtn").html('Next <span><i class="fa-solid fa-angle-right"></i></span>&nb
 
     const detailRows = [
       ["Customer Name", customerName],
+      ["Customer Contact Name", customerContactName],
       ["Phone", customerPhone],
       ["Email", customerEmail],
       ["Site", siteLabel],
+      ["Customer Asset ID or Excel Barcode", customerAssetId],
       ["Asset Description", assetDescription],
       ["Asset Location", assetLocation],
-      ["Customer Asset ID", customerAssetId],
+      ["Asset Make", assetMake],
+      ["Asset Model", assetModel],
+      ["Asset Serial Number", assetSerialNumber],
       ["Technicians", technicianCount ? String(technicianCount) : ""],
       ["Hours", hours ? String(hours) : ""],
       ["Cost Center", costCenterLabel],
@@ -2228,7 +2499,9 @@ $("#nextBtn").html('Next <span><i class="fa-solid fa-angle-right"></i></span>&nb
     };
   }
 
-  function submitJob() {
+  function submitJob(options = {}) {
+    const { onSuccess, onError } = options || {};
+
     if (!validateStep(2)) {
       return;
     }
@@ -2239,36 +2512,64 @@ $("#nextBtn").html('Next <span><i class="fa-solid fa-angle-right"></i></span>&nb
     const payload = buildLeadPayload();
     const json = JSON.stringify(payload, null, 2);
 
-
     if (window.submitLeadToSimpro) {
       window.submitLeadToSimpro(payload, {
-        onSuccess: function (response) {
+        onSuccess: async function (response) {
           console.log(response);
           const leadId = response.ID;
           const hasPhotos = Array.isArray(photoFiles) && photoFiles.length > 0;
 
+          // Upload generated PDF
+          const pdfFile = await createLeadPdfFile();
+          if (pdfFile && typeof window.uploadLeadAttachments === "function") {
+            window.uploadLeadAttachments(leadId, [pdfFile], {
+              onComplete: function () {
+                console.log("PDF uploaded successfully.");
+              },
+              onError: function (error) {
+                console.log("PDF upload failed:", error);
+              },
+            });
+          }
+          
           if (leadId && hasPhotos && typeof window.uploadLeadAttachments === "function") {
             window.uploadLeadAttachments(leadId, photoFiles, {
               onComplete: function () {
-                alert("Lead created successfully. Your images have been uploaded.");
+                showAlertDialog("Lead created successfully.");
               },
               onError: function (error) {
                 console.error("Lead attachment upload failed:", error);
-                alert("Lead created, but one or more image uploads failed.");
+                showAlertDialog("Lead created, but one or more image uploads failed.");
               },
             });
           } else {
             // No photos attached or upload function unavailable
-            alert("Lead created successfully.");
+            showAlertDialog("Lead created successfully.");
           }
+          
+          if (typeof onSuccess === "function") {
+            onSuccess(response, payload, json);
+            return;
+          }
+
+          resetWizard();
         },
-        onError: function () {
-          alert("Failed to create lead. Please try again. Staff not found.");
+        onError: function (error) {
+          if (typeof onError === "function") {
+            onError(error, payload, json);
+            return;
+          }
+
+          showAlertDialog("Failed to create lead. Please try again. Staff not found.");
         },
       });
     } else {
       console.error("submitLeadToSimpro is not available.");
-      alert("Failed to create lead. Please try again.");
+      if (typeof onError === "function") {
+        onError(null, payload, json);
+        return;
+      }
+      showAlertDialog("Failed to create lead. Please try again.");
     }
 
     // $("#modalJobNum").text(jobData.customer.jobNumber || "");
@@ -2319,4 +2620,59 @@ $("#nextBtn").html('Next <span><i class="fa-solid fa-angle-right"></i></span>&nb
     this.style.height = "auto";
     this.style.height = this.scrollHeight + "px";
   });
+
+
+
+
+  //convert lead description to PDF
+  async function createLeadPdfFile() {
+
+        const html = buildLeadDescriptionHtml();
+
+        const container = document.createElement("div");
+
+        container.innerHTML = html;
+
+        container.style.position = "fixed";
+        container.style.left = "-9999px";
+        container.style.top = "0";
+        container.style.width = "794px"; // A4 width
+        container.style.background = "#fff";
+        container.style.padding = "20px";
+
+        document.body.appendChild(container);
+
+        //await new Promise(resolve => setTimeout(resolve, 300));
+
+        const canvas = await html2canvas(container, {
+            scale: 2,
+            useCORS: true,
+            backgroundColor: "#ffffff"
+        });
+
+        document.body.removeChild(container);
+
+        const imgData = canvas.toDataURL("image/png");
+
+        const { jsPDF } = window.jspdf;
+
+        const pdf = new jsPDF("p", "mm", "a4");
+
+        const pdfWidth = 210;
+        const pdfHeight = (canvas.height * pdfWidth) / canvas.width;
+
+        pdf.addImage(imgData, "PNG", 0, 0, pdfWidth, pdfHeight);
+
+        const blob = pdf.output("blob");
+
+        return new File(
+            [blob],
+            "Lead Description.pdf",
+            {
+                type: "application/pdf"
+            }
+        );
+    }
+
+
 });
