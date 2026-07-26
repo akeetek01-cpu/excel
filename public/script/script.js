@@ -379,7 +379,8 @@ $("#nextBtn").html('Next <span><i class="fa-solid fa-angle-right"></i></span>&nb
         resetWizard({ preserveCustomerDetails: !!preserveCustomerDetails });
       },
       onError: function () {
-        resetWizard({ preserveCustomerDetails: !!preserveCustomerDetails });
+        showAlertDialog("Failed to create lead. Please try again. Staff not found.");
+        //resetWizard({ preserveCustomerDetails: !!preserveCustomerDetails });
       },
     });
   }
