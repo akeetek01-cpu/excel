@@ -2103,6 +2103,8 @@ $("#nextBtn").html('Next <span><i class="fa-solid fa-angle-right"></i></span>&nb
 
     if (files.length > spaceLeft) {
       showAlertDialog(`Only ${spaceLeft} more image(s) can be added (max ${MAX_PHOTOS})`);
+      clearInput();
+      return;
     }
 
     const allowed = files.slice(0, spaceLeft);
@@ -2131,7 +2133,16 @@ $("#nextBtn").html('Next <span><i class="fa-solid fa-angle-right"></i></span>&nb
     const dt = e.originalEvent.dataTransfer;
     if (dt && dt.files) {
       const files = Array.from(dt.files);
-      const allowed = files.slice(0, MAX_PHOTOS - photoFiles.length);
+      const spaceLeft = MAX_PHOTOS - photoFiles.length;
+      if (spaceLeft <= 0) {
+        showAlertDialog(`Only ${MAX_PHOTOS} images allowed`);
+        return;
+      }
+      if (files.length > spaceLeft) {
+        showAlertDialog(`Only ${spaceLeft} more image(s) can be added (max ${MAX_PHOTOS})`);
+        return;
+      }
+      const allowed = files.slice(0, spaceLeft);
       allowed.forEach((f) => photoFiles.push(f));
       jobData.photos = photoFiles.slice();
       renderPreviews();
