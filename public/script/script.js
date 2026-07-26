@@ -2097,6 +2097,16 @@ $("#nextBtn").html('Next <span><i class="fa-solid fa-angle-right"></i></span>&nb
 
   $("#createNewBtn").on("click", function (e) {
     e.preventDefault();
+
+    saveStepData(0);
+    saveStepData(1);
+    saveStepData(2);
+
+    const isValid = validateStep(0) && validateStep(1) && validateStep(2);
+    if (!isValid) {
+      return false;
+    }
+
     showCreateNewConfirm();
   });
 
