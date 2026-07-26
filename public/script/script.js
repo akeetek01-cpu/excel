@@ -1035,6 +1035,20 @@ $("#nextBtn").html('Next <span><i class="fa-solid fa-angle-right"></i></span>&nb
     }
   });
 
+  function syncSelectDisplayText($select) {
+    const $field = $select instanceof jQuery ? $select : $("#" + $select);
+    const selectedText = $field.find("option:selected").text().trim();
+    $field.attr("title", selectedText || "");
+  }
+
+  $(document).on("change", "select", function () {
+    syncSelectDisplayText($(this));
+  });
+
+  $("select").each(function () {
+    syncSelectDisplayText($(this));
+  });
+
   // Faults
   function updateAiLabelState($card) {
     const workVal = ($card.find(".work-req").val() || "").trim();
@@ -1134,7 +1148,7 @@ $("#nextBtn").html('Next <span><i class="fa-solid fa-angle-right"></i></span>&nb
                         <select class="form-select equipment-select totalRecovery-select" aria-label="Select equipment">
                           <option value="">Select equipment</option>
                         </select>
-                        <input type="number" min="1" class="form-control equipment-qty" value="0" style="max-width:65px;">
+                        <input type="text" inputmode="numeric" maxlength="2" class="form-control equipment-qty" value="0" style="max-width:65px;">
                         <button type="button" class="btn btn-outline-primary add-equipment-btn">Add</button>
                       </div>
                       <div class="equipment-list mb-2">
@@ -1156,7 +1170,7 @@ $("#nextBtn").html('Next <span><i class="fa-solid fa-angle-right"></i></span>&nb
                       <label class="form-label">Parts & Material Required</label>
                       <div class="d-flex align-items-center gap-2">
                         <input id="partsMeterial" maxlength="150" class="form-control form-select parts-select" placeholder="Enter">
-                        <input type="number" min="1" class="form-control parts-qty" value="0" style="max-width:65px;">
+                        <input type="text" inputmode="numeric" maxlength="2" class="form-control parts-qty" value="0" style="max-width:65px;">
                         <button type="button" class="btn btn-outline-primary add-part-btn">Add</button>
                       </div>
                       <div class="parts-list mb-2" aria-live="polite">
@@ -1308,9 +1322,26 @@ $("#nextBtn").html('Next <span><i class="fa-solid fa-angle-right"></i></span>&nb
   }
 
   function clampQtyValue($qtyInput) {
-    const parsedValue = Number($qtyInput.val());
+    const rawValue = String($qtyInput.val() || "").replace(/\D/g, "");
+    if (!rawValue) {
+      $qtyInput.val(1);
+      return;
+    }
+
+    const parsedValue = Number(rawValue);
     if (!Number.isFinite(parsedValue) || parsedValue < 1) {
       $qtyInput.val(1);
+    } else {
+      $qtyInput.val(Math.min(99, parsedValue));
+    }
+  }
+
+  function limitQtyInput($qtyInput) {
+    const rawValue = String($qtyInput.val() || "").replace(/\D/g, "");
+    const trimmedValue = rawValue.slice(0, 2);
+    $qtyInput.val(trimmedValue);
+    if (trimmedValue) {
+      clampQtyValue($qtyInput);
     }
   }
 
@@ -1318,6 +1349,16 @@ $("#nextBtn").html('Next <span><i class="fa-solid fa-angle-right"></i></span>&nb
     const $card = $(this).closest('.fault-card');
     const $qtyInput = $card.find('.equipment-qty');
     syncQtyOnSelection($(this), $qtyInput);
+  });
+
+  $(document).on('focus', '.equipment-select, .parts-select', function () {
+    const $field = $(this);
+    if ($field.is('select')) {
+      $field.val('');
+      $field.find('option[value=""]').prop('selected', true);
+    } else {
+      $field.val('');
+    }
   });
 
   $(document).on('input change', '.parts-select', function () {
@@ -1330,6 +1371,10 @@ $("#nextBtn").html('Next <span><i class="fa-solid fa-angle-right"></i></span>&nb
     const $card = $(this).closest('.fault-card');
     const $qtyInput = $card.find('.consumables-qty');
     syncQtyOnSelection($(this), $qtyInput);
+  });
+
+  $(document).on('input', '.equipment-qty, .parts-qty, .consumables-qty', function () {
+    limitQtyInput($(this));
   });
 
   $(document).on('blur', '.equipment-qty, .parts-qty, .consumables-qty', function () {

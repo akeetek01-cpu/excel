@@ -570,7 +570,7 @@ textarea {
 }
 .submit-btn {
     padding-left: 20%;
-    margin: 0 10%;
+    margin: 0 9%;
     padding-right: 20%;
 }
 @media (min-width: 768px) {
@@ -669,6 +669,34 @@ textarea {
 .fault-input-row .form-select,
 .fault-input-row .form-control {
   background: #ffffff;
+}
+
+select.form-select,
+select {
+  max-width: 100%;
+  overflow-x: auto;
+  overflow-y: hidden;
+  white-space: nowrap;
+  text-overflow: initial;
+  scrollbar-width: thin;
+  scrollbar-color: #12c8c0 #f1f3f5;
+}
+
+select.form-select::-webkit-scrollbar,
+select::-webkit-scrollbar {
+  height: 8px;
+}
+
+select.form-select::-webkit-scrollbar-thumb,
+select::-webkit-scrollbar-thumb {
+  background: #12c8c0;
+  border-radius: 999px;
+}
+
+select option {
+  white-space: normal;
+  word-break: break-word;
+  overflow-wrap: anywhere;
 }
 
 .d-flex .form-select.parts-select,
