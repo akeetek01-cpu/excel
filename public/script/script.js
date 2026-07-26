@@ -177,6 +177,7 @@ $("#nextBtn").html('Next <span><i class="fa-solid fa-angle-right"></i></span>&nb
       tenancy: String(jobData.customer.tenancy || "").trim(),
       tenancyLabel: String(jobData.customer.tenancyLabel || "").trim(),
       notes: String(jobData.customer.notes || "").trim(),
+      autoJobBtnValue: String($("#autoJobBtn").val() || "").trim(),
       customerNameValue: String($("#customerName").val() || "").trim(),
       customerNameInputValue: String($("#customerNameInput").val() || "").trim(),
       customerPhoneValue: String($("#customerPhone").val() || "").trim(),
@@ -211,6 +212,7 @@ $("#nextBtn").html('Next <span><i class="fa-solid fa-angle-right"></i></span>&nb
     ).text("");
     $("#customerNameInput").val("");
     $("#customerNameInputWrapper").addClass("d-none");
+    $("#serviceManagerSelect").val("");
     $("#costCenterSelect").val("");
     $("#tagsSelect").val("");
     $("#technicians").val(1);
@@ -251,12 +253,19 @@ $("#nextBtn").html('Next <span><i class="fa-solid fa-angle-right"></i></span>&nb
     };
     jobData.photos = [];
     photoFiles = [];
-    $("#previewGrid").empty();
+    $("#photoInput").val("");
+    renderPreviews();
+    $(".totalRecovery-select").val("");
+    $(".equipment-select").val("");
+    $(".parts-select").val("");
+    $(".equipment-qty, .parts-qty, .consumables-qty").val(0);
+    $(".equipment-list, .parts-list, .consumables-list").empty();
     $("#uploadStatus").hide().text("");
     $("#jsonOutput").text("");
 
     if (preserveCustomerDetails) {
       $("#jobNumber").val(preservedCustomer?.jobNumberValue || preservedCustomer?.jobNumber || "");
+      $("#autoJobBtn").val(preservedCustomer?.autoJobBtnValue || "");
       $("#customerName").val(preservedCustomer?.customerNameValue || "");
       $("#customerNameInput").val(preservedCustomer?.customerNameInputValue || "");
       $("#customerPhone").val(preservedCustomer?.customerPhoneValue || "");
@@ -269,6 +278,7 @@ $("#nextBtn").html('Next <span><i class="fa-solid fa-angle-right"></i></span>&nb
       $("#customerEmailError").text("");
     } else {
       $("#jobNumber").val("");
+      $("#autoJobBtn").val("");
       $("#customerName").val("");
       $("#customerNameInput").val("");
       $("#customerPhone").val("");
@@ -1002,6 +1012,52 @@ $("#nextBtn").html('Next <span><i class="fa-solid fa-angle-right"></i></span>&nb
     $card.find(".ai-pre-fill").toggleClass("is-filled", hasAutoFilled);
   }
 
+  function refreshWorkRequiredOptions($card) {
+    if (window.populateWorkRequiredSelects) {
+      const items = Array.isArray(window.workRequiredItems) ? window.workRequiredItems : [];
+      window.populateWorkRequiredSelects(items);
+      if ($card && $card.length) {
+        const selectedValue = $card.find(".work-req").val() || "";
+        if (selectedValue) {
+          $card.find(".work-req").val(selectedValue);
+        }
+      }
+      return true;
+    }
+
+    if (window.initWorkRequired) {
+      window.initWorkRequired().catch(() => {});
+      return true;
+    }
+
+    return false;
+  }
+
+  function refreshToolRecoveryOptions($card) {
+    const $selects = $card && $card.length
+      ? $card.find("select.totalRecovery-select")
+      : $("select.totalRecovery-select");
+
+    if (!$selects.length) {
+      return false;
+    }
+
+    const optionsHtml = typeof window.getTotalRecoveryOptionsHtml === "function"
+      ? window.getTotalRecoveryOptionsHtml(window.totalRecoveryItems)
+      : '<option value="">Select equipment</option>';
+
+    $selects.each(function () {
+      const $select = $(this);
+      const selectedValue = String($select.val() || "").trim();
+      $select.empty().append(optionsHtml);
+      if (selectedValue) {
+        $select.val(selectedValue);
+      }
+    });
+
+    return true;
+  }
+
   function renderFaults() {
     const $list = $("#faultList").empty();
     jobData.faults.forEach((f, idx) => {
@@ -1044,17 +1100,7 @@ $("#nextBtn").html('Next <span><i class="fa-solid fa-angle-right"></i></span>&nb
                       <label class="form-label">Tool Recovery (Special Equipments & Consumables)</label>
                       <div class="d-flex align-items-center gap-2">
                         <select class="form-select equipment-select totalRecovery-select" aria-label="Select equipment">
-                          ${
-                            (window.totalRecoveryItems && window.totalRecoveryItems.length)
-                              ? window.totalRecoveryItems
-                                  .map((it) => {
-                                    const name = (it && it.Catalog && it.Catalog.Name) || it.Name || "";
-                                    const val = escapeHtml(name);
-                                    return `<option value="${val}">${val}</option>`;
-                                  })
-                                  .join("")
-                              : `<option value="">Select equipment</option>`
-                          }
+                          <option value="">Select equipment</option>
                         </select>
                         <input type="number" min="1" class="form-control equipment-qty" value="0" style="max-width:65px;">
                         <button type="button" class="btn btn-outline-primary add-equipment-btn">Add</button>
@@ -1117,9 +1163,8 @@ $("#nextBtn").html('Next <span><i class="fa-solid fa-angle-right"></i></span>&nb
       if (f.work) {
         $card.find('.work-req').val(f.work);
       }
-      if (window.populateWorkRequiredSelects) {
-        window.populateWorkRequiredSelects(window.workRequiredItems || []);
-      }
+      refreshToolRecoveryOptions($card);
+      refreshWorkRequiredOptions($card);
       updateAiLabelState($card);
     });
     calculate();
