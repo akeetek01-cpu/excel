@@ -14,6 +14,7 @@ $(function () {
       siteContact: "",
       siteContactLabel: "",
       customerContact: "",
+      contactName: "",
     },
     asset: {
       description: "",
@@ -21,6 +22,9 @@ $(function () {
       location: "",
       locationLabel: "",
       customerAssetId: "",
+      make: "",
+      model: "",
+      serialNumber: "",
     },  
     faults: [],
     estimates: {
@@ -231,6 +235,8 @@ $("#nextBtn").html('Next <span><i class="fa-solid fa-angle-right"></i></span>&nb
       notes: preservedCustomer?.notes || "",
       siteContact: "",
       siteContactLabel: "",
+      customerContact: "",
+      contactName: "",
     };
     jobData.asset = {
       description: "",
@@ -238,6 +244,9 @@ $("#nextBtn").html('Next <span><i class="fa-solid fa-angle-right"></i></span>&nb
       location: "",
       locationLabel: "",
       customerAssetId: "",
+      make: "",
+      model: "",
+      serialNumber: "",
     };
     jobData.faults = [];
     jobData.estimates = {
@@ -2280,11 +2289,7 @@ $("#nextBtn").html('Next <span><i class="fa-solid fa-angle-right"></i></span>&nb
       const selectedContactLabel = String($("#customerName option:selected").text() || "").trim();
       const manualContactName = String($("#customerNameInput").val() || "").trim();
       const selectedContactId = selectedContactValue && selectedContactValue !== "other" ? selectedContactValue : "";
-      jobData.customer.name = selectedContactValue === "other"
-        ? manualContactName
-        : selectedContactValue
-          ? selectedContactLabel
-          : "";
+      jobData.customer.name = String($("#autoJobBtn").val() || "").trim();
       jobData.customer.phone = String($("#customerPhone").val() || "").trim();
       jobData.customer.email = String($("#customerEmail").val() || "").trim();
       jobData.customer.tenancy = String($("#customerTenancy").val() || "").trim();
@@ -2293,21 +2298,25 @@ $("#nextBtn").html('Next <span><i class="fa-solid fa-angle-right"></i></span>&nb
       jobData.customer.siteContact = selectedContactId;
       jobData.customer.siteContactLabel = String($("#siteContractName").text() || "").trim() || jobData.customer.siteContactLabel;
       jobData.customer.customerContact = selectedContactId;
+      jobData.customer.contactName = selectedContactValue === "other"
+        ? manualContactName
+        : selectedContactValue
+          ? selectedContactLabel
+          : "";
     }
     if (idx === 1) {
-      const selectedDescription = $("#assetDescriptionSelect").val();
-      const selectedLocation = $("#assetLocation").val();
-      jobData.asset.description =
-        selectedDescription === "other"
-          ? String($("#assetDescriptionInput").val() || "").trim()
-          : String(selectedDescription || "").trim();
-      jobData.asset.descriptionLabel = String($("#assetDescriptionSelect option:selected").text() || "").trim();
-      jobData.asset.location =
-        selectedLocation === "other"
-          ? String($("#assetLocationInput").val() || "").trim()
-          : String(selectedLocation || "").trim();
-      jobData.asset.locationLabel = String($("#assetLocation option:selected").text() || "").trim();
-      jobData.asset.customerAssetId = String($("#customerAssetId").val() || "").trim();
+      const customerAssetIdSelectValue = String($("#customerAssetId").val() || "").trim();
+      const customerAssetIdInputValue = String($("#customerAssetIdInput").val() || "").trim();
+      const assetDescriptionValue = String($("#assetDescriptionInput").val() || "").trim();
+      const assetLocationValue = String($("#assetLocation").val() || "").trim();
+      jobData.asset.description = assetDescriptionValue;
+      jobData.asset.descriptionLabel = assetDescriptionValue;
+      jobData.asset.location = assetLocationValue;
+      jobData.asset.locationLabel = assetLocationValue;
+      jobData.asset.customerAssetId = customerAssetIdInputValue || (customerAssetIdSelectValue && customerAssetIdSelectValue !== "other" ? customerAssetIdSelectValue : "");
+      jobData.asset.make = String($("#assertMake").val() || "").trim();
+      jobData.asset.model = String($("#assertModel").val() || "").trim();
+      jobData.asset.serialNumber = String($("#assertSerialNumber").val() || "").trim();
       // faults already bound
     }
     if (idx === 2) {
@@ -2342,12 +2351,16 @@ $("#nextBtn").html('Next <span><i class="fa-solid fa-angle-right"></i></span>&nb
 
   function buildLeadDescriptionHtml() {
     const customerName = String(jobData.customer.name || "").trim();
+    const customerContactName = String(jobData.customer.contactName || "").trim();
     const customerPhone = String(jobData.customer.phone || "").trim();
     const customerEmail = String(jobData.customer.email || "").trim();
     const siteLabel = String(jobData.customer.tenancyLabel || jobData.customer.tenancy || "").trim();
     const assetDescription = String(jobData.asset.description || "").trim();
     const assetLocation = String(jobData.asset.location || "").trim();
     const customerAssetId = String(jobData.asset.customerAssetId || "").trim();
+    const assetMake = String(jobData.asset.make || "").trim();
+    const assetModel = String(jobData.asset.model || "").trim();
+    const assetSerialNumber = String(jobData.asset.serialNumber || "").trim();
     const notes = String($("#customerNotes").val() || "").trim();
     const technicianCount = Number(jobData.estimates.technicians || 0);
     const hours = Number(jobData.estimates.hours || 0);
@@ -2369,12 +2382,16 @@ $("#nextBtn").html('Next <span><i class="fa-solid fa-angle-right"></i></span>&nb
 
     const detailRows = [
       ["Customer Name", customerName],
+      ["Customer Contact Name", customerContactName],
       ["Phone", customerPhone],
       ["Email", customerEmail],
       ["Site", siteLabel],
+      ["Customer Asset ID or Excel Barcode", customerAssetId],
       ["Asset Description", assetDescription],
       ["Asset Location", assetLocation],
-      ["Customer Asset ID", customerAssetId],
+      ["Asset Make", assetMake],
+      ["Asset Model", assetModel],
+      ["Asset Serial Number", assetSerialNumber],
       ["Technicians", technicianCount ? String(technicianCount) : ""],
       ["Hours", hours ? String(hours) : ""],
       ["Cost Center", costCenterLabel],
@@ -2502,13 +2519,6 @@ $("#nextBtn").html('Next <span><i class="fa-solid fa-angle-right"></i></span>&nb
           const leadId = response.ID;
           const hasPhotos = Array.isArray(photoFiles) && photoFiles.length > 0;
 
-          if (typeof onSuccess === "function") {
-            onSuccess(response, payload, json);
-            return;
-          }
-
-          resetWizard();
-
           if (leadId && hasPhotos && typeof window.uploadLeadAttachments === "function") {
             window.uploadLeadAttachments(leadId, photoFiles, {
               onComplete: function () {
@@ -2523,6 +2533,13 @@ $("#nextBtn").html('Next <span><i class="fa-solid fa-angle-right"></i></span>&nb
             // No photos attached or upload function unavailable
             showAlertDialog("Lead created successfully.");
           }
+          
+          if (typeof onSuccess === "function") {
+            onSuccess(response, payload, json);
+            return;
+          }
+
+          resetWizard();
         },
         onError: function (error) {
           if (typeof onError === "function") {
