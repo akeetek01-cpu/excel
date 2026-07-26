@@ -1768,13 +1768,13 @@ $("#nextBtn").html('Next <span><i class="fa-solid fa-angle-right"></i></span>&nb
     return "";
   }
 
-  $("#barcodeScanBtn").on("click", function (e) {
-    e.preventDefault();
-    const $fileInput = $("#barcodeFileInput");
-    $fileInput.attr("accept", "image/*");
-    $fileInput.attr("capture", "environment");
-    $fileInput.trigger("click");
-  });
+  // $("#barcodeScanBtn").on("click", function (e) {
+  //   e.preventDefault();
+  //   const $fileInput = $("#barcodeFileInput");
+  //   $fileInput.attr("accept", "image/*");
+  //   $fileInput.attr("capture", "environment");
+  //   $fileInput.trigger("click");
+  // });
 
   $("#barcodeFileInput").on("change", async function (event) {
     const input = this;

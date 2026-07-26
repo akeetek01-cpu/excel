@@ -369,6 +369,17 @@ color: var(--teal)!important;
 #assetDescriptionInput {
       font-size: 13px;
 }
+
+#assetDescriptionInput.border-dashed {
+      font-size: 13px;
+    border: 1px dashed #12c8c0 !important;
+    background: transparent;
+    color: gray;
+}
+#assetDescriptionInput.border-dashed::placeholder {
+  color: gray;   /* Changes the text color */
+  opacity: 1;       /* Ensures full opacity, mostly for Firefox */
+}
 #addFaultBtn{
   display: none;
 }
