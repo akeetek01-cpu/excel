@@ -373,22 +373,21 @@ $("#nextBtn").html('Next <span><i class="fa-solid fa-angle-right"></i></span>&nb
 
   function completeCreateNewLeadChoice(preserveCustomerDetails) {
     dismissCustomDialog();
-
-    submitJob({
-      onSuccess: function () {
-        resetWizard({ preserveCustomerDetails: !!preserveCustomerDetails });
-      },
-      onError: function () {
-        showAlertDialog("Failed to create lead. Please try again. Staff not found.");
-        //resetWizard({ preserveCustomerDetails: !!preserveCustomerDetails });
-      },
-    });
+    // submitJob({
+    //   onSuccess: function () {
+    //     resetWizard({ preserveCustomerDetails: !!preserveCustomerDetails });
+    //   },
+    //   onError: function () {
+    //     showAlertDialog("Failed to create lead. Please try again. Staff not found.");
+    //     //resetWizard({ preserveCustomerDetails: !!preserveCustomerDetails });
+    //   },
+    // });
   }
 
   function showCreateNewConfirm() {
     showCustomDialog({
       title: "Create New Lead?",
-      message: "Do you want to keep the customer details and start a new lead with the rest cleared?",
+      message: "Do you want to create other lead for the same Job Number ?",
       confirmText: "Yes",
       cancelText: "No",
       showCancel: true,
@@ -1621,13 +1620,13 @@ $("#nextBtn").html('Next <span><i class="fa-solid fa-angle-right"></i></span>&nb
   function calculate() {
     const technicians = Number($("#technicians").val() || 0);
     const apprentice = Number($("#apprentice").val() || 0);
-    const tech = technicians + apprentice;
+    const tech = technicians;
     const hrs = Number($("#hours").val() || 0);
-    const totalHours = tech * hrs;
+    const totalHours = (tech+apprentice) * hrs;
     const faults = jobData.faults.length || 0;
 
     $("#statFaults").text(faults || "-");
-    $("#statTech").text(tech || "-");
+    $("#statTech").text(tech+apprentice || "-");
     $("#statHours").text(totalHours || "-");
 
     jobData.estimates.technicians = tech;
@@ -2214,7 +2213,7 @@ $("#nextBtn").html('Next <span><i class="fa-solid fa-angle-right"></i></span>&nb
     }
 
     if (files.length > spaceLeft) {
-      showAlertDialog(`Only ${spaceLeft} more image(s) can be added (max ${MAX_PHOTOS})`);
+      showAlertDialog(`Only ${spaceLeft} more image(s) can be added (Max ${MAX_PHOTOS} images)`);
       clearInput();
       return;
     }
@@ -2466,6 +2465,7 @@ $("#nextBtn").html('Next <span><i class="fa-solid fa-angle-right"></i></span>&nb
     const assetSerialNumber = String(jobData.asset.serialNumber || "").trim();
     const notes = String($("#customerNotes").val() || "").trim();
     const technicianCount = Number(jobData.estimates.technicians || 0);
+    const apprenticeCount = Number(jobData.estimates.apprentice || 0);
     const hours = Number(jobData.estimates.hours || 0);
     const costCenterLabel = String(jobData.estimates.costCenterLabel || "").trim();
     const serviceManagerLabel = String($("#serviceManagerSelect option:selected").text() || "").trim();
@@ -2496,6 +2496,7 @@ $("#nextBtn").html('Next <span><i class="fa-solid fa-angle-right"></i></span>&nb
       ["Asset Model", assetModel],
       ["Asset Serial Number", assetSerialNumber],
       ["Technicians", technicianCount ? String(technicianCount) : ""],
+      ["Apprentice", apprenticeCount ? String(apprenticeCount) : ""],
       ["Hours", hours ? String(hours) : ""],
       ["Cost Center", costCenterLabel],
       ["Service Manager", serviceManagerLabel],
