@@ -32,7 +32,7 @@
         const name = ((it && it.Catalog && it.Catalog.Name) || it.Name || "").toString();
         const partNo = ((it && it.Catalog && it.Catalog.PartNo) || it.PartNo || "").toString();
         if (partNo && name) {
-          return `<option value="${partNo} - ${name}">${partNo} - ${name}</option>`;
+          return `<option value="${name} - ${partNo}">${name} - ${partNo}</option>`;
         } else if (name) {
           return `<option value="${name}">${name}</option>`;
         } else if (partNo) {
