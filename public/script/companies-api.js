@@ -39,6 +39,20 @@ $(function() {
         assetDescriptionInput.removeClass("border-dashed").prop("readonly", true).val("");
     }
 
+    function findMatchingAsset(value) {
+        const normalizedValue = String(value || "").trim().toLowerCase();
+        if (!normalizedValue) {
+            return null;
+        }
+
+        return Array.from(assetDetailsByTypeId.values()).find(function(item) {
+            const barcode = String(getCustomFieldValue(item, ["EXCEL Barcode", "Excel Asset ID", "Excel Barcode", "Barcode"]) || "").trim().toLowerCase();
+            const assetId = String(item?.ID || "").trim().toLowerCase();
+            const assetName = String(item?.Name || "").trim().toLowerCase();
+            return barcode === normalizedValue || assetId === normalizedValue || assetName === normalizedValue;
+        }) || null;
+    }
+
     function setCustomerAssetIdMode() {
         const selectedValue = String($("#customerAssetId").val() || "").trim();
         const customerAssetIdInputWrapper = $("#customerAssetIdInputWrapper");
@@ -63,17 +77,13 @@ $(function() {
             return;
         }
 
-        const matchingAsset = Array.from(assetDetailsByTypeId.values()).find(item => {
-            const barcode = getCustomFieldValue(item, ["EXCEL Barcode", "Excel Asset ID", "Excel Barcode", "Barcode"]);
-            const assetId = String(item?.ID || "").trim();
-            const assetName = String(item?.Name || "").trim();
-            return barcode === selectedValue || assetId === selectedValue || assetName === selectedValue;
-        }) || null;
-
+        const matchingAsset = findMatchingAsset(selectedValue);
         populateAssetFields(matchingAsset);
     }
 
-    function populateAssetFields(asset) {
+    function populateAssetFields(asset, options) {
+        const settings = options || {};
+
         if (!asset) {
             clearAssetFields();
             return;
@@ -87,7 +97,9 @@ $(function() {
         const assetType = asset?.AssetType || {};
         const assetDescription = getCustomFieldValue(asset, ["Asset Description", "Description"]) || String(asset?.Name || assetType?.Name || "").trim();
 
-        $("#customerAssetId").val(excelBarcode || "");
+        if (!settings.preserveSelection) {
+            $("#customerAssetId").val(excelBarcode || "");
+        }
         $("#assertMake").val(assetMake || "");
         $("#assertModel").val(assetModel || "");
         $("#assertSerialNumber").val(assetSerialNumber || "");
@@ -253,8 +265,22 @@ $(function() {
     // });
 
     $("#customerAssetId").on("change", function() {
-        updateCustomerAssetIdOptionLabels(false);
         setCustomerAssetIdMode();
+    });
+
+    $("#customerAssetIdInput").on("input blur", function() {
+        const enteredValue = String($(this).val() || "").trim();
+        if (!enteredValue) {
+            clearAssetFields();
+            return;
+        }
+
+        const matchingAsset = findMatchingAsset(enteredValue);
+        if (matchingAsset) {
+            populateAssetFields(matchingAsset, { preserveSelection: true });
+        } else {
+            clearAssetFields();
+        }
     });
 
     $("#customerAssetId").on("focus", function() {

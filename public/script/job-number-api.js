@@ -48,6 +48,7 @@ $(function () {
     clearSiteSelection($siteSelect);
 
     $("#autoJobBtn").val("");
+    $("#customerAssetIdSelectWrapper").removeClass("col-3")
     $("#customerName").val("").removeClass("is-invalid");
     $("#customerNameInput").val("").removeClass("is-invalid");
     $("#customerNameInputWrapper")
