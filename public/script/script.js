@@ -607,6 +607,31 @@ $("#nextBtn").html('Next <span><i class="fa-solid fa-angle-right"></i></span>&nb
   function validateStep1() {
     let valid = true;
 
+    const selectedAssetValue = String($("#customerAssetId").val() || "").trim();
+    const manualAssetValue = String($("#customerAssetIdInput").val() || "").trim();
+    const hasAssetSelection = selectedAssetValue !== "" && selectedAssetValue !== "other";
+    const hasManualAssetEntry = selectedAssetValue === "other" && manualAssetValue !== "";
+
+    if (!hasAssetSelection && !hasManualAssetEntry) {
+      if (selectedAssetValue === "other") {
+        showError(
+          "#customerAssetIdInput",
+          "#customerAssetIdInputError",
+          "Customer Asset ID or Excel Barcode is required.",
+        );
+      } else {
+        showError(
+          "#customerAssetId",
+          "#customerAssetIdError",
+          "Customer Asset ID or Excel Barcode is required.",
+        );
+      }
+      valid = false;
+    } else {
+      clearError("#customerAssetIdInput", "#customerAssetIdInputError");
+      clearError("#customerAssetId", "#customerAssetIdError");
+    }
+
     if ($("#assetDescriptionSelect").val() === "") {
       showError(
         "#assetDescriptionSelect",
