@@ -456,6 +456,109 @@ $("#nextBtn").html('Next <span><i class="fa-solid fa-angle-right"></i></span>&nb
     if ($error.length) $error.text("");
   }
 
+  function validateCustomerContactFields({ showErrors = true } = {}) {
+    let valid = true;
+    const customerNameValue = String($("#customerName").val() || "").trim();
+    const customerNameInput = String($("#customerNameInput").val() || "").trim();
+    const customerPhoneValue = String($("#customerPhone").val() || "").trim();
+    const customerEmailValue = String($("#customerEmail").val() || "").trim();
+    const isOtherContact = customerNameValue === "other";
+
+    if (isOtherContact) {
+      if (customerNameInput === "") {
+        if (showErrors) {
+          showError(
+            "#customerNameInput",
+            "#customerNameInputError",
+            "Customer Contact Name is required.",
+          );
+        }
+        valid = false;
+      } else if (customerNameInput.length < 2) {
+        if (showErrors) {
+          showError(
+            "#customerNameInput",
+            "#customerNameInputError",
+            "Customer Name must contain a minimum of 2 characters.",
+          );
+        }
+        valid = false;
+      } else if (showErrors) {
+        clearError("#customerNameInput", "#customerNameInputError");
+      }
+
+      if (customerPhoneValue === "") {
+        if (showErrors) {
+          showError("#customerPhone", "#customerPhoneError", "Phone is required.");
+        }
+        valid = false;
+      } else if (!/^\d{8,12}$/.test(customerPhoneValue.replace(/\D/g, ""))) {
+        if (showErrors) {
+          showError("#customerPhone", "#customerPhoneError", "Please enter a valid phone number.");
+        }
+        valid = false;
+      } else if (showErrors) {
+        clearError("#customerPhone", "#customerPhoneError");
+      }
+
+      if (customerEmailValue === "") {
+        if (showErrors) {
+          showError("#customerEmail", "#customerEmailError", "Email is required.");
+        }
+        valid = false;
+      } else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(customerEmailValue)) {
+        if (showErrors) {
+          showError("#customerEmail", "#customerEmailError", "Please enter a valid email address.");
+        }
+        valid = false;
+      } else if (showErrors) {
+        clearError("#customerEmail", "#customerEmailError");
+      }
+
+      if (showErrors) {
+        clearError("#customerName", "#customerNameError");
+      }
+    } else if (customerNameValue === "") {
+      if (showErrors) {
+        showError("#customerName", "#customerNameError", "Customer Contact Name is required.");
+      }
+      valid = false;
+    } else {
+      if (showErrors) {
+        clearError("#customerName", "#customerNameError");
+        clearError("#customerNameInput", "#customerNameInputError");
+      }
+
+      if (customerPhoneValue !== "") {
+        if (!/^\d{8,12}$/.test(customerPhoneValue.replace(/\D/g, ""))) {
+          if (showErrors) {
+            showError("#customerPhone", "#customerPhoneError", "Please enter a valid phone number.");
+          }
+          valid = false;
+        } else if (showErrors) {
+          clearError("#customerPhone", "#customerPhoneError");
+        }
+      } else if (showErrors) {
+        clearError("#customerPhone", "#customerPhoneError");
+      }
+
+      if (customerEmailValue !== "") {
+        if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(customerEmailValue)) {
+          if (showErrors) {
+            showError("#customerEmail", "#customerEmailError", "Please enter a valid email address.");
+          }
+          valid = false;
+        } else if (showErrors) {
+          clearError("#customerEmail", "#customerEmailError");
+        }
+      } else if (showErrors) {
+        clearError("#customerEmail", "#customerEmailError");
+      }
+    }
+
+    return valid;
+  }
+
   function markFaultCardInvalid($card) {
     $card.addClass("fault-card-invalid");
     $card.find(".fault-header").addClass("fault-header-invalid");
@@ -484,65 +587,8 @@ $("#nextBtn").html('Next <span><i class="fa-solid fa-angle-right"></i></span>&nb
     } else {
       clearError("#jobNumber", "#jobNumberError");
     }
-    const customerNameValue = String($("#customerName").val() || "").trim();
-    const customerNameInput = String($("#customerNameInput").val() || "").trim();
-    const customerPhoneValue = String($("#customerPhone").val() || "").trim();
-    const customerEmailValue = String($("#customerEmail").val() || "").trim();
-    const isOtherContact = customerNameValue === "other";
 
-    if (isOtherContact) {
-      if (customerNameInput === "") {
-        showError(
-          "#customerNameInput",
-          "#customerNameInputError",
-          "Customer Contact Name is required.",
-        );
-        valid = false;
-      } else if (customerNameInput.length < 2) {
-        showError(
-          "#customerNameInput",
-          "#customerNameInputError",
-          "Customer Name must contain a minimum of 2 characters.",
-        );
-        valid = false;
-      } else {
-        clearError("#customerNameInput", "#customerNameInputError");
-      }
-
-      if (customerPhoneValue === "") {
-        showError("#customerPhone", "#customerPhoneError", "Phone is required.");
-        valid = false;
-      } else if (!/^\d{8,12}$/.test(customerPhoneValue.replace(/\D/g, ""))) {
-        showError("#customerPhone", "#customerPhoneError", "Please enter a valid phone number.");
-        valid = false;
-      } else {
-        clearError("#customerPhone", "#customerPhoneError");
-      }
-
-      if (customerEmailValue === "") {
-        showError("#customerEmail", "#customerEmailError", "Email is required.");
-        valid = false;
-      } else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(customerEmailValue)) {
-        showError("#customerEmail", "#customerEmailError", "Please enter a valid email address.");
-        valid = false;
-      } else {
-        clearError("#customerEmail", "#customerEmailError");
-      }
-
-      clearError("#customerName", "#customerNameError");
-    } else if (customerNameValue === "") {
-      showError(
-        "#customerName",
-        "#customerNameError",
-        "Customer Contact Name is required.",
-      );
-      valid = false;
-    } else {
-      clearError("#customerName", "#customerNameError");
-      clearError("#customerNameInput", "#customerNameInputError");
-      clearError("#customerPhone", "#customerPhoneError");
-      clearError("#customerEmail", "#customerEmailError");
-    }
+    valid = validateCustomerContactFields({ showErrors: true }) && valid;
 
     if ($("#customerTenancy").val().trim() === "") {
       showError(
@@ -661,6 +707,32 @@ $("#nextBtn").html('Next <span><i class="fa-solid fa-angle-right"></i></span>&nb
 
     return valid;
   }
+
+  $("#customerPhone")
+    .on("input", function () {
+      const normalizedValue = String($(this).val() || "").replace(/\D/g, "").slice(0, 12);
+      $(this).val(normalizedValue);
+
+      if ($("#customerName").val() === "other") {
+        if (normalizedValue === "") {
+          showError("#customerPhone", "#customerPhoneError", "Phone is required.");
+        } else if (!/^\d{8,12}$/.test(normalizedValue)) {
+          showError("#customerPhone", "#customerPhoneError", "Please enter a valid phone number.");
+        } else {
+          clearError("#customerPhone", "#customerPhoneError");
+        }
+      } else {
+        clearError("#customerPhone", "#customerPhoneError");
+      }
+    })
+    .on("blur", function () {
+      validateCustomerContactFields({ showErrors: true });
+    });
+
+  $("#customerEmail")
+    .on("blur", function () {
+      validateCustomerContactFields({ showErrors: true });
+    });
 
   $("#jobNumber")
     .attr("maxlength", "6")

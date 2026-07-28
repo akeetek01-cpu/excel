@@ -43,10 +43,47 @@ $(function () {
     }
   }
 
-  window.clearJobNumberDependentFields = function () {
+  function clearLookupDependentFields() {
     const $siteSelect = $("#customerTenancy");
     clearSiteSelection($siteSelect);
+
     $("#autoJobBtn").val("");
+    $("#customerName").val("").removeClass("is-invalid");
+    $("#customerNameInput").val("").removeClass("is-invalid");
+    $("#customerNameInputWrapper")
+      .addClass("d-none")
+      .removeClass("col-9")
+      .addClass("col-12");
+    $("#customerNameSelectWrapper")
+      .removeClass("col-3")
+      .addClass("col-12");
+    $("#customerPhone").val("").removeClass("is-invalid");
+    $("#customerEmail").val("").removeClass("is-invalid");
+    $("#customerNameError, #customerNameInputError, #customerPhoneError, #customerEmailError").text("");
+
+    $("#customerAssetId").val("");
+    $("#customerAssetIdInput").val("").removeClass("is-invalid");
+    $("#customerAssetIdInputWrapper").addClass("d-none");
+    $("#customerAssetIdSelectWrapper").removeClass("d-none");
+    $("#customerAssetIdInputError").text("");
+
+    $("#assetDescriptionInput").val("").removeClass("is-invalid");
+    $("#assetDescriptionInputError").text("");
+    $("#assertMake").val("").removeClass("is-invalid");
+    $("#assertModel").val("").removeClass("is-invalid");
+    $("#assertSerialNumber").val("").removeClass("is-invalid");
+    $("#assetLocation").val("").removeClass("is-invalid");
+    $("#assetLocationError, #assetLocationInputError").text("");
+    $("#assetLocationInput").val("").addClass("d-none");
+
+    $("#siteContractName").text("");
+    window.leadCaptureLookup = {};
+    window.pendingCustomerContactId = "";
+    window.customerContactsById = {};
+  }
+
+  window.clearJobNumberDependentFields = function () {
+    clearLookupDependentFields();
   };
 
   // populate sites and optionally select a default by ID or name
@@ -91,7 +128,12 @@ $(function () {
   clearSiteSelection($customerTenancy);
 
   window.handleJobNumberCompleteApi = function (value) {
-    if (!value) return;
+    if (!value) {
+      clearLookupDependentFields();
+      return;
+    }
+
+    clearLookupDependentFields();
 
     getJobData(value)
       .done(function (response) {
@@ -150,6 +192,7 @@ $(function () {
       })
       .fail(function (jqXHR, textStatus, errorThrown) {
         console.error("Job lookup failed:", textStatus, errorThrown);
+        clearLookupDependentFields();
       });
   };
 });
