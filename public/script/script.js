@@ -373,22 +373,23 @@ $("#nextBtn").html('Next <span><i class="fa-solid fa-angle-right"></i></span>&nb
 
   function completeCreateNewLeadChoice(preserveCustomerDetails) {
     dismissCustomDialog();
-
-    submitJob({
-      onSuccess: function () {
-        resetWizard({ preserveCustomerDetails: !!preserveCustomerDetails });
-      },
-      onError: function () {
-        showAlertDialog("Failed to create lead. Please try again. Staff not found.");
-        //resetWizard({ preserveCustomerDetails: !!preserveCustomerDetails });
-      },
-    });
+    if (preserveCustomerDetails) {
+      submitJob({
+        onSuccess: function () {
+          resetWizard({ preserveCustomerDetails: !!preserveCustomerDetails });
+        },
+        onError: function () {
+          showAlertDialog("Failed to create lead. Please try again. Staff not found.");
+          //resetWizard({ preserveCustomerDetails: !!preserveCustomerDetails });
+        },
+      });
+    }
   }
 
   function showCreateNewConfirm() {
     showCustomDialog({
       title: "Create New Lead?",
-      message: "Do you want to keep the customer details and start a new lead with the rest cleared?",
+      message: "Do you want to create other lead for the same Job Number ?",
       confirmText: "Yes",
       cancelText: "No",
       showCancel: true,
@@ -456,6 +457,109 @@ $("#nextBtn").html('Next <span><i class="fa-solid fa-angle-right"></i></span>&nb
     if ($error.length) $error.text("");
   }
 
+  function validateCustomerContactFields({ showErrors = true } = {}) {
+    let valid = true;
+    const customerNameValue = String($("#customerName").val() || "").trim();
+    const customerNameInput = String($("#customerNameInput").val() || "").trim();
+    const customerPhoneValue = String($("#customerPhone").val() || "").trim();
+    const customerEmailValue = String($("#customerEmail").val() || "").trim();
+    const isOtherContact = customerNameValue === "other";
+
+    if (isOtherContact) {
+      if (customerNameInput === "") {
+        if (showErrors) {
+          showError(
+            "#customerNameInput",
+            "#customerNameInputError",
+            "Customer Contact Name is required.",
+          );
+        }
+        valid = false;
+      } else if (customerNameInput.length < 2) {
+        if (showErrors) {
+          showError(
+            "#customerNameInput",
+            "#customerNameInputError",
+            "Customer Name must contain a minimum of 2 characters.",
+          );
+        }
+        valid = false;
+      } else if (showErrors) {
+        clearError("#customerNameInput", "#customerNameInputError");
+      }
+
+      if (customerPhoneValue === "") {
+        if (showErrors) {
+          showError("#customerPhone", "#customerPhoneError", "Phone is required.");
+        }
+        valid = false;
+      } else if (!/^\d{8,12}$/.test(customerPhoneValue.replace(/\D/g, ""))) {
+        if (showErrors) {
+          showError("#customerPhone", "#customerPhoneError", "Please enter a valid phone number.");
+        }
+        valid = false;
+      } else if (showErrors) {
+        clearError("#customerPhone", "#customerPhoneError");
+      }
+
+      if (customerEmailValue === "") {
+        if (showErrors) {
+          showError("#customerEmail", "#customerEmailError", "Email is required.");
+        }
+        valid = false;
+      } else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(customerEmailValue)) {
+        if (showErrors) {
+          showError("#customerEmail", "#customerEmailError", "Please enter a valid email address.");
+        }
+        valid = false;
+      } else if (showErrors) {
+        clearError("#customerEmail", "#customerEmailError");
+      }
+
+      if (showErrors) {
+        clearError("#customerName", "#customerNameError");
+      }
+    } else if (customerNameValue === "") {
+      if (showErrors) {
+        showError("#customerName", "#customerNameError", "Customer Contact Name is required.");
+      }
+      valid = false;
+    } else {
+      if (showErrors) {
+        clearError("#customerName", "#customerNameError");
+        clearError("#customerNameInput", "#customerNameInputError");
+      }
+
+      if (customerPhoneValue !== "") {
+        if (!/^\d{8,12}$/.test(customerPhoneValue.replace(/\D/g, ""))) {
+          if (showErrors) {
+            showError("#customerPhone", "#customerPhoneError", "Please enter a valid phone number.");
+          }
+          valid = false;
+        } else if (showErrors) {
+          clearError("#customerPhone", "#customerPhoneError");
+        }
+      } else if (showErrors) {
+        clearError("#customerPhone", "#customerPhoneError");
+      }
+
+      if (customerEmailValue !== "") {
+        if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(customerEmailValue)) {
+          if (showErrors) {
+            showError("#customerEmail", "#customerEmailError", "Please enter a valid email address.");
+          }
+          valid = false;
+        } else if (showErrors) {
+          clearError("#customerEmail", "#customerEmailError");
+        }
+      } else if (showErrors) {
+        clearError("#customerEmail", "#customerEmailError");
+      }
+    }
+
+    return valid;
+  }
+
   function markFaultCardInvalid($card) {
     $card.addClass("fault-card-invalid");
     $card.find(".fault-header").addClass("fault-header-invalid");
@@ -484,65 +588,8 @@ $("#nextBtn").html('Next <span><i class="fa-solid fa-angle-right"></i></span>&nb
     } else {
       clearError("#jobNumber", "#jobNumberError");
     }
-    const customerNameValue = String($("#customerName").val() || "").trim();
-    const customerNameInput = String($("#customerNameInput").val() || "").trim();
-    const customerPhoneValue = String($("#customerPhone").val() || "").trim();
-    const customerEmailValue = String($("#customerEmail").val() || "").trim();
-    const isOtherContact = customerNameValue === "other";
 
-    if (isOtherContact) {
-      if (customerNameInput === "") {
-        showError(
-          "#customerNameInput",
-          "#customerNameInputError",
-          "Customer Contact Name is required.",
-        );
-        valid = false;
-      } else if (customerNameInput.length < 2) {
-        showError(
-          "#customerNameInput",
-          "#customerNameInputError",
-          "Customer Name must contain a minimum of 2 characters.",
-        );
-        valid = false;
-      } else {
-        clearError("#customerNameInput", "#customerNameInputError");
-      }
-
-      if (customerPhoneValue === "") {
-        showError("#customerPhone", "#customerPhoneError", "Phone is required.");
-        valid = false;
-      } else if (!/^\d{8,12}$/.test(customerPhoneValue.replace(/\D/g, ""))) {
-        showError("#customerPhone", "#customerPhoneError", "Please enter a valid phone number.");
-        valid = false;
-      } else {
-        clearError("#customerPhone", "#customerPhoneError");
-      }
-
-      if (customerEmailValue === "") {
-        showError("#customerEmail", "#customerEmailError", "Email is required.");
-        valid = false;
-      } else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(customerEmailValue)) {
-        showError("#customerEmail", "#customerEmailError", "Please enter a valid email address.");
-        valid = false;
-      } else {
-        clearError("#customerEmail", "#customerEmailError");
-      }
-
-      clearError("#customerName", "#customerNameError");
-    } else if (customerNameValue === "") {
-      showError(
-        "#customerName",
-        "#customerNameError",
-        "Customer Contact Name is required.",
-      );
-      valid = false;
-    } else {
-      clearError("#customerName", "#customerNameError");
-      clearError("#customerNameInput", "#customerNameInputError");
-      clearError("#customerPhone", "#customerPhoneError");
-      clearError("#customerEmail", "#customerEmailError");
-    }
+    valid = validateCustomerContactFields({ showErrors: true }) && valid;
 
     if ($("#customerTenancy").val().trim() === "") {
       showError(
@@ -560,6 +607,31 @@ $("#nextBtn").html('Next <span><i class="fa-solid fa-angle-right"></i></span>&nb
 
   function validateStep1() {
     let valid = true;
+
+    const selectedAssetValue = String($("#customerAssetId").val() || "").trim();
+    const manualAssetValue = String($("#customerAssetIdInput").val() || "").trim();
+    const hasAssetSelection = selectedAssetValue !== "" && selectedAssetValue !== "other";
+    const hasManualAssetEntry = selectedAssetValue === "other" && manualAssetValue !== "";
+
+    if (!hasAssetSelection && !hasManualAssetEntry) {
+      if (selectedAssetValue === "other") {
+        showError(
+          "#customerAssetIdInput",
+          "#customerAssetIdInputError",
+          "Customer Asset ID or Excel Barcode is required.",
+        );
+      } else {
+        showError(
+          "#customerAssetId",
+          "#customerAssetIdError",
+          "Customer Asset ID or Excel Barcode is required.",
+        );
+      }
+      valid = false;
+    } else {
+      clearError("#customerAssetIdInput", "#customerAssetIdInputError");
+      clearError("#customerAssetId", "#customerAssetIdError");
+    }
 
     if ($("#assetDescriptionSelect").val() === "") {
       showError(
@@ -661,6 +733,32 @@ $("#nextBtn").html('Next <span><i class="fa-solid fa-angle-right"></i></span>&nb
 
     return valid;
   }
+
+  $("#customerPhone")
+    .on("input", function () {
+      const normalizedValue = String($(this).val() || "").replace(/\D/g, "").slice(0, 12);
+      $(this).val(normalizedValue);
+
+      if ($("#customerName").val() === "other") {
+        if (normalizedValue === "") {
+          showError("#customerPhone", "#customerPhoneError", "Phone is required.");
+        } else if (!/^\d{8,12}$/.test(normalizedValue)) {
+          showError("#customerPhone", "#customerPhoneError", "Please enter a valid phone number.");
+        } else {
+          clearError("#customerPhone", "#customerPhoneError");
+        }
+      } else {
+        clearError("#customerPhone", "#customerPhoneError");
+      }
+    })
+    .on("blur", function () {
+      validateCustomerContactFields({ showErrors: true });
+    });
+
+  $("#customerEmail")
+    .on("blur", function () {
+      validateCustomerContactFields({ showErrors: true });
+    });
 
   $("#jobNumber")
     .attr("maxlength", "6")
@@ -1163,7 +1261,7 @@ $("#nextBtn").html('Next <span><i class="fa-solid fa-angle-right"></i></span>&nb
                       </div>
                       <div class="equipment-list mb-2">
                         ${Array.isArray(f.equipmentItems) && f.equipmentItems.length ? f.equipmentItems.map(item => `
-                          <label class="list-group-item d-flex justify-content-between align-items-center added-item" data-name="${item.name}" data-qty="${item.qty}">
+                          <div class="list-group-item d-flex justify-content-between align-items-center added-item" data-name="${item.name}" data-qty="${item.qty}">
                             <span class="d-flex align-items-center gap-1">
                             <small class="text-muted">${item.qty}</small>
                               <span class="item-label">${item.name}</span>
@@ -1171,7 +1269,7 @@ $("#nextBtn").html('Next <span><i class="fa-solid fa-angle-right"></i></span>&nb
                             <button type="button" class="close remove-added-item" aria-label="Close" title="Remove item">
                               <i class="fa-solid fa-xmark" aria-hidden="true"></i>
                             </button>
-                          </label>
+                          </div>
                         `).join('') : ''}
                       </div>
                       <div class="invalid-feedback equipment-error"></div>
@@ -1185,7 +1283,7 @@ $("#nextBtn").html('Next <span><i class="fa-solid fa-angle-right"></i></span>&nb
                       </div>
                       <div class="parts-list mb-2" aria-live="polite">
                         ${Array.isArray(f.partsItems) && f.partsItems.length ? f.partsItems.map(item => `
-                          <label class="list-group-item d-flex justify-content-between align-items-center added-item" data-name="${item.name}" data-qty="${item.qty}">
+                          <div class="list-group-item d-flex justify-content-between align-items-center added-item" data-name="${item.name}" data-qty="${item.qty}">
                             <span class="d-flex align-items-center gap-1">
                               <small class="text-muted">${item.qty}</small>
                               <span class="item-label">${item.name}</span>
@@ -1193,7 +1291,7 @@ $("#nextBtn").html('Next <span><i class="fa-solid fa-angle-right"></i></span>&nb
                             <button type="button" class="close remove-added-item" aria-label="Close" title="Remove item">
                               <i class="fa-solid fa-xmark" aria-hidden="true"></i>
                             </button>
-                          </label>
+                          </div>
                         `).join('') : ''}
                       </div>
                       <div class="invalid-feedback parts-error"></div>
@@ -1413,7 +1511,7 @@ $("#nextBtn").html('Next <span><i class="fa-solid fa-angle-right"></i></span>&nb
       }
     } else {
       jobData.faults[idx].partsItems.push({ name, qty });
-      $list.append(`<label class="list-group-item d-flex justify-content-between align-items-center added-item" data-name="${name}" data-qty="${qty}"><span class="d-flex align-items-center gap-1"><span class="rounded-pill">${qty}</span><span class="item-label">${name}</span></span><button type="button" class="btn-sm remove-added-item" aria-label="Remove item" title="Remove item" style="color: #dc3545;"><i class="fa-solid fa-xmark" aria-hidden="true"></i></button></label>`);
+      $list.append(`<div class="list-group-item d-flex justify-content-between align-items-center added-item" data-name="${name}" data-qty="${qty}"><span class="d-flex align-items-center gap-1"><span class="rounded-pill">${qty}</span><span class="item-label">${name}</span></span><button type="button" class="btn-sm remove-added-item" aria-label="Remove item" title="Remove item" style="color: #dc3545;"><i class="fa-solid fa-xmark" aria-hidden="true"></i></button></div>`);
     }
 
     $card.find('.parts-select').val('');
@@ -1442,7 +1540,7 @@ $("#nextBtn").html('Next <span><i class="fa-solid fa-angle-right"></i></span>&nb
       }
     } else {
       jobData.faults[idx].equipmentItems.push({ name, qty });
-      $list.append(`<label class="list-group-item d-flex justify-content-between align-items-center added-item" data-name="${name}" data-qty="${qty}"><span class="d-flex align-items-center gap-1"><span class="rounded-pill" >${qty}</span><span class="item-label">${name}</span></span><button type="button" class="btn-sm remove-added-item" aria-label="Remove item" title="Remove item" style="color: #dc3545;"><i class="fa-solid fa-xmark" aria-hidden="true"></i></button></label>`);
+      $list.append(`<div class="list-group-item d-flex justify-content-between align-items-center added-item" data-name="${name}" data-qty="${qty}"><span class="d-flex align-items-center gap-1"><span class="rounded-pill" >${qty}</span><span class="item-label">${name}</span></span><button type="button" class="btn-sm remove-added-item" aria-label="Remove item" title="Remove item" style="color: #dc3545;"><i class="fa-solid fa-xmark" aria-hidden="true"></i></button></div>`);
     }
 
     $card.find('.equipment-select').val('');
@@ -1471,7 +1569,7 @@ $("#nextBtn").html('Next <span><i class="fa-solid fa-angle-right"></i></span>&nb
       }
     } else {
       jobData.faults[idx].consumablesItems.push({ name, qty });
-      $list.append(`<label class="list-group-item d-flex justify-content-between align-items-center added-item" data-name="${name}" data-qty="${qty}"><span class="d-flex align-items-center gap-1"><span class="rounded-pill" >${qty}</span><span class="item-label">${name}</span></span><button type="button" class="btn-sm remove-added-item" aria-label="Remove item" title="Remove item" style="color: #dc3545;"><i class="fa-solid fa-xmark" aria-hidden="true"></i></button></label>`);
+      $list.append(`<div class="list-group-item d-flex justify-content-between align-items-center added-item" data-name="${name}" data-qty="${qty}"><span class="d-flex align-items-center gap-1"><span class="rounded-pill" >${qty}</span><span class="item-label">${name}</span></span><button type="button" class="btn-sm remove-added-item" aria-label="Remove item" title="Remove item" style="color: #dc3545;"><i class="fa-solid fa-xmark" aria-hidden="true"></i></button></div>`);
     }
 
     $card.find('.consumables-select').val('');
@@ -1480,14 +1578,18 @@ $("#nextBtn").html('Next <span><i class="fa-solid fa-angle-right"></i></span>&nb
   });
 
   // remove added item
-  $(document).on('click', '.remove-added-item', function () {
-    const $item = $(this).closest('.added-item');
-    const $card = $(this).closest('.fault-card');
+  $(document).on('click', '.remove-added-item', function (event) {
+    event.preventDefault();
+    event.stopPropagation();
+
+    const $button = $(this);
+    const $item = $button.closest('.added-item');
+    const $card = $button.closest('.fault-card');
     const idx = Number($card.data('idx'));
     if (isNaN(idx)) return;
     const name = $item.data('name');
     const qty = Number($item.data('qty'));
-    // determine which list
+
     if ($item.closest('.parts-list').length) {
       jobData.faults[idx].partsItems = (jobData.faults[idx].partsItems || []).filter(i => !(i.name === name && Number(i.qty) === qty));
     } else if ($item.closest('.equipment-list').length) {
@@ -1495,6 +1597,7 @@ $("#nextBtn").html('Next <span><i class="fa-solid fa-angle-right"></i></span>&nb
     } else if ($item.closest('.consumables-list').length) {
       jobData.faults[idx].consumablesItems = (jobData.faults[idx].consumablesItems || []).filter(i => !(i.name === name && Number(i.qty) === qty));
     }
+
     $item.remove();
   });
 
@@ -1519,13 +1622,13 @@ $("#nextBtn").html('Next <span><i class="fa-solid fa-angle-right"></i></span>&nb
   function calculate() {
     const technicians = Number($("#technicians").val() || 0);
     const apprentice = Number($("#apprentice").val() || 0);
-    const tech = technicians + apprentice;
+    const tech = technicians;
     const hrs = Number($("#hours").val() || 0);
-    const totalHours = tech * hrs;
+    const totalHours = (tech+apprentice) * hrs;
     const faults = jobData.faults.length || 0;
 
     $("#statFaults").text(faults || "-");
-    $("#statTech").text(tech || "-");
+    $("#statTech").text(tech+apprentice || "-");
     $("#statHours").text(totalHours || "-");
 
     jobData.estimates.technicians = tech;
@@ -2112,7 +2215,7 @@ $("#nextBtn").html('Next <span><i class="fa-solid fa-angle-right"></i></span>&nb
     }
 
     if (files.length > spaceLeft) {
-      showAlertDialog(`Only ${spaceLeft} more image(s) can be added (max ${MAX_PHOTOS})`);
+      showAlertDialog(`Only ${spaceLeft} more image(s) can be added (Max ${MAX_PHOTOS} images)`);
       clearInput();
       return;
     }
@@ -2364,10 +2467,13 @@ $("#nextBtn").html('Next <span><i class="fa-solid fa-angle-right"></i></span>&nb
     const assetSerialNumber = String(jobData.asset.serialNumber || "").trim();
     const notes = String($("#customerNotes").val() || "").trim();
     const technicianCount = Number(jobData.estimates.technicians || 0);
+    const apprenticeCount = Number(jobData.estimates.apprentice || 0);
     const hours = Number(jobData.estimates.hours || 0);
+    const afterHoursValue = jobData.estimates.afterHours ? "Yes" : "No";
     const costCenterLabel = String(jobData.estimates.costCenterLabel || "").trim();
     const serviceManagerLabel = String($("#serviceManagerSelect option:selected").text() || "").trim();
     const tagLabel = String($("#tagsSelect option:selected").text() || "").trim();
+    const totalHours = Number(jobData.estimates.totalHours || 0);
 
     const userData = (() => {
       try {
@@ -2394,7 +2500,11 @@ $("#nextBtn").html('Next <span><i class="fa-solid fa-angle-right"></i></span>&nb
       ["Asset Model", assetModel],
       ["Asset Serial Number", assetSerialNumber],
       ["Technicians", technicianCount ? String(technicianCount) : ""],
+      ["Apprentice", apprenticeCount ? String(apprenticeCount) : ""],
       ["Hours", hours ? String(hours) : ""],
+      ["Total Technicians", technicianCount + apprenticeCount ? String(technicianCount + apprenticeCount) : ""],
+      ["Total Hours", totalHours ? String(totalHours) : ""],
+      ["After Hours", afterHoursValue],
       ["Cost Center", costCenterLabel],
       ["Service Manager", serviceManagerLabel],
       ["Tag", tagLabel],
@@ -2417,13 +2527,13 @@ $("#nextBtn").html('Next <span><i class="fa-solid fa-angle-right"></i></span>&nb
         .map((item) => `${String(item.name || "").trim()} x ${String(item.qty || "").trim()}`)
         .join(", ");
 
-      if (description) detailRows.push([`Fault ${index + 1} - Description`, description]);
-      if (work) detailRows.push([`Fault ${index + 1} - Work Required`, work]);
-      if (parts) detailRows.push([`Fault ${index + 1} - Parts & Material`, parts]);
-      if (partsItems) detailRows.push([`Fault ${index + 1} - Parts Items`, partsItems]);
-      if (equipment) detailRows.push([`Fault ${index + 1} - Equipment`, equipment]);
-      if (equipmentItems) detailRows.push([`Fault ${index + 1} - Equipment Items`, equipmentItems]);
-      if (consumablesItems) detailRows.push([`Fault ${index + 1} - Consumables`, consumablesItems]);
+      if (description) detailRows.push([`Fault - Description`, description]);
+      if (work) detailRows.push([`Fault - Work Required`, work]);
+      if (parts) detailRows.push([`Fault - Parts & Material`, parts]);
+      if (partsItems) detailRows.push([`Fault - Parts Items`, partsItems]);
+      if (equipment) detailRows.push([`Fault - Equipment`, equipment]);
+      if (equipmentItems) detailRows.push([`Fault - Equipment Items`, equipmentItems]);
+      if (consumablesItems) detailRows.push([`Fault - Consumables`, consumablesItems]);
     });
 
     const detailTable = detailRows.length
