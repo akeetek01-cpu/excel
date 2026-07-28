@@ -373,15 +373,17 @@ $("#nextBtn").html('Next <span><i class="fa-solid fa-angle-right"></i></span>&nb
 
   function completeCreateNewLeadChoice(preserveCustomerDetails) {
     dismissCustomDialog();
-    // submitJob({
-    //   onSuccess: function () {
-    //     resetWizard({ preserveCustomerDetails: !!preserveCustomerDetails });
-    //   },
-    //   onError: function () {
-    //     showAlertDialog("Failed to create lead. Please try again. Staff not found.");
-    //     //resetWizard({ preserveCustomerDetails: !!preserveCustomerDetails });
-    //   },
-    // });
+    if (preserveCustomerDetails) {
+      submitJob({
+        onSuccess: function () {
+          resetWizard({ preserveCustomerDetails: !!preserveCustomerDetails });
+        },
+        onError: function () {
+          showAlertDialog("Failed to create lead. Please try again. Staff not found.");
+          //resetWizard({ preserveCustomerDetails: !!preserveCustomerDetails });
+        },
+      });
+    }
   }
 
   function showCreateNewConfirm() {
@@ -2467,9 +2469,11 @@ $("#nextBtn").html('Next <span><i class="fa-solid fa-angle-right"></i></span>&nb
     const technicianCount = Number(jobData.estimates.technicians || 0);
     const apprenticeCount = Number(jobData.estimates.apprentice || 0);
     const hours = Number(jobData.estimates.hours || 0);
+    const afterHoursValue = jobData.estimates.afterHours ? "Yes" : "No";
     const costCenterLabel = String(jobData.estimates.costCenterLabel || "").trim();
     const serviceManagerLabel = String($("#serviceManagerSelect option:selected").text() || "").trim();
     const tagLabel = String($("#tagsSelect option:selected").text() || "").trim();
+    const totalHours = Number(jobData.estimates.totalHours || 0);
 
     const userData = (() => {
       try {
@@ -2498,6 +2502,9 @@ $("#nextBtn").html('Next <span><i class="fa-solid fa-angle-right"></i></span>&nb
       ["Technicians", technicianCount ? String(technicianCount) : ""],
       ["Apprentice", apprenticeCount ? String(apprenticeCount) : ""],
       ["Hours", hours ? String(hours) : ""],
+      ["Total Technicians", technicianCount + apprenticeCount ? String(technicianCount + apprenticeCount) : ""],
+      ["Total Hours", totalHours ? String(totalHours) : ""],
+      ["After Hours", afterHoursValue],
       ["Cost Center", costCenterLabel],
       ["Service Manager", serviceManagerLabel],
       ["Tag", tagLabel],
@@ -2520,13 +2527,13 @@ $("#nextBtn").html('Next <span><i class="fa-solid fa-angle-right"></i></span>&nb
         .map((item) => `${String(item.name || "").trim()} x ${String(item.qty || "").trim()}`)
         .join(", ");
 
-      if (description) detailRows.push([`Fault ${index + 1} - Description`, description]);
-      if (work) detailRows.push([`Fault ${index + 1} - Work Required`, work]);
-      if (parts) detailRows.push([`Fault ${index + 1} - Parts & Material`, parts]);
-      if (partsItems) detailRows.push([`Fault ${index + 1} - Parts Items`, partsItems]);
-      if (equipment) detailRows.push([`Fault ${index + 1} - Equipment`, equipment]);
-      if (equipmentItems) detailRows.push([`Fault ${index + 1} - Equipment Items`, equipmentItems]);
-      if (consumablesItems) detailRows.push([`Fault ${index + 1} - Consumables`, consumablesItems]);
+      if (description) detailRows.push([`Fault - Description`, description]);
+      if (work) detailRows.push([`Fault - Work Required`, work]);
+      if (parts) detailRows.push([`Fault - Parts & Material`, parts]);
+      if (partsItems) detailRows.push([`Fault - Parts Items`, partsItems]);
+      if (equipment) detailRows.push([`Fault - Equipment`, equipment]);
+      if (equipmentItems) detailRows.push([`Fault - Equipment Items`, equipmentItems]);
+      if (consumablesItems) detailRows.push([`Fault - Consumables`, consumablesItems]);
     });
 
     const detailTable = detailRows.length
