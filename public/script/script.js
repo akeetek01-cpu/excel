@@ -1260,7 +1260,7 @@ $("#nextBtn").html('Next <span><i class="fa-solid fa-angle-right"></i></span>&nb
                       </div>
                       <div class="equipment-list mb-2">
                         ${Array.isArray(f.equipmentItems) && f.equipmentItems.length ? f.equipmentItems.map(item => `
-                          <label class="list-group-item d-flex justify-content-between align-items-center added-item" data-name="${item.name}" data-qty="${item.qty}">
+                          <div class="list-group-item d-flex justify-content-between align-items-center added-item" data-name="${item.name}" data-qty="${item.qty}">
                             <span class="d-flex align-items-center gap-1">
                             <small class="text-muted">${item.qty}</small>
                               <span class="item-label">${item.name}</span>
@@ -1268,7 +1268,7 @@ $("#nextBtn").html('Next <span><i class="fa-solid fa-angle-right"></i></span>&nb
                             <button type="button" class="close remove-added-item" aria-label="Close" title="Remove item">
                               <i class="fa-solid fa-xmark" aria-hidden="true"></i>
                             </button>
-                          </label>
+                          </div>
                         `).join('') : ''}
                       </div>
                       <div class="invalid-feedback equipment-error"></div>
@@ -1282,7 +1282,7 @@ $("#nextBtn").html('Next <span><i class="fa-solid fa-angle-right"></i></span>&nb
                       </div>
                       <div class="parts-list mb-2" aria-live="polite">
                         ${Array.isArray(f.partsItems) && f.partsItems.length ? f.partsItems.map(item => `
-                          <label class="list-group-item d-flex justify-content-between align-items-center added-item" data-name="${item.name}" data-qty="${item.qty}">
+                          <div class="list-group-item d-flex justify-content-between align-items-center added-item" data-name="${item.name}" data-qty="${item.qty}">
                             <span class="d-flex align-items-center gap-1">
                               <small class="text-muted">${item.qty}</small>
                               <span class="item-label">${item.name}</span>
@@ -1290,7 +1290,7 @@ $("#nextBtn").html('Next <span><i class="fa-solid fa-angle-right"></i></span>&nb
                             <button type="button" class="close remove-added-item" aria-label="Close" title="Remove item">
                               <i class="fa-solid fa-xmark" aria-hidden="true"></i>
                             </button>
-                          </label>
+                          </div>
                         `).join('') : ''}
                       </div>
                       <div class="invalid-feedback parts-error"></div>
@@ -1510,7 +1510,7 @@ $("#nextBtn").html('Next <span><i class="fa-solid fa-angle-right"></i></span>&nb
       }
     } else {
       jobData.faults[idx].partsItems.push({ name, qty });
-      $list.append(`<label class="list-group-item d-flex justify-content-between align-items-center added-item" data-name="${name}" data-qty="${qty}"><span class="d-flex align-items-center gap-1"><span class="rounded-pill">${qty}</span><span class="item-label">${name}</span></span><button type="button" class="btn-sm remove-added-item" aria-label="Remove item" title="Remove item" style="color: #dc3545;"><i class="fa-solid fa-xmark" aria-hidden="true"></i></button></label>`);
+      $list.append(`<div class="list-group-item d-flex justify-content-between align-items-center added-item" data-name="${name}" data-qty="${qty}"><span class="d-flex align-items-center gap-1"><span class="rounded-pill">${qty}</span><span class="item-label">${name}</span></span><button type="button" class="btn-sm remove-added-item" aria-label="Remove item" title="Remove item" style="color: #dc3545;"><i class="fa-solid fa-xmark" aria-hidden="true"></i></button></div>`);
     }
 
     $card.find('.parts-select').val('');
@@ -1539,7 +1539,7 @@ $("#nextBtn").html('Next <span><i class="fa-solid fa-angle-right"></i></span>&nb
       }
     } else {
       jobData.faults[idx].equipmentItems.push({ name, qty });
-      $list.append(`<label class="list-group-item d-flex justify-content-between align-items-center added-item" data-name="${name}" data-qty="${qty}"><span class="d-flex align-items-center gap-1"><span class="rounded-pill" >${qty}</span><span class="item-label">${name}</span></span><button type="button" class="btn-sm remove-added-item" aria-label="Remove item" title="Remove item" style="color: #dc3545;"><i class="fa-solid fa-xmark" aria-hidden="true"></i></button></label>`);
+      $list.append(`<div class="list-group-item d-flex justify-content-between align-items-center added-item" data-name="${name}" data-qty="${qty}"><span class="d-flex align-items-center gap-1"><span class="rounded-pill" >${qty}</span><span class="item-label">${name}</span></span><button type="button" class="btn-sm remove-added-item" aria-label="Remove item" title="Remove item" style="color: #dc3545;"><i class="fa-solid fa-xmark" aria-hidden="true"></i></button></div>`);
     }
 
     $card.find('.equipment-select').val('');
@@ -1568,7 +1568,7 @@ $("#nextBtn").html('Next <span><i class="fa-solid fa-angle-right"></i></span>&nb
       }
     } else {
       jobData.faults[idx].consumablesItems.push({ name, qty });
-      $list.append(`<label class="list-group-item d-flex justify-content-between align-items-center added-item" data-name="${name}" data-qty="${qty}"><span class="d-flex align-items-center gap-1"><span class="rounded-pill" >${qty}</span><span class="item-label">${name}</span></span><button type="button" class="btn-sm remove-added-item" aria-label="Remove item" title="Remove item" style="color: #dc3545;"><i class="fa-solid fa-xmark" aria-hidden="true"></i></button></label>`);
+      $list.append(`<div class="list-group-item d-flex justify-content-between align-items-center added-item" data-name="${name}" data-qty="${qty}"><span class="d-flex align-items-center gap-1"><span class="rounded-pill" >${qty}</span><span class="item-label">${name}</span></span><button type="button" class="btn-sm remove-added-item" aria-label="Remove item" title="Remove item" style="color: #dc3545;"><i class="fa-solid fa-xmark" aria-hidden="true"></i></button></div>`);
     }
 
     $card.find('.consumables-select').val('');
@@ -1577,14 +1577,18 @@ $("#nextBtn").html('Next <span><i class="fa-solid fa-angle-right"></i></span>&nb
   });
 
   // remove added item
-  $(document).on('click', '.remove-added-item', function () {
-    const $item = $(this).closest('.added-item');
-    const $card = $(this).closest('.fault-card');
+  $(document).on('click', '.remove-added-item', function (event) {
+    event.preventDefault();
+    event.stopPropagation();
+
+    const $button = $(this);
+    const $item = $button.closest('.added-item');
+    const $card = $button.closest('.fault-card');
     const idx = Number($card.data('idx'));
     if (isNaN(idx)) return;
     const name = $item.data('name');
     const qty = Number($item.data('qty'));
-    // determine which list
+
     if ($item.closest('.parts-list').length) {
       jobData.faults[idx].partsItems = (jobData.faults[idx].partsItems || []).filter(i => !(i.name === name && Number(i.qty) === qty));
     } else if ($item.closest('.equipment-list').length) {
@@ -1592,6 +1596,7 @@ $("#nextBtn").html('Next <span><i class="fa-solid fa-angle-right"></i></span>&nb
     } else if ($item.closest('.consumables-list').length) {
       jobData.faults[idx].consumablesItems = (jobData.faults[idx].consumablesItems || []).filter(i => !(i.name === name && Number(i.qty) === qty));
     }
+
     $item.remove();
   });
 
