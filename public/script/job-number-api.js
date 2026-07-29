@@ -28,19 +28,13 @@ $(function () {
   }
 
   function clearSiteSelection($select) {
-    const $emptyOption = $select.find('option[value=""]');
-
-    if ($emptyOption.length) {
-      $select.find("option").prop("selected", false);
-      $emptyOption.prop("selected", true);
-      $select.val("");
+    if (!$select || !$select.length) {
       return;
     }
 
-    $select.find("option").prop("selected", false);
-    if ($select[0]) {
-      $select[0].selectedIndex = -1;
-    }
+    $select.empty().append(new Option("Select site", ""));
+    $select.append(new Option("Other", "Other"));
+    $select.val("");
   }
 
   function clearLookupDependentFields() {
@@ -92,7 +86,7 @@ $(function () {
     const $select = $("#customerTenancy");
     const currentValue = $select.val();
 
-    $select.find("option").not(":first").remove();
+    $select.find("option").remove();
 
     if (Array.isArray(sites) && sites.length) {
       const sortedSites = [...sites]
@@ -112,6 +106,13 @@ $(function () {
     const otherOption = $select.find('option[value="Other"]');
     if (!otherOption.length) {
       $select.append(new Option("Other", "Other"));
+    }
+
+    if (!sites || !sites.length) {
+      $select.empty().append(new Option("Select site", ""));
+      $select.append(new Option("Other", "Other"));
+      $select.val("");
+      return;
     }
 
     // prefer current selection if it matches; otherwise try defaultSiteId (ID or name)

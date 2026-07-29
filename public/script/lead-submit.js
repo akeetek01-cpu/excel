@@ -122,7 +122,7 @@
 
         console.log(response);
         if (window.alert) {
-          window.alert("Lead created successfully.");
+          showAlertDialogSuccess("Lead created successfully.");
         }
       })
       .fail(function (xhr, status, error) {

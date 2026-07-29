@@ -362,7 +362,16 @@ $("#nextBtn").html('Next <span><i class="fa-solid fa-angle-right"></i></span>&nb
     $("#createNewConfirmModal").css("display", "flex");
   }
 
-  function showAlertDialog(message, title = "Successful!") {
+  function showAlertDialog(message, title = "Notice") {
+    showCustomDialog({
+      title,
+      message,
+      confirmText: "OK",
+      showCancel: false,
+    });
+  }
+
+  function showAlertDialogSuccess(message, title = "Successful!") {
     showCustomDialog({
       title,
       message,
@@ -2646,7 +2655,7 @@ $("#nextBtn").html('Next <span><i class="fa-solid fa-angle-right"></i></span>&nb
           if (leadId && hasPhotos && typeof window.uploadLeadAttachments === "function") {
             window.uploadLeadAttachments(leadId, photoFiles, {
               onComplete: function () {
-                showAlertDialog("Lead created successfully.");
+                showAlertDialogSuccess("Lead created successfully.");
               },
               onError: function (error) {
                 console.error("Lead attachment upload failed:", error);
@@ -2655,7 +2664,7 @@ $("#nextBtn").html('Next <span><i class="fa-solid fa-angle-right"></i></span>&nb
             });
           } else {
             // No photos attached or upload function unavailable
-            showAlertDialog("Lead created successfully.");
+            showAlertDialogSuccess("Lead created successfully.");
           }
           
           if (typeof onSuccess === "function") {
