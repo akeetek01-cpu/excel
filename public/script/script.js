@@ -146,7 +146,7 @@ $(function () {
     } else {
              $("#nextBtn").removeClass("submit-btn");
 // $("#nextBtn").html("Next <span><i class=\"fa-solid fa-angle-right\"></i> </span>   Asset & Fault");    }
-$("#nextBtn").html('Next <span><i class="fa-solid fa-angle-right"></i></span>&nbsp;&nbsp;Asset & Faults');}
+$("#nextBtn").html('Next <span><i class="fa-solid fa-angle-right"></i></span>&nbsp;&nbsp;Asset & Fault');}
     $("#createNewBtn").toggle(idx === 2);
   }
 
@@ -362,7 +362,7 @@ $("#nextBtn").html('Next <span><i class="fa-solid fa-angle-right"></i></span>&nb
     $("#createNewConfirmModal").css("display", "flex");
   }
 
-  function showAlertDialog(message, title = "Notice") {
+  function showAlertDialog(message, title = "Successful!") {
     showCustomDialog({
       title,
       message,
@@ -389,7 +389,7 @@ $("#nextBtn").html('Next <span><i class="fa-solid fa-angle-right"></i></span>&nb
   function showCreateNewConfirm() {
     showCustomDialog({
       title: "Create New Lead?",
-      message: "Do you want to create other lead for the same Job Number ?",
+      message: "Do you want to create another lead for the same Job Number?",
       confirmText: "Yes",
       cancelText: "No",
       showCancel: true,

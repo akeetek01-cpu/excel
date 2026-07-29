@@ -561,9 +561,13 @@ textarea {
     color: gray;
   /* margin-top: 5px; */
 }
-#backBtn, #createNewBtn{
+#backBtn, #createNewBtn, .btn-border{
         border: 1px solid #12c8c0;
-    background: transparent;
+        background: transparent;
+}
+
+.confirm-no{
+  color: black;
 }
 .modal-content {
     color: #000 !important;

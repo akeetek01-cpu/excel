@@ -119,7 +119,35 @@ h2 {
   justify-content: center;
   align-items: center;
   position: relative;
+  background: #12c8c0;
+  color: #fff;
+  border: none;
+  padding: 5px 15px;
+  border-radius: 25px;
+  cursor: pointer;
+  gap: 5px;
 }
+
+.btn2 {
+  background: #09aaa5;
+  color: #fff;
+  font-size: 16px;
+  cursor: pointer;
+  box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  position: relative;
+  background: #12c8c0;
+  color: #fff;
+  border: none;
+  padding: 5px 15px;
+  border-radius: 25px;
+  cursor: pointer;
+  gap: 5px;
+}
+
+
 
 ::placeholder,
 select,
@@ -521,15 +549,6 @@ textarea {
   flex-shrink: 0;
 }
 
-.btn1 {
-  background: #12c8c0;
-  color: #fff;
-  border: none;
-  padding: 5px 15px;
-  border-radius: 25px;
-  cursor: pointer;
-  gap: 5px;
-}
 
 .deleteBtn {
   background: #d9534f;
