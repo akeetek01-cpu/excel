@@ -566,6 +566,10 @@ textarea {
         background: transparent;
 }
 
+.footer-nav-center{
+  justify-content: center !important;
+}
+
 .confirm-no{
   color: black;
 }
@@ -573,9 +577,9 @@ textarea {
     color: #000 !important;
 }
 .submit-btn {
-    padding-left: 20%;
-    margin: 0 9%;
-    padding-right: 20%;
+  padding-left: 10%;
+    /* margin: 0 9%; */
+    padding-right: 10%;
 }
 @media (min-width: 768px) {
   .wizard-card {

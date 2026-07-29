@@ -128,13 +128,13 @@ $(function () {
     // buttons
     if (idx === 0) {
       $("#backBtn").hide().prop("disabled", true);
-      $("#nextButtonContainer").width("100%")
+      $('.footer-nav').addClass('footer-nav-center');
     } else if (idx === 1) {
        $("#backBtn").show().prop("disabled", false);
-      $("#nextButtonContainer").width("auto")
+       $('.footer-nav').removeClass('footer-nav-center');
     } else {
       $("#backBtn").show().prop("disabled", false);
-      $("#nextButtonContainer").width("100%")
+      $('.footer-nav').removeClass('footer-nav-center');
     }
     if (idx === 1) {
        $("#nextBtn").removeClass("submit-btn");
