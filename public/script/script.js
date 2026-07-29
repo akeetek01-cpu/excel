@@ -2756,14 +2756,14 @@ $("#nextBtn").html('Next <span><i class="fa-solid fa-angle-right"></i></span>&nb
         //await new Promise(resolve => setTimeout(resolve, 300));
 
         const canvas = await html2canvas(container, {
-            scale: 2,
+            scale: 1.2,
             useCORS: true,
             backgroundColor: "#ffffff"
         });
 
         document.body.removeChild(container);
 
-        const imgData = canvas.toDataURL("image/png");
+        const imgData = canvas.toDataURL("image/jpeg", 0.85);
 
         const { jsPDF } = window.jspdf;
 
@@ -2772,7 +2772,7 @@ $("#nextBtn").html('Next <span><i class="fa-solid fa-angle-right"></i></span>&nb
         const pdfWidth = 210;
         const pdfHeight = (canvas.height * pdfWidth) / canvas.width;
 
-        pdf.addImage(imgData, "PNG", 0, 0, pdfWidth, pdfHeight);
+        pdf.addImage(imgData, "JPEG", 0, 0, pdfWidth, pdfHeight);
 
         const blob = pdf.output("blob");
 
