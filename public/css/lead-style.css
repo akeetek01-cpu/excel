@@ -307,16 +307,7 @@ textarea {
   display: none;
   font-weight: 600;
 }
-.afterhrs-container {
-  margin-top: 40px;
-  /* padding-left: 20px; */
-  display: flex;
-  align-items: center;
-  justify-content: flex-start;
-  gap: 5px;
-  flex-wrap: nowrap;
-  min-height: 32px;
-}
+
 
 .after-hours-label {
    font-size: 12px;
