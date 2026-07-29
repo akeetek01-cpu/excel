@@ -1,7 +1,9 @@
 $(function () {
   function getJobData(jobNumber) {
     const settings = {
-      url: `${window.SIMPRO_CONFIG.baseUrl}/companies/6/jobs/${jobNumber}`,
+      url: typeof window.SIMPRO_CONFIG?.buildCompanyUrl === "function"
+        ? window.SIMPRO_CONFIG.buildCompanyUrl(`/jobs/${jobNumber}`)
+        : `${window.SIMPRO_CONFIG.baseUrl}/companies/${window.SIMPRO_CONFIG.companyId}/jobs/${jobNumber}`,
       method: "GET",
       timeout: 0,
       headers: {
@@ -15,7 +17,9 @@ $(function () {
 
   function getCompanySites(customerID) {
     const settings = {
-      url: `${window.SIMPRO_CONFIG.baseUrl}/companies/6/customers/companies/${customerID}`,
+      url: typeof window.SIMPRO_CONFIG?.buildCompanyUrl === "function"
+        ? window.SIMPRO_CONFIG.buildCompanyUrl(`/customers/companies/${customerID}`)
+        : `${window.SIMPRO_CONFIG.baseUrl}/companies/${window.SIMPRO_CONFIG.companyId}/customers/companies/${customerID}`,
       method: "GET",
       timeout: 0,
       headers: {

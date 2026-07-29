@@ -317,6 +317,7 @@ textarea {
   margin-bottom: 0;
   white-space: nowrap;
   display: flex;
+  margin-left: 6px;
   align-items: center;
 }
 

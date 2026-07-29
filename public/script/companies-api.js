@@ -347,7 +347,7 @@ $(function() {
 
     function fetchAssetData(siteId) {
         $.ajax({
-            url: `${window.SIMPRO_CONFIG.baseUrl}/companies/6/sites/${siteId}/assets/?search=any&columns=CustomFields,ID,AssetType&pageSize=250&page=1&orderby=Name&limit=100`,
+            url: `${window.SIMPRO_CONFIG.baseUrl}/companies/${window.SIMPRO_CONFIG.companyId}/sites/${siteId}/assets/?search=any&columns=CustomFields,ID,AssetType&pageSize=250&page=1&orderby=Name&limit=100`,
             method: "GET",
             timeout: 0,
             headers: {

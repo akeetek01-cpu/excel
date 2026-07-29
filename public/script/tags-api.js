@@ -1,7 +1,7 @@
 $(function () {
   function loadTags() {
     const settings = {
-      url: `${window.SIMPRO_CONFIG.baseUrl}/companies/6/setup/tags/projects/?search=any&pageSize=100&page=1&orderby=Name&limit=100`,
+      url: `${window.SIMPRO_CONFIG.baseUrl}/companies/${window.SIMPRO_CONFIG.companyId}/setup/tags/projects/?search=any&pageSize=100&page=1&orderby=Name&limit=100`,
       method: "GET",
       timeout: 0,
       headers: {

@@ -54,7 +54,7 @@
 
     const requests = customFields.map((field) => {
       return $.ajax({
-        url: `${baseUrl}/companies/6/leads/${leadId}/customFields/${field.id}`,
+        url: `${baseUrl}/companies/${companyId}/leads/${leadId}/customFields/${field.id}`,
         method: "PATCH",
         timeout: 0,
         headers: {
@@ -72,6 +72,7 @@
     const config = window.SIMPRO_CONFIG || {};
     const baseUrl = String(config.baseUrl || "").trim();
     const authToken = String(config.authToken || "").trim();
+    const companyId = String(config.companyId || "6").trim();
 
     setLeadSubmitLoading(true);
 
@@ -90,7 +91,7 @@
     const requestBody = typeof payload === "string" ? payload : JSON.stringify(payload, null, 2);
 
     const settings = {
-      url: `${baseUrl}/companies/6/leads/`,
+      url: `${baseUrl}/companies/${companyId}/leads/`,
       method: "POST",
       timeout: 0,
       headers: {
