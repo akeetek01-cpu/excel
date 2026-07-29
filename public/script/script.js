@@ -2429,7 +2429,7 @@ $("#nextBtn").html('Next <span><i class="fa-solid fa-angle-right"></i></span>&nb
       const hours = Number($("#hours").val() || 0);
       const totalHours = (technicians + apprentice) * hours;
 
-      jobData.estimates.technicians = technicians + apprentice;
+      jobData.estimates.technicians = technicians;
       jobData.estimates.hours = hours;
       jobData.estimates.totalHours = totalHours;
       jobData.estimates.apprentice = apprentice;
