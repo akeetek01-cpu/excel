@@ -34,9 +34,18 @@ $(function() {
         return "";
     }
 
+    function syncAssetDescriptionReadOnlyState() {
+        assetDescriptionInput.prop("readonly", assetDescriptionInput.hasClass("border-dashed"));
+    }
+
     function clearAssetFields() {
         $("#assertMake, #assertModel, #assertSerialNumber, #assetLocation").val("");
-        assetDescriptionInput.removeClass("border-dashed").prop("readonly", true).val("");
+        assetDescriptionInput.removeClass("border-dashed").val("");
+        syncAssetDescriptionReadOnlyState();
+    }
+
+    function applyAssetDescriptionReadOnlyState() {
+        assetDescriptionInput.prop("readonly", assetDescriptionInput.hasClass("border-dashed"));
     }
 
     function findMatchingAsset(value) {
@@ -64,7 +73,8 @@ $(function() {
             customerAssetIdInputWrapper.removeClass("d-none").removeClass("col-12").addClass("col-9");
             customerAssetIdInput.removeClass("is-invalid").val("");
             clearAssetFields();
-            assetDescriptionInput.removeClass("border-dashed").prop("readonly", false).val("");
+            assetDescriptionInput.removeClass("border-dashed").val("");
+            syncAssetDescriptionReadOnlyState();
             return;
         }
 
@@ -104,7 +114,8 @@ $(function() {
         $("#assertModel").val(assetModel || "");
         $("#assertSerialNumber").val(assetSerialNumber || "");
         $("#assetLocation").val(assetLocation || "");
-        assetDescriptionInput.val(assetDescription || "").addClass("border-dashed").prop("readonly", true);
+        assetDescriptionInput.val(assetDescription || "").addClass("border-dashed");
+        syncAssetDescriptionReadOnlyState();
     }
 
     function updateCustomerAssetIdOptionLabels(showFullLabels) {
@@ -126,17 +137,32 @@ $(function() {
         const customerAssetIdSelect = $("#customerAssetId");
         customerAssetIdSelect.find("option:gt(1)").remove();
 
-        assetDescriptions.forEach(entry => {
-            const asset = assetDetailsByTypeId.get(String(entry.id)) || null;
-            const excelBarcode = getCustomFieldValue(asset, ["EXCEL Barcode", "Excel Asset ID", "Excel Barcode", "Barcode"]);
+        const sortedOptions = assetDescriptions
+            .map(entry => {
+                const asset = assetDetailsByTypeId.get(String(entry.id)) || null;
+                const excelBarcode = getCustomFieldValue(asset, ["EXCEL Barcode", "Excel Asset ID", "Excel Barcode", "Barcode"]);
 
-            if (!excelBarcode) {
-                return;
-            }
+                if (!excelBarcode) {
+                    return null;
+                }
 
-            const label = excelBarcode ? `${excelBarcode} - ${entry.name}` : entry.name;
-            const option = new Option(excelBarcode, excelBarcode);
-            option.dataset.fullLabel = label;
+                const label = excelBarcode ? `${excelBarcode} - ${entry.name}` : entry.name;
+                return {
+                    value: excelBarcode,
+                    label,
+                    fullLabel: label,
+                };
+            })
+            .filter(Boolean)
+            .sort((a, b) => {
+                const valueA = String(a.value || "").trim().toLowerCase();
+                const valueB = String(b.value || "").trim().toLowerCase();
+                return valueA.localeCompare(valueB, undefined, { sensitivity: "base" });
+            });
+
+        sortedOptions.forEach(optionData => {
+            const option = new Option(optionData.value, optionData.value);
+            option.dataset.fullLabel = optionData.fullLabel;
             customerAssetIdSelect.append(option);
         });
 
