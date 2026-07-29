@@ -69,8 +69,8 @@ $(function() {
         const customerAssetIdSelectWrapper = $("#customerAssetIdSelectWrapper");
 
         if (selectedValue === "other") {
-            customerAssetIdSelectWrapper.removeClass("col-12").addClass("col-3");
-            customerAssetIdInputWrapper.removeClass("d-none").removeClass("col-12").addClass("col-9");
+            customerAssetIdSelectWrapper.removeClass("col-12").addClass("col-3-5");
+            customerAssetIdInputWrapper.removeClass("d-none").removeClass("col-12").addClass("col-8-5");
             customerAssetIdInput.removeClass("is-invalid").val("");
             clearAssetFields();
             assetDescriptionInput.removeClass("border-dashed").val("");
@@ -78,8 +78,8 @@ $(function() {
             return;
         }
 
-        customerAssetIdSelectWrapper.removeClass("col-3").addClass("col-12");
-        customerAssetIdInputWrapper.addClass("d-none").removeClass("col-9").addClass("col-12");
+        customerAssetIdSelectWrapper.removeClass("col-3-5").addClass("col-12");
+        customerAssetIdInputWrapper.addClass("d-none").removeClass("col-8-5").addClass("col-12");
         customerAssetIdInput.val("").removeClass("is-invalid");
 
         if (!selectedValue) {

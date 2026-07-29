@@ -42,7 +42,7 @@ $(function () {
     clearSiteSelection($siteSelect);
 
     $("#autoJobBtn").val("");
-    $("#customerAssetIdSelectWrapper").removeClass("col-3")
+    $("#customerAssetIdSelectWrapper").removeClass("col-3-5")
     $("#customerName").val("").removeClass("is-invalid");
     $("#customerNameInput").val("").removeClass("is-invalid");
     $("#customerNameInputWrapper")

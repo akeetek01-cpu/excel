@@ -740,6 +740,15 @@ textarea {
   min-height: 32px;
 }
 
+.col-3-5 {
+    flex: 0 0 29.166%;
+    max-width: 29.166%;
+}
+.col-8-5 {
+  flex: 0 0 70.833333%;
+  max-width: 70.833333%;
+}
+
 @media (max-width: 450px) {
   .afterhrs-container {
     flex-direction: column;
