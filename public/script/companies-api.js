@@ -40,7 +40,10 @@ $(function() {
 
     function clearAssetFields() {
         $("#assertMake, #assertModel, #assertSerialNumber, #assetLocation").val("");
-        assetDescriptionInput.removeClass("border-dashed").val("");
+        assetDescriptionInput
+            .removeClass("border-dashed is-invalid")
+            .val("")
+            .prop("readonly", false);
         syncAssetDescriptionReadOnlyState();
     }
 

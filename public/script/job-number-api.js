@@ -1,9 +1,7 @@
 $(function () {
   function getJobData(jobNumber) {
     const settings = {
-      url: typeof window.SIMPRO_CONFIG?.buildCompanyUrl === "function"
-        ? window.SIMPRO_CONFIG.buildCompanyUrl(`/jobs/${jobNumber}`)
-        : `${window.SIMPRO_CONFIG.baseUrl}/companies/${window.SIMPRO_CONFIG.companyId}/jobs/${jobNumber}`,
+      url: `${window.SIMPRO_CONFIG.baseUrl}/companies/${window.SIMPRO_CONFIG.companyId}/jobs/${jobNumber}`,
       method: "GET",
       timeout: 0,
       headers: {
@@ -17,9 +15,7 @@ $(function () {
 
   function getCompanySites(customerID) {
     const settings = {
-      url: typeof window.SIMPRO_CONFIG?.buildCompanyUrl === "function"
-        ? window.SIMPRO_CONFIG.buildCompanyUrl(`/customers/companies/${customerID}`)
-        : `${window.SIMPRO_CONFIG.baseUrl}/companies/${window.SIMPRO_CONFIG.companyId}/customers/companies/${customerID}`,
+      url: `${window.SIMPRO_CONFIG.baseUrl}/companies/${window.SIMPRO_CONFIG.companyId}/customers/companies/${customerID}`,
       method: "GET",
       timeout: 0,
       headers: {
@@ -60,13 +56,29 @@ $(function () {
     $("#customerEmail").val("").removeClass("is-invalid");
     $("#customerNameError, #customerNameInputError, #customerPhoneError, #customerEmailError").text("");
 
-    $("#customerAssetId").val("");
-    $("#customerAssetIdInput").val("").removeClass("is-invalid");
-    $("#customerAssetIdInputWrapper").addClass("d-none");
-    $("#customerAssetIdSelectWrapper").removeClass("d-none");
-    $("#customerAssetIdInputError").text("");
+    const $customerAssetId = $("#customerAssetId");
+    const $customerAssetIdInput = $("#customerAssetIdInput");
+    const $customerAssetIdInputWrapper = $("#customerAssetIdInputWrapper");
+    const $customerAssetIdSelectWrapper = $("#customerAssetIdSelectWrapper");
+    const $customerAssetIdInputError = $("#customerAssetIdInputError");
+    const $assetDescriptionInput = $("#assetDescriptionInput");
 
-    $("#assetDescriptionInput").val("").removeClass("is-invalid");
+    $customerAssetId.find("option").prop("selected", false);
+    const $placeholderOption = $customerAssetId.find('option[value=""]');
+    if ($placeholderOption.length) {
+      $placeholderOption.prop("selected", true);
+    } else {
+      $customerAssetId.val("");
+    }
+    $customerAssetIdInput.val("").removeClass("is-invalid");
+    $customerAssetIdInputWrapper.addClass("d-none").removeClass("col-8-5 col-9").addClass("col-12");
+    $customerAssetIdSelectWrapper.removeClass("d-none col-3-5 col-3").addClass("col-12");
+    $customerAssetIdInputError.text("");
+
+    $assetDescriptionInput
+      .val("")
+      .removeClass("border-dashed is-invalid")
+      .prop("readonly", false);
     $("#assetDescriptionInputError").text("");
     $("#assertMake").val("").removeClass("is-invalid");
     $("#assertModel").val("").removeClass("is-invalid");
