@@ -1180,7 +1180,7 @@ $("#nextBtn").html('Next <span><i class="fa-solid fa-angle-right"></i></span>&nb
       const items = Array.isArray(window.workRequiredItems) ? window.workRequiredItems : [];
       window.populateWorkRequiredSelects(items);
       if ($card && $card.length) {
-        const selectedValue = $card.find(".work-req").val() || "";
+        const selectedValue = $card.find(".work-req").attr("title") || "";
         if (selectedValue) {
           $card.find(".work-req").val(selectedValue);
         }
@@ -1250,7 +1250,7 @@ $("#nextBtn").html('Next <span><i class="fa-solid fa-angle-right"></i></span>&nb
                 <div class="d-flex justify-content-between align-items-center">
                   <label class="form-label mb-0">Work Required (Select script)</label>
                 </div>
-                <select class="form-select work-req work-required-select" aria-label="Work Required">
+                <select class="form-select work-req work-required-select" aria-label="Work Required" title="${f.work || ""}">
                   <option value="">Select Work Required</option>
                 </select>
                 <div class="invalid-feedback work-req-error"></div>
@@ -1323,9 +1323,9 @@ $("#nextBtn").html('Next <span><i class="fa-solid fa-angle-right"></i></span>&nb
         </div>
       `);
       $list.append($card);
-      if (f.work) {
-        $card.find('.work-req').val(f.work);
-      }
+      // if (f.work) {
+      //   $card.find('.work-req').val(f.work)
+      // }
       refreshToolRecoveryOptions($card);
       refreshWorkRequiredOptions($card);
       updateAiLabelState($card);
