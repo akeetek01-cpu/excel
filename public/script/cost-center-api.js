@@ -1,7 +1,7 @@
 $(function () {
   function loadCostCenters() {
     const settings = {
-      url: `${window.SIMPRO_CONFIG.baseUrl}/companies/6/setup/accounts/costCenters/?search=any&pageSize=50&page=1&limit=10`,
+      url: `${window.SIMPRO_CONFIG.baseUrl}/companies/${window.SIMPRO_CONFIG.companyId}/setup/accounts/costCenters/?search=any&pageSize=50&page=1&limit=10`,
       method: "GET",
       timeout: 0,
       headers: {

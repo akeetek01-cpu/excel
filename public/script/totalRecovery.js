@@ -2,7 +2,7 @@
   // Default settings (can be overridden by passing options to initTotalRecovery)
   const DEFAULT = {
     url:
-      `${window.SIMPRO_CONFIG.baseUrl}/companies/6/catalogs/?search=any&pageSize=250&page=1&Group.ID=21`,
+      `${window.SIMPRO_CONFIG.baseUrl}/companies/${window.SIMPRO_CONFIG.companyId}/catalogs/?search=any&pageSize=250&page=1&Group.ID=21`,
     // url:
     //   `${window.SIMPRO_CONFIG.baseUrl}/companies/6/storageDevices/37/stock/?search=any&pageSize=250&page=1&limit=100`,
     // url:

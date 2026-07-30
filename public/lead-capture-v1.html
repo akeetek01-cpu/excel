@@ -345,10 +345,10 @@
                             style="display:none;"></div>
                         <div id="uploadStatus" class="photo-status mt-2" style="display:none;"></div>
                     </div>
-                    <div class="summary-title mt-3">Review Summary</div>
+                    <div class="summary-title mt-3">Org & Tags</div>
 
                     <div class="summary-estimates">
-                        <div class="cards-row mb-1">
+                        <div class="cards-row mb-1 d-none">
 
 
                             <div class="stat-card d-none">
@@ -393,8 +393,8 @@
                                 </select>
                                 <div id="tagsError" class="invalid-feedback"></div>
                             </div>
-                            <div class="col-6 d-flex align-items-end afterhrs-container">
-                                <label class="after-hours-label mb-2">After Hours (OT)?</label>
+                            <div class="col-6 d-flex align-items-center afterhrs-container">
+                                <label class="after-hours-label">After Hours (OT)?</label>
                                 <div class="form-check form-switch">
                                     <!-- <input class="form-check-input" type="checkbox" id="afterHours"> -->
                                     <label class="switch">
@@ -419,14 +419,14 @@
             <button class="btn1 btn btn-outline-secondary btn-sm" id="backBtn" aria-label="Back">
                 <i class="fa-solid fa-arrow-left"></i>Back
             </button>
-            <div id="nextButtonContainer" class="d-flex justify-content-center align-items-center">
+            
                 <button id="nextBtn" type="button" class="customer-next-btn btn1 btn btn-primary">Next -> Asset &
                     Faults</button>
 
                 <button style="display: none;" type="button" class="btn1 btn btn-outline-secondary btn-sm"
                     id="createNewBtn">+ New</button>
 
-            </div>
+            
 
         </div>
         <!-- <div class="d-flex justify-content-center align-items-center">
@@ -466,8 +466,8 @@
             </div>
             <p id="createNewConfirmModalMessage" style="margin:0 0 16px; color:#555;">Do you want to keep the customer details and start a new lead with the rest cleared?</p>
             <div style="display:flex; justify-content:flex-end; gap:10px;">
-                <button type="button" class="btn btn-outline-secondary confirm-no" style="display:none;">No</button>
-                <button type="button" class="btn btn-primary confirm-yes">OK</button>
+                <button type="button" class="btn btn2 btn-border btn-outline-secondary confirm-no" style="display:none;">No</button>
+                <button type="button" class="btn btn2 btn-primary confirm-yes">OK</button>
             </div>
         </div>
     </div>

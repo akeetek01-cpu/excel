@@ -107,7 +107,7 @@ $(function () {
     }
 
     const settings = {
-      url: `${window.SIMPRO_CONFIG.baseUrl}/companies/6/customers/${customerId}/contacts/?search=any&columns=ID,GivenName,FamilyName,Position,Email,WorkPhone,CellPhone&pageSize=250&page=1&limit=100`,
+      url: `${window.SIMPRO_CONFIG.baseUrl}/companies/${window.SIMPRO_CONFIG.companyId}/customers/${customerId}/contacts/?search=any&columns=ID,GivenName,FamilyName,Position,Email,WorkPhone,CellPhone&pageSize=250&page=1&limit=100`,
       method: "GET",
       timeout: 0,
       headers: {

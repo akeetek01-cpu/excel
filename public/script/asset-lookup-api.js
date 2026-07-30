@@ -98,7 +98,7 @@ $(function () {
     }
 
     const settings = {
-      url: `${window.SIMPRO_CONFIG.baseUrl}/companies/6/sites/${siteId}/assets/?search=any&columns=CustomFields,ID,AssetType&pageSize=100&page=1&orderby=Name&limit=100&CustomFields.Value=${encodeURIComponent(normalizedValue)}`,
+      url: `${window.SIMPRO_CONFIG.baseUrl}/companies/${window.SIMPRO_CONFIG.companyId}/sites/${siteId}/assets/?search=any&columns=CustomFields,ID,AssetType&pageSize=100&page=1&orderby=Name&limit=100&CustomFields.Value=${encodeURIComponent(normalizedValue)}`,
       method: "GET",
       timeout: 0,
       headers: {

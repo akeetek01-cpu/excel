@@ -1,7 +1,9 @@
 $(function () {
   function getJobData(jobNumber) {
     const settings = {
-      url: `${window.SIMPRO_CONFIG.baseUrl}/companies/6/jobs/${jobNumber}`,
+      url: typeof window.SIMPRO_CONFIG?.buildCompanyUrl === "function"
+        ? window.SIMPRO_CONFIG.buildCompanyUrl(`/jobs/${jobNumber}`)
+        : `${window.SIMPRO_CONFIG.baseUrl}/companies/${window.SIMPRO_CONFIG.companyId}/jobs/${jobNumber}`,
       method: "GET",
       timeout: 0,
       headers: {
@@ -15,7 +17,9 @@ $(function () {
 
   function getCompanySites(customerID) {
     const settings = {
-      url: `${window.SIMPRO_CONFIG.baseUrl}/companies/6/customers/companies/${customerID}`,
+      url: typeof window.SIMPRO_CONFIG?.buildCompanyUrl === "function"
+        ? window.SIMPRO_CONFIG.buildCompanyUrl(`/customers/companies/${customerID}`)
+        : `${window.SIMPRO_CONFIG.baseUrl}/companies/${window.SIMPRO_CONFIG.companyId}/customers/companies/${customerID}`,
       method: "GET",
       timeout: 0,
       headers: {
@@ -28,19 +32,13 @@ $(function () {
   }
 
   function clearSiteSelection($select) {
-    const $emptyOption = $select.find('option[value=""]');
-
-    if ($emptyOption.length) {
-      $select.find("option").prop("selected", false);
-      $emptyOption.prop("selected", true);
-      $select.val("");
+    if (!$select || !$select.length) {
       return;
     }
 
-    $select.find("option").prop("selected", false);
-    if ($select[0]) {
-      $select[0].selectedIndex = -1;
-    }
+    $select.empty().append(new Option("Select site", ""));
+    $select.append(new Option("Other", "Other"));
+    $select.val("");
   }
 
   function clearLookupDependentFields() {
@@ -48,7 +46,7 @@ $(function () {
     clearSiteSelection($siteSelect);
 
     $("#autoJobBtn").val("");
-    $("#customerAssetIdSelectWrapper").removeClass("col-3")
+    $("#customerAssetIdSelectWrapper").removeClass("col-3-5")
     $("#customerName").val("").removeClass("is-invalid");
     $("#customerNameInput").val("").removeClass("is-invalid");
     $("#customerNameInputWrapper")
@@ -92,7 +90,7 @@ $(function () {
     const $select = $("#customerTenancy");
     const currentValue = $select.val();
 
-    $select.find("option").not(":first").remove();
+    $select.find("option").remove();
 
     if (Array.isArray(sites) && sites.length) {
       const sortedSites = [...sites]
@@ -112,6 +110,13 @@ $(function () {
     const otherOption = $select.find('option[value="Other"]');
     if (!otherOption.length) {
       $select.append(new Option("Other", "Other"));
+    }
+
+    if (!sites || !sites.length) {
+      $select.empty().append(new Option("Select site", ""));
+      $select.append(new Option("Other", "Other"));
+      $select.val("");
+      return;
     }
 
     // prefer current selection if it matches; otherwise try defaultSiteId (ID or name)

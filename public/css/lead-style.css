@@ -307,16 +307,7 @@ textarea {
   display: none;
   font-weight: 600;
 }
-.afterhrs-container {
-  margin-top: 40px;
-  /* padding-left: 20px; */
-  display: flex;
-  align-items: center;
-  justify-content: flex-start;
-  gap: 5px;
-  flex-wrap: nowrap;
-  min-height: 32px;
-}
+
 
 .after-hours-label {
    font-size: 12px;
@@ -326,6 +317,7 @@ textarea {
   margin-bottom: 0;
   white-space: nowrap;
   display: flex;
+  margin-left: 6px;
   align-items: center;
 }
 
@@ -561,17 +553,25 @@ textarea {
     color: gray;
   /* margin-top: 5px; */
 }
-#backBtn, #createNewBtn{
+#backBtn, #createNewBtn, .btn-border{
         border: 1px solid #12c8c0;
-    background: transparent;
+        background: transparent;
+}
+
+.footer-nav-center{
+  justify-content: center !important;
+}
+
+.confirm-no{
+  color: black;
 }
 .modal-content {
     color: #000 !important;
 }
 .submit-btn {
-    padding-left: 20%;
-    margin: 0 9%;
-    padding-right: 20%;
+  padding-left: 10%;
+    /* margin: 0 9%; */
+    padding-right: 10%;
 }
 @media (min-width: 768px) {
   .wizard-card {

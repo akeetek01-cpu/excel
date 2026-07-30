@@ -128,13 +128,13 @@ $(function () {
     // buttons
     if (idx === 0) {
       $("#backBtn").hide().prop("disabled", true);
-      $("#nextButtonContainer").width("100%")
+      $('.footer-nav').addClass('footer-nav-center');
     } else if (idx === 1) {
        $("#backBtn").show().prop("disabled", false);
-      $("#nextButtonContainer").width("auto")
+       $('.footer-nav').removeClass('footer-nav-center');
     } else {
       $("#backBtn").show().prop("disabled", false);
-      $("#nextButtonContainer").width("100%")
+      $('.footer-nav').removeClass('footer-nav-center');
     }
     if (idx === 1) {
        $("#nextBtn").removeClass("submit-btn");
@@ -146,7 +146,7 @@ $(function () {
     } else {
              $("#nextBtn").removeClass("submit-btn");
 // $("#nextBtn").html("Next <span><i class=\"fa-solid fa-angle-right\"></i> </span>   Asset & Fault");    }
-$("#nextBtn").html('Next <span><i class="fa-solid fa-angle-right"></i></span>&nbsp;&nbsp;Asset & Faults');}
+$("#nextBtn").html('Next <span><i class="fa-solid fa-angle-right"></i></span>&nbsp;&nbsp;Asset & Fault');}
     $("#createNewBtn").toggle(idx === 2);
   }
 
@@ -371,6 +371,15 @@ $("#nextBtn").html('Next <span><i class="fa-solid fa-angle-right"></i></span>&nb
     });
   }
 
+  function showAlertDialogSuccess(message, title = "Successful!") {
+    showCustomDialog({
+      title,
+      message,
+      confirmText: "OK",
+      showCancel: false,
+    });
+  }
+
   function completeCreateNewLeadChoice(preserveCustomerDetails) {
     dismissCustomDialog();
     if (preserveCustomerDetails) {
@@ -389,7 +398,7 @@ $("#nextBtn").html('Next <span><i class="fa-solid fa-angle-right"></i></span>&nb
   function showCreateNewConfirm() {
     showCustomDialog({
       title: "Create New Lead?",
-      message: "Do you want to create other lead for the same Job Number ?",
+      message: "Do you want to create another lead for the same Job Number?",
       confirmText: "Yes",
       cancelText: "No",
       showCancel: true,
@@ -2429,7 +2438,7 @@ $("#nextBtn").html('Next <span><i class="fa-solid fa-angle-right"></i></span>&nb
       const hours = Number($("#hours").val() || 0);
       const totalHours = (technicians + apprentice) * hours;
 
-      jobData.estimates.technicians = technicians + apprentice;
+      jobData.estimates.technicians = technicians;
       jobData.estimates.hours = hours;
       jobData.estimates.totalHours = totalHours;
       jobData.estimates.apprentice = apprentice;
@@ -2646,7 +2655,7 @@ $("#nextBtn").html('Next <span><i class="fa-solid fa-angle-right"></i></span>&nb
           if (leadId && hasPhotos && typeof window.uploadLeadAttachments === "function") {
             window.uploadLeadAttachments(leadId, photoFiles, {
               onComplete: function () {
-                showAlertDialog("Lead created successfully.");
+                showAlertDialogSuccess("Lead created successfully.");
               },
               onError: function (error) {
                 console.error("Lead attachment upload failed:", error);
@@ -2655,7 +2664,7 @@ $("#nextBtn").html('Next <span><i class="fa-solid fa-angle-right"></i></span>&nb
             });
           } else {
             // No photos attached or upload function unavailable
-            showAlertDialog("Lead created successfully.");
+            showAlertDialogSuccess("Lead created successfully.");
           }
           
           if (typeof onSuccess === "function") {
@@ -2756,14 +2765,14 @@ $("#nextBtn").html('Next <span><i class="fa-solid fa-angle-right"></i></span>&nb
         //await new Promise(resolve => setTimeout(resolve, 300));
 
         const canvas = await html2canvas(container, {
-            scale: 2,
+            scale: 1.2,
             useCORS: true,
             backgroundColor: "#ffffff"
         });
 
         document.body.removeChild(container);
 
-        const imgData = canvas.toDataURL("image/png");
+        const imgData = canvas.toDataURL("image/jpeg", 0.85);
 
         const { jsPDF } = window.jspdf;
 
@@ -2772,7 +2781,7 @@ $("#nextBtn").html('Next <span><i class="fa-solid fa-angle-right"></i></span>&nb
         const pdfWidth = 210;
         const pdfHeight = (canvas.height * pdfWidth) / canvas.width;
 
-        pdf.addImage(imgData, "PNG", 0, 0, pdfWidth, pdfHeight);
+        pdf.addImage(imgData, "JPEG", 0, 0, pdfWidth, pdfHeight);
 
         const blob = pdf.output("blob");
 

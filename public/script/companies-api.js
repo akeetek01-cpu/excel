@@ -34,9 +34,18 @@ $(function() {
         return "";
     }
 
+    function syncAssetDescriptionReadOnlyState() {
+        assetDescriptionInput.prop("readonly", assetDescriptionInput.hasClass("border-dashed"));
+    }
+
     function clearAssetFields() {
         $("#assertMake, #assertModel, #assertSerialNumber, #assetLocation").val("");
-        assetDescriptionInput.removeClass("border-dashed").prop("readonly", true).val("");
+        assetDescriptionInput.removeClass("border-dashed").val("");
+        syncAssetDescriptionReadOnlyState();
+    }
+
+    function applyAssetDescriptionReadOnlyState() {
+        assetDescriptionInput.prop("readonly", assetDescriptionInput.hasClass("border-dashed"));
     }
 
     function findMatchingAsset(value) {
@@ -60,16 +69,17 @@ $(function() {
         const customerAssetIdSelectWrapper = $("#customerAssetIdSelectWrapper");
 
         if (selectedValue === "other") {
-            customerAssetIdSelectWrapper.removeClass("col-12").addClass("col-3");
-            customerAssetIdInputWrapper.removeClass("d-none").removeClass("col-12").addClass("col-9");
+            customerAssetIdSelectWrapper.removeClass("col-12").addClass("col-3-5");
+            customerAssetIdInputWrapper.removeClass("d-none").removeClass("col-12").addClass("col-8-5");
             customerAssetIdInput.removeClass("is-invalid").val("");
             clearAssetFields();
-            assetDescriptionInput.removeClass("border-dashed").prop("readonly", false).val("");
+            assetDescriptionInput.removeClass("border-dashed").val("");
+            syncAssetDescriptionReadOnlyState();
             return;
         }
 
-        customerAssetIdSelectWrapper.removeClass("col-3").addClass("col-12");
-        customerAssetIdInputWrapper.addClass("d-none").removeClass("col-9").addClass("col-12");
+        customerAssetIdSelectWrapper.removeClass("col-3-5").addClass("col-12");
+        customerAssetIdInputWrapper.addClass("d-none").removeClass("col-8-5").addClass("col-12");
         customerAssetIdInput.val("").removeClass("is-invalid");
 
         if (!selectedValue) {
@@ -104,7 +114,8 @@ $(function() {
         $("#assertModel").val(assetModel || "");
         $("#assertSerialNumber").val(assetSerialNumber || "");
         $("#assetLocation").val(assetLocation || "");
-        assetDescriptionInput.val(assetDescription || "").addClass("border-dashed").prop("readonly", true);
+        assetDescriptionInput.val(assetDescription || "").addClass("border-dashed");
+        syncAssetDescriptionReadOnlyState();
     }
 
     function updateCustomerAssetIdOptionLabels(showFullLabels) {
@@ -126,17 +137,32 @@ $(function() {
         const customerAssetIdSelect = $("#customerAssetId");
         customerAssetIdSelect.find("option:gt(1)").remove();
 
-        assetDescriptions.forEach(entry => {
-            const asset = assetDetailsByTypeId.get(String(entry.id)) || null;
-            const excelBarcode = getCustomFieldValue(asset, ["EXCEL Barcode", "Excel Asset ID", "Excel Barcode", "Barcode"]);
+        const sortedOptions = assetDescriptions
+            .map(entry => {
+                const asset = assetDetailsByTypeId.get(String(entry.id)) || null;
+                const excelBarcode = getCustomFieldValue(asset, ["EXCEL Barcode", "Excel Asset ID", "Excel Barcode", "Barcode"]);
 
-            if (!excelBarcode) {
-                return;
-            }
+                if (!excelBarcode) {
+                    return null;
+                }
 
-            const label = excelBarcode ? `${excelBarcode} - ${entry.name}` : entry.name;
-            const option = new Option(excelBarcode, excelBarcode);
-            option.dataset.fullLabel = label;
+                const label = excelBarcode ? `${excelBarcode} - ${entry.name}` : entry.name;
+                return {
+                    value: excelBarcode,
+                    label,
+                    fullLabel: label,
+                };
+            })
+            .filter(Boolean)
+            .sort((a, b) => {
+                const valueA = String(a.value || "").trim().toLowerCase();
+                const valueB = String(b.value || "").trim().toLowerCase();
+                return valueA.localeCompare(valueB, undefined, { sensitivity: "base" });
+            });
+
+        sortedOptions.forEach(optionData => {
+            const option = new Option(optionData.value, optionData.value);
+            option.dataset.fullLabel = optionData.fullLabel;
             customerAssetIdSelect.append(option);
         });
 
@@ -321,7 +347,7 @@ $(function() {
 
     function fetchAssetData(siteId) {
         $.ajax({
-            url: `${window.SIMPRO_CONFIG.baseUrl}/companies/6/sites/${siteId}/assets/?search=any&columns=CustomFields,ID,AssetType&pageSize=250&page=1&orderby=Name&limit=100`,
+            url: `${window.SIMPRO_CONFIG.baseUrl}/companies/${window.SIMPRO_CONFIG.companyId}/sites/${siteId}/assets/?search=any&columns=CustomFields,ID,AssetType&pageSize=250&page=1&orderby=Name&limit=100`,
             method: "GET",
             timeout: 0,
             headers: {
