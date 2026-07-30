@@ -54,7 +54,7 @@
 
     const requests = customFields.map((field) => {
       return $.ajax({
-        url: `${baseUrl}/companies/${companyId}/leads/${leadId}/customFields/${field.id}`,
+        url: `${baseUrl}/companies/${window.SIMPRO_CONFIG.companyId}/leads/${leadId}/customFields/${field.id}`,
         method: "PATCH",
         timeout: 0,
         headers: {
@@ -91,7 +91,7 @@
     const requestBody = typeof payload === "string" ? payload : JSON.stringify(payload, null, 2);
 
     const settings = {
-      url: `${baseUrl}/companies/${companyId}/leads/`,
+      url: `${baseUrl}/companies/${window.SIMPRO_CONFIG.companyId}/leads/`,
       method: "POST",
       timeout: 0,
       headers: {

@@ -41,7 +41,7 @@
       };
 
       const settings = {
-        url: `${baseUrl}/companies/${companyId}/leads/${leadId}/attachments/files/`,
+        url: `${baseUrl}/companies/${window.SIMPRO_CONFIG.companyId}/leads/${leadId}/attachments/files/`,
         method: "POST",
         timeout: 0,
         headers: {

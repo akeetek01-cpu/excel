@@ -297,7 +297,7 @@ $(function() {
         setCustomerAssetIdMode();
     });
 
-    $("#customerAssetIdInput").on("input blur", function() {
+    $("#customerAssetIdInput").on("input", function() {
         const enteredValue = String($(this).val() || "").trim();
         if (!enteredValue) {
             clearAssetFields();
