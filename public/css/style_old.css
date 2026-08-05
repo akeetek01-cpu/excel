@@ -147,7 +147,7 @@ h2 {
 }
 
 /* Forgot */
-.forgot {
+.forgot, .login{
     margin: 20px 0;
 }
 

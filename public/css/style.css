@@ -218,12 +218,13 @@ textarea {
 }
 
 /* Forgot */
-.forgot {
-  margin: 20px 0;
+.forgot, .login{
+    margin: 12px auto;
 }
 
+
 .forgot a {
-  color: #09aaa5;
+  color: white;
   text-decoration: underline;
 }
 
@@ -260,16 +261,26 @@ textarea {
 
 .back-link {
   display: block;
-  margin-top: 25px;
+  margin-top: 2px;
   color: #17c8c3;
   text-decoration: none;
   font-weight: 600;
 }
 
+.resend-link{
+    white-space: nowrap;
+    color: #17c8c3;
+    text-decoration: none;
+    font-size: 14px;
+    display: none;
+}
 .error {
   color: #ffb4b4;
   margin-top: 15px;
   visibility: hidden;
+}
+.pre-login .error{
+  margin-top: 6px;
 }
 
 .success {

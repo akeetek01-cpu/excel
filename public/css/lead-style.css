@@ -29,9 +29,7 @@
 
 }
 #loginBtn {
-  width: 120px;
   display: block;
-  margin: 0 auto;
 }
 /* Override browser autofill background/color for login inputs */
 #loginForm input:-webkit-autofill,
