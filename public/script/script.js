@@ -2946,6 +2946,11 @@ $(function () {
 
   function buildQuotePayload() {
     const lead = buildLeadPayload();
+    // const tags = [
+    //   ...(Array.isArray(lead.Tags) ? lead.Tags : []),
+    //   lead.Salesperson,
+    //   lead.ProjectManager,
+    // ].filter((value, index, array) => value != null && value !== "" && array.indexOf(value) === index);
     // Reuse most lead fields for quote creation; include Notes and Description
     return Object.assign(
       {},
@@ -2964,8 +2969,11 @@ $(function () {
         // Technicians: lead.Salesperson || 0,
         // Technician: lead.Salesperson || 0,
         LinkedJobID: Number(jobData.customer.jobNumber) || 0,
-        Tags: lead.Tags || [],
         AutoAdjustStatus: !!lead.AutoAdjustStatus,
+        Name:
+          (Array.isArray(jobData.faults)
+            ? jobData.faults.find((fault) => String(fault.work || "").trim())?.work
+            : "") || "",
       },
     );
   }
@@ -3157,7 +3165,7 @@ $(function () {
                   "Quote created successfully and section request sent.",
                 );
               } catch (qerr) {
-                console.error("Quote creation failed:", qerr);
+                //console.error("Quote creation failed:", qerr);
               }
             } else {
               console.warn("submitQuoteToSimpro is not available.");
