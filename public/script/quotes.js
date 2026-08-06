@@ -442,45 +442,38 @@
                       ? [options.laborPayload]
                       : [];
 
-                  if (catalogPayloads.length && sectionCostCenterId > 0) {
-                    requestPromises.push(
-                      createQuoteSectionCatalog(quoteId, sectionId, sectionCostCenterId, catalogPayloads)
-                        .then((catalogResult) => {
-                          console.log("Quote catalog created:", catalogResult);
-                          if (typeof options?.onCatalogSuccess === "function") {
-                            options.onCatalogSuccess(catalogResult);
-                          }
-                        })
-                        .catch((catalogErr) => {
-                          console.error("Quote catalog creation failed:", catalogErr);
-                          if (typeof options?.onCatalogError === "function") {
-                            options.onCatalogError(catalogErr);
-                          }
-                        }),
-                    );
-                  }
-
                   if (laborPayloads.length && sectionCostCenterId > 0) {
-                    // send all labor entries in a single PUT request as an array
-                    requestPromises.push(
-                      createQuoteSectionCostCenterLabor(quoteId, sectionId, sectionCostCenterId, laborPayloads)
-                        .then((laborResult) => {
-                          console.log("Quote labor created:", laborResult);
-                          if (typeof options?.onLaborSuccess === "function") {
-                            options.onLaborSuccess(laborResult);
-                          }
-                        })
-                        .catch((laborErr) => {
-                          console.error("Quote labor creation failed:", laborErr);
-                          if (typeof options?.onLaborError === "function") {
-                            options.onLaborError(laborErr);
-                          }
-                        }),
-                    );
+                    await createQuoteSectionCostCenterLabor(quoteId, sectionId, sectionCostCenterId, laborPayloads)
+                      .then((laborResult) => {
+                        console.log("Quote labor created:", laborResult);
+                        if (typeof options?.onLaborSuccess === "function") {
+                          options.onLaborSuccess(laborResult);
+                        }
+                      })
+                      .catch((laborErr) => {
+                        console.error("Quote labor creation failed:", laborErr);
+                        if (typeof options?.onLaborError === "function") {
+                          options.onLaborError(laborErr);
+                        }
+                      });
+
+                    await new Promise((resolve) => setTimeout(resolve, 1000));
                   }
 
-                  if (requestPromises.length) {
-                    await Promise.all(requestPromises);
+                  if (catalogPayloads.length && sectionCostCenterId > 0) {
+                    await createQuoteSectionCatalog(quoteId, sectionId, sectionCostCenterId, catalogPayloads)
+                      .then((catalogResult) => {
+                        console.log("Quote catalog created:", catalogResult);
+                        if (typeof options?.onCatalogSuccess === "function") {
+                          options.onCatalogSuccess(catalogResult);
+                        }
+                      })
+                      .catch((catalogErr) => {
+                        console.error("Quote catalog creation failed:", catalogErr);
+                        if (typeof options?.onCatalogError === "function") {
+                          options.onCatalogError(catalogErr);
+                        }
+                      });
                   }
                 } else {
                   console.warn("Quote section response did not return a section ID.");
