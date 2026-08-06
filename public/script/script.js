@@ -25,7 +25,7 @@ $(function () {
       make: "",
       model: "",
       serialNumber: "",
-    },  
+    },
     faults: [],
     estimates: {
       technicians: 0,
@@ -128,25 +128,29 @@ $(function () {
     // buttons
     if (idx === 0) {
       $("#backBtn").hide().prop("disabled", true);
-      $('.footer-nav').addClass('footer-nav-center');
+      $(".footer-nav").addClass("footer-nav-center");
     } else if (idx === 1) {
-       $("#backBtn").show().prop("disabled", false);
-       $('.footer-nav').removeClass('footer-nav-center');
+      $("#backBtn").show().prop("disabled", false);
+      $(".footer-nav").removeClass("footer-nav-center");
     } else {
       $("#backBtn").show().prop("disabled", false);
-      $('.footer-nav').removeClass('footer-nav-center');
+      $(".footer-nav").removeClass("footer-nav-center");
     }
     if (idx === 1) {
-       $("#nextBtn").removeClass("submit-btn");
-      $("#nextBtn").html('Next <span><i class="fa-solid fa-angle-right"></i></span>&nbsp;&nbsp;Estimates');
-    }
-    else if (idx === 2) {
+      $("#nextBtn").removeClass("submit-btn");
+      $("#nextBtn").html(
+        'Next <span><i class="fa-solid fa-angle-right"></i></span>&nbsp;&nbsp;Estimates',
+      );
+    } else if (idx === 2) {
       $("#nextBtn").addClass("submit-btn");
       $("#nextBtn").html("Submit");
     } else {
-             $("#nextBtn").removeClass("submit-btn");
-// $("#nextBtn").html("Next <span><i class=\"fa-solid fa-angle-right\"></i> </span>   Asset & Fault");    }
-$("#nextBtn").html('Next <span><i class="fa-solid fa-angle-right"></i></span>&nbsp;&nbsp;Asset & Fault');}
+      $("#nextBtn").removeClass("submit-btn");
+      // $("#nextBtn").html("Next <span><i class=\"fa-solid fa-angle-right\"></i> </span>   Asset & Fault");    }
+      $("#nextBtn").html(
+        'Next <span><i class="fa-solid fa-angle-right"></i></span>&nbsp;&nbsp;Asset & Fault',
+      );
+    }
     $("#createNewBtn").toggle(idx === 2);
   }
 
@@ -172,24 +176,34 @@ $("#nextBtn").html('Next <span><i class="fa-solid fa-angle-right"></i></span>&nb
   }
 
   function resetWizard(options = {}) {
-    const preserveCustomerDetails = !!(options && options.preserveCustomerDetails);
-    const preservedCustomer = preserveCustomerDetails ? {
-      jobNumber: String(jobData.customer.jobNumber || "#jobNumber" in window ? "" : "").trim(),
-      name: String(jobData.customer.name || "").trim(),
-      phone: String(jobData.customer.phone || "").trim(),
-      email: String(jobData.customer.email || "").trim(),
-      tenancy: String(jobData.customer.tenancy || "").trim(),
-      tenancyLabel: String(jobData.customer.tenancyLabel || "").trim(),
-      notes: String(jobData.customer.notes || "").trim(),
-      autoJobBtnValue: String($("#autoJobBtn").val() || "").trim(),
-      customerNameValue: String($("#customerName").val() || "").trim(),
-      customerNameInputValue: String($("#customerNameInput").val() || "").trim(),
-      customerPhoneValue: String($("#customerPhone").val() || "").trim(),
-      customerEmailValue: String($("#customerEmail").val() || "").trim(),
-      customerTenancyValue: String($("#customerTenancy").val() || "").trim(),
-      customerNotesValue: String($("#customerNotes").val() || "").trim(),
-      jobNumberValue: String($("#jobNumber").val() || "").trim(),
-    } : null;
+    const preserveCustomerDetails = !!(
+      options && options.preserveCustomerDetails
+    );
+    const preservedCustomer = preserveCustomerDetails
+      ? {
+          jobNumber: String(
+            jobData.customer.jobNumber || "#jobNumber" in window ? "" : "",
+          ).trim(),
+          name: String(jobData.customer.name || "").trim(),
+          phone: String(jobData.customer.phone || "").trim(),
+          email: String(jobData.customer.email || "").trim(),
+          tenancy: String(jobData.customer.tenancy || "").trim(),
+          tenancyLabel: String(jobData.customer.tenancyLabel || "").trim(),
+          notes: String(jobData.customer.notes || "").trim(),
+          autoJobBtnValue: String($("#autoJobBtn").val() || "").trim(),
+          customerNameValue: String($("#customerName").val() || "").trim(),
+          customerNameInputValue: String(
+            $("#customerNameInput").val() || "",
+          ).trim(),
+          customerPhoneValue: String($("#customerPhone").val() || "").trim(),
+          customerEmailValue: String($("#customerEmail").val() || "").trim(),
+          customerTenancyValue: String(
+            $("#customerTenancy").val() || "",
+          ).trim(),
+          customerNotesValue: String($("#customerNotes").val() || "").trim(),
+          jobNumberValue: String($("#jobNumber").val() || "").trim(),
+        }
+      : null;
 
     $("#form-customer")[0].reset();
     $("#faultList").empty();
@@ -205,8 +219,7 @@ $("#nextBtn").html('Next <span><i class="fa-solid fa-angle-right"></i></span>&nb
     $("#customerAssetId").prop("disabled", false);
     $("#autoJobBtn").val("");
 
-    $("#assetDescriptionInput")
-      .removeClass("is-invalid");
+    $("#assetDescriptionInput").removeClass("is-invalid");
     $("#assetLocationInput")
       .val("")
       .addClass("d-none")
@@ -226,7 +239,8 @@ $("#nextBtn").html('Next <span><i class="fa-solid fa-angle-right"></i></span>&nb
     jobData.customer = {
       customerId: "",
       id: "",
-      jobNumber: preservedCustomer?.jobNumber || preservedCustomer?.jobNumberValue || "",
+      jobNumber:
+        preservedCustomer?.jobNumber || preservedCustomer?.jobNumberValue || "",
       name: preservedCustomer?.name || "",
       phone: preservedCustomer?.phone || "",
       email: preservedCustomer?.email || "",
@@ -273,15 +287,22 @@ $("#nextBtn").html('Next <span><i class="fa-solid fa-angle-right"></i></span>&nb
     $("#jsonOutput").text("");
 
     if (preserveCustomerDetails) {
-      $("#jobNumber").val(preservedCustomer?.jobNumberValue || preservedCustomer?.jobNumber || "");
+      $("#jobNumber").val(
+        preservedCustomer?.jobNumberValue || preservedCustomer?.jobNumber || "",
+      );
       $("#autoJobBtn").val(preservedCustomer?.autoJobBtnValue || "");
       $("#customerName").val(preservedCustomer?.customerNameValue || "");
-      $("#customerNameInput").val(preservedCustomer?.customerNameInputValue || "");
+      $("#customerNameInput").val(
+        preservedCustomer?.customerNameInputValue || "",
+      );
       $("#customerPhone").val(preservedCustomer?.customerPhoneValue || "");
       $("#customerEmail").val(preservedCustomer?.customerEmailValue || "");
       $("#customerTenancy").val(preservedCustomer?.customerTenancyValue || "");
       $("#customerNotes").val(preservedCustomer?.customerNotesValue || "");
-      $("#customerNameInputWrapper").toggleClass("d-none", String(preservedCustomer?.customerNameValue || "") !== "other");
+      $("#customerNameInputWrapper").toggleClass(
+        "d-none",
+        String(preservedCustomer?.customerNameValue || "") !== "other",
+      );
       $("#customerNameInputError").text("");
       $("#customerPhoneError").text("");
       $("#customerEmailError").text("");
@@ -349,15 +370,13 @@ $("#nextBtn").html('Next <span><i class="fa-solid fa-angle-right"></i></span>&nb
         }
       });
 
-    $cancelButton
-      .off("click")
-      .on("click", function (e) {
-        e.preventDefault();
-        dismissCustomDialog();
-        if (typeof onCancel === "function") {
-          onCancel();
-        }
-      });
+    $cancelButton.off("click").on("click", function (e) {
+      e.preventDefault();
+      dismissCustomDialog();
+      if (typeof onCancel === "function") {
+        onCancel();
+      }
+    });
 
     $("#createNewConfirmModal").css("display", "flex");
   }
@@ -388,7 +407,9 @@ $("#nextBtn").html('Next <span><i class="fa-solid fa-angle-right"></i></span>&nb
           resetWizard({ preserveCustomerDetails: !!preserveCustomerDetails });
         },
         onError: function () {
-          showAlertDialog("Failed to create lead. Please try again. Staff not found.");
+          showAlertDialog(
+            "Failed to create lead. Please try again. Staff not found.",
+          );
           //resetWizard({ preserveCustomerDetails: !!preserveCustomerDetails });
         },
       });
@@ -418,7 +439,10 @@ $("#nextBtn").html('Next <span><i class="fa-solid fa-angle-right"></i></span>&nb
     $error.text(message);
   }
 
-  function resetAssetFields({ keepAssetDescription = false, keepCustomerAssetId = false } = {}) {
+  function resetAssetFields({
+    keepAssetDescription = false,
+    keepCustomerAssetId = false,
+  } = {}) {
     const clearValue = (selector) => {
       const $field = $(selector);
       if ($field.length) {
@@ -447,7 +471,7 @@ $("#nextBtn").html('Next <span><i class="fa-solid fa-angle-right"></i></span>&nb
     $("#assetLocationInputError").text("");
 
     if (!keepCustomerAssetId) {
-     // clearValue("#customerAssetId");
+      // clearValue("#customerAssetId");
     }
 
     jobData.asset.description = "";
@@ -469,7 +493,9 @@ $("#nextBtn").html('Next <span><i class="fa-solid fa-angle-right"></i></span>&nb
   function validateCustomerContactFields({ showErrors = true } = {}) {
     let valid = true;
     const customerNameValue = String($("#customerName").val() || "").trim();
-    const customerNameInput = String($("#customerNameInput").val() || "").trim();
+    const customerNameInput = String(
+      $("#customerNameInput").val() || "",
+    ).trim();
     const customerPhoneValue = String($("#customerPhone").val() || "").trim();
     const customerEmailValue = String($("#customerEmail").val() || "").trim();
     const isOtherContact = customerNameValue === "other";
@@ -499,12 +525,20 @@ $("#nextBtn").html('Next <span><i class="fa-solid fa-angle-right"></i></span>&nb
 
       if (customerPhoneValue === "") {
         if (showErrors) {
-          showError("#customerPhone", "#customerPhoneError", "Phone is required.");
+          showError(
+            "#customerPhone",
+            "#customerPhoneError",
+            "Phone is required.",
+          );
         }
         valid = false;
       } else if (!/^\d{8,12}$/.test(customerPhoneValue.replace(/\D/g, ""))) {
         if (showErrors) {
-          showError("#customerPhone", "#customerPhoneError", "Please enter a valid phone number.");
+          showError(
+            "#customerPhone",
+            "#customerPhoneError",
+            "Please enter a valid phone number.",
+          );
         }
         valid = false;
       } else if (showErrors) {
@@ -513,12 +547,20 @@ $("#nextBtn").html('Next <span><i class="fa-solid fa-angle-right"></i></span>&nb
 
       if (customerEmailValue === "") {
         if (showErrors) {
-          showError("#customerEmail", "#customerEmailError", "Email is required.");
+          showError(
+            "#customerEmail",
+            "#customerEmailError",
+            "Email is required.",
+          );
         }
         valid = false;
       } else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(customerEmailValue)) {
         if (showErrors) {
-          showError("#customerEmail", "#customerEmailError", "Please enter a valid email address.");
+          showError(
+            "#customerEmail",
+            "#customerEmailError",
+            "Please enter a valid email address.",
+          );
         }
         valid = false;
       } else if (showErrors) {
@@ -530,7 +572,11 @@ $("#nextBtn").html('Next <span><i class="fa-solid fa-angle-right"></i></span>&nb
       }
     } else if (customerNameValue === "") {
       if (showErrors) {
-        showError("#customerName", "#customerNameError", "Customer Contact Name is required.");
+        showError(
+          "#customerName",
+          "#customerNameError",
+          "Customer Contact Name is required.",
+        );
       }
       valid = false;
     } else {
@@ -542,7 +588,11 @@ $("#nextBtn").html('Next <span><i class="fa-solid fa-angle-right"></i></span>&nb
       if (customerPhoneValue !== "") {
         if (!/^\d{8,12}$/.test(customerPhoneValue.replace(/\D/g, ""))) {
           if (showErrors) {
-            showError("#customerPhone", "#customerPhoneError", "Please enter a valid phone number.");
+            showError(
+              "#customerPhone",
+              "#customerPhoneError",
+              "Please enter a valid phone number.",
+            );
           }
           valid = false;
         } else if (showErrors) {
@@ -555,7 +605,11 @@ $("#nextBtn").html('Next <span><i class="fa-solid fa-angle-right"></i></span>&nb
       if (customerEmailValue !== "") {
         if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(customerEmailValue)) {
           if (showErrors) {
-            showError("#customerEmail", "#customerEmailError", "Please enter a valid email address.");
+            showError(
+              "#customerEmail",
+              "#customerEmailError",
+              "Please enter a valid email address.",
+            );
           }
           valid = false;
         } else if (showErrors) {
@@ -618,9 +672,13 @@ $("#nextBtn").html('Next <span><i class="fa-solid fa-angle-right"></i></span>&nb
     let valid = true;
 
     const selectedAssetValue = String($("#customerAssetId").val() || "").trim();
-    const manualAssetValue = String($("#customerAssetIdInput").val() || "").trim();
-    const hasAssetSelection = selectedAssetValue !== "" && selectedAssetValue !== "other";
-    const hasManualAssetEntry = selectedAssetValue === "other" && manualAssetValue !== "";
+    const manualAssetValue = String(
+      $("#customerAssetIdInput").val() || "",
+    ).trim();
+    const hasAssetSelection =
+      selectedAssetValue !== "" && selectedAssetValue !== "other";
+    const hasManualAssetEntry =
+      selectedAssetValue === "other" && manualAssetValue !== "";
 
     if (!hasAssetSelection && !hasManualAssetEntry) {
       if (selectedAssetValue === "other") {
@@ -745,14 +803,24 @@ $("#nextBtn").html('Next <span><i class="fa-solid fa-angle-right"></i></span>&nb
 
   $("#customerPhone")
     .on("input", function () {
-      const normalizedValue = String($(this).val() || "").replace(/\D/g, "").slice(0, 12);
+      const normalizedValue = String($(this).val() || "")
+        .replace(/\D/g, "")
+        .slice(0, 12);
       $(this).val(normalizedValue);
 
       if ($("#customerName").val() === "other") {
         if (normalizedValue === "") {
-          showError("#customerPhone", "#customerPhoneError", "Phone is required.");
+          showError(
+            "#customerPhone",
+            "#customerPhoneError",
+            "Phone is required.",
+          );
         } else if (!/^\d{8,12}$/.test(normalizedValue)) {
-          showError("#customerPhone", "#customerPhoneError", "Please enter a valid phone number.");
+          showError(
+            "#customerPhone",
+            "#customerPhoneError",
+            "Please enter a valid phone number.",
+          );
         } else {
           clearError("#customerPhone", "#customerPhoneError");
         }
@@ -764,10 +832,9 @@ $("#nextBtn").html('Next <span><i class="fa-solid fa-angle-right"></i></span>&nb
       validateCustomerContactFields({ showErrors: true });
     });
 
-  $("#customerEmail")
-    .on("blur", function () {
-      validateCustomerContactFields({ showErrors: true });
-    });
+  $("#customerEmail").on("blur", function () {
+    validateCustomerContactFields({ showErrors: true });
+  });
 
   $("#jobNumber")
     .attr("maxlength", "6")
@@ -906,7 +973,11 @@ $("#nextBtn").html('Next <span><i class="fa-solid fa-angle-right"></i></span>&nb
     if (isOther && value === "") {
       showError("#customerPhone", "#customerPhoneError", "Phone is required.");
     } else if (isOther && !/^\d{8,12}$/.test(value.replace(/\D/g, ""))) {
-      showError("#customerPhone", "#customerPhoneError", "Please enter a valid phone number.");
+      showError(
+        "#customerPhone",
+        "#customerPhoneError",
+        "Please enter a valid phone number.",
+      );
     } else {
       clearError("#customerPhone", "#customerPhoneError");
     }
@@ -919,7 +990,11 @@ $("#nextBtn").html('Next <span><i class="fa-solid fa-angle-right"></i></span>&nb
     if (isOther && value === "") {
       showError("#customerEmail", "#customerEmailError", "Email is required.");
     } else if (isOther && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(value)) {
-      showError("#customerEmail", "#customerEmailError", "Please enter a valid email address.");
+      showError(
+        "#customerEmail",
+        "#customerEmailError",
+        "Please enter a valid email address.",
+      );
     } else {
       clearError("#customerEmail", "#customerEmailError");
     }
@@ -997,7 +1072,11 @@ $("#nextBtn").html('Next <span><i class="fa-solid fa-angle-right"></i></span>&nb
   $("#serviceManagerSelect").on("change blur", function () {
     const value = $(this).val().trim();
     if (value === "") {
-      showError("#serviceManagerSelect", "#serviceManagerError", "Service Manager is required.");
+      showError(
+        "#serviceManagerSelect",
+        "#serviceManagerError",
+        "Service Manager is required.",
+      );
     } else {
       clearError("#serviceManagerSelect", "#serviceManagerError");
     }
@@ -1006,7 +1085,11 @@ $("#nextBtn").html('Next <span><i class="fa-solid fa-angle-right"></i></span>&nb
   $("#costCenterSelect").on("change blur", function () {
     const value = $(this).val().trim();
     if (value === "") {
-      showError("#costCenterSelect", "#costCenterError", "Cost Center is required.");
+      showError(
+        "#costCenterSelect",
+        "#costCenterError",
+        "Cost Center is required.",
+      );
     } else {
       clearError("#costCenterSelect", "#costCenterError");
     }
@@ -1021,41 +1104,45 @@ $("#nextBtn").html('Next <span><i class="fa-solid fa-angle-right"></i></span>&nb
     }
   });
 
-  $("#technicians").on("input", function () {
-    const value = Number($(this).val() || 0);
-    if (!Number.isNaN(value) && value > 0) {
-      $(this).val(Math.min(1000, Math.floor(value)));
-    }
-  }).on("blur", function () {
-    const tech = Number($(this).val() || 0);
-    if (!Number.isInteger(tech) || tech < 1) {
-      showError(
-        "#technicians",
-        "#techniciansError",
-        "No. of technicians must be a positive whole number.",
-      );
-    } else {
-      clearError("#technicians", "#techniciansError");
-    }
-  });
+  $("#technicians")
+    .on("input", function () {
+      const value = Number($(this).val() || 0);
+      if (!Number.isNaN(value) && value > 0) {
+        $(this).val(Math.min(1000, Math.floor(value)));
+      }
+    })
+    .on("blur", function () {
+      const tech = Number($(this).val() || 0);
+      if (!Number.isInteger(tech) || tech < 1) {
+        showError(
+          "#technicians",
+          "#techniciansError",
+          "No. of technicians must be a positive whole number.",
+        );
+      } else {
+        clearError("#technicians", "#techniciansError");
+      }
+    });
 
-  $("#apprentice").on("input", function () {
-    const value = Number($(this).val() || 0);
-    if (!Number.isNaN(value) && value >= 0) {
-      $(this).val(Math.min(1000, Math.floor(value)));
-    }
-  }).on("blur", function () {
-    const apprentice = Number($(this).val() || 0);
-    if (!Number.isInteger(apprentice) || apprentice < 0) {
-      showError(
-        "#apprentice",
-        "#apprenticeError",
-        "No. of apprentices must be a whole number greater than or equal to 0.",
-      );
-    } else {
-      clearError("#apprentice", "#apprenticeError");
-    }
-  });
+  $("#apprentice")
+    .on("input", function () {
+      const value = Number($(this).val() || 0);
+      if (!Number.isNaN(value) && value >= 0) {
+        $(this).val(Math.min(1000, Math.floor(value)));
+      }
+    })
+    .on("blur", function () {
+      const apprentice = Number($(this).val() || 0);
+      if (!Number.isInteger(apprentice) || apprentice < 0) {
+        showError(
+          "#apprentice",
+          "#apprenticeError",
+          "No. of apprentices must be a whole number greater than or equal to 0.",
+        );
+      } else {
+        clearError("#apprentice", "#apprenticeError");
+      }
+    });
 
   $("#hours").on("blur", function () {
     const hrs = Number($(this).val() || 0);
@@ -1169,15 +1256,26 @@ $("#nextBtn").html('Next <span><i class="fa-solid fa-angle-right"></i></span>&nb
   // Faults
   function updateAiLabelState($card) {
     const workVal = ($card.find(".work-req").val() || "").trim();
-    const partsVal = ($card.find(".parts").val() || $card.find('.parts-select').val() || "").trim();
-    const equipmentVal = ($card.find(".equipment").val() || $card.find('.equipment-select').val() || "").trim();
-    const hasAutoFilled = workVal !== "" || partsVal !== "" || equipmentVal !== "";
+    const partsVal = (
+      $card.find(".parts").val() ||
+      $card.find(".parts-select").val() ||
+      ""
+    ).trim();
+    const equipmentVal = (
+      $card.find(".equipment").val() ||
+      $card.find(".equipment-select").val() ||
+      ""
+    ).trim();
+    const hasAutoFilled =
+      workVal !== "" || partsVal !== "" || equipmentVal !== "";
     $card.find(".ai-pre-fill").toggleClass("is-filled", hasAutoFilled);
   }
 
   function refreshWorkRequiredOptions($card) {
     if (window.populateWorkRequiredSelects) {
-      const items = Array.isArray(window.workRequiredItems) ? window.workRequiredItems : [];
+      const items = Array.isArray(window.workRequiredItems)
+        ? window.workRequiredItems
+        : [];
       window.populateWorkRequiredSelects(items);
       if ($card && $card.length) {
         const selectedValue = $card.find(".work-req").attr("title") || "";
@@ -1197,17 +1295,19 @@ $("#nextBtn").html('Next <span><i class="fa-solid fa-angle-right"></i></span>&nb
   }
 
   function refreshToolRecoveryOptions($card) {
-    const $selects = $card && $card.length
-      ? $card.find("select.totalRecovery-select")
-      : $("select.totalRecovery-select");
+    const $selects =
+      $card && $card.length
+        ? $card.find("select.totalRecovery-select")
+        : $("select.totalRecovery-select");
 
     if (!$selects.length) {
       return false;
     }
 
-    const optionsHtml = typeof window.getTotalRecoveryOptionsHtml === "function"
-      ? window.getTotalRecoveryOptionsHtml(window.totalRecoveryItems)
-      : '<option value="">Select equipment</option>';
+    const optionsHtml =
+      typeof window.getTotalRecoveryOptionsHtml === "function"
+        ? window.getTotalRecoveryOptionsHtml(window.totalRecoveryItems)
+        : '<option value="">Select equipment</option>';
 
     $selects.each(function () {
       const $select = $(this);
@@ -1269,8 +1369,13 @@ $("#nextBtn").html('Next <span><i class="fa-solid fa-angle-right"></i></span>&nb
                         <button type="button" class="btn btn-outline-primary add-equipment-btn">Add</button>
                       </div>
                       <div class="equipment-list mb-2">
-                        ${Array.isArray(f.equipmentItems) && f.equipmentItems.length ? f.equipmentItems.map(item => `
-                          <div class="list-group-item d-flex justify-content-between align-items-center added-item" data-name="${item.name}" data-qty="${item.qty}">
+                        ${
+                          Array.isArray(f.equipmentItems) &&
+                          f.equipmentItems.length
+                            ? f.equipmentItems
+                                .map(
+                                  (item) => `
+                          <div class="list-group-item d-flex justify-content-between align-items-center added-item" data-name="${item.name}" data-qty="${item.qty}" data-tool-id="${item.toolId || ""}">
                             <span class="d-flex align-items-center gap-1">
                             <small class="text-muted">${item.qty}</small>
                               <span class="item-label">${item.name}</span>
@@ -1279,7 +1384,11 @@ $("#nextBtn").html('Next <span><i class="fa-solid fa-angle-right"></i></span>&nb
                               <i class="fa-solid fa-xmark" aria-hidden="true"></i>
                             </button>
                           </div>
-                        `).join('') : ''}
+                        `,
+                                )
+                                .join("")
+                            : ""
+                        }
                       </div>
                       <div class="invalid-feedback equipment-error"></div>
                     </div>
@@ -1291,7 +1400,11 @@ $("#nextBtn").html('Next <span><i class="fa-solid fa-angle-right"></i></span>&nb
                         <button type="button" class="btn btn-outline-primary add-part-btn">Add</button>
                       </div>
                       <div class="parts-list mb-2" aria-live="polite">
-                        ${Array.isArray(f.partsItems) && f.partsItems.length ? f.partsItems.map(item => `
+                        ${
+                          Array.isArray(f.partsItems) && f.partsItems.length
+                            ? f.partsItems
+                                .map(
+                                  (item) => `
                           <div class="list-group-item d-flex justify-content-between align-items-center added-item" data-name="${item.name}" data-qty="${item.qty}">
                             <span class="d-flex align-items-center gap-1">
                               <small class="text-muted">${item.qty}</small>
@@ -1301,7 +1414,11 @@ $("#nextBtn").html('Next <span><i class="fa-solid fa-angle-right"></i></span>&nb
                               <i class="fa-solid fa-xmark" aria-hidden="true"></i>
                             </button>
                           </div>
-                        `).join('') : ''}
+                        `,
+                                )
+                                .join("")
+                            : ""
+                        }
                       </div>
                       <div class="invalid-feedback parts-error"></div>
                     </div>
@@ -1462,149 +1579,203 @@ $("#nextBtn").html('Next <span><i class="fa-solid fa-angle-right"></i></span>&nb
     }
   }
 
-  $(document).on('change', '.equipment-select', function () {
-    const $card = $(this).closest('.fault-card');
-    const $qtyInput = $card.find('.equipment-qty');
+  $(document).on("change", ".equipment-select", function () {
+    const $card = $(this).closest(".fault-card");
+    const $qtyInput = $card.find(".equipment-qty");
     syncQtyOnSelection($(this), $qtyInput);
   });
 
-  $(document).on('focus', '.equipment-select, .parts-select', function () {
+  $(document).on("focus", ".equipment-select, .parts-select", function () {
     const $field = $(this);
-    if ($field.is('select')) {
-      $field.val('');
-      $field.find('option[value=""]').prop('selected', true);
+    if ($field.is("select")) {
+      $field.val("");
+      $field.find('option[value=""]').prop("selected", true);
     } else {
-      $field.val('');
+      $field.val("");
     }
   });
 
-  $(document).on('input change', '.parts-select', function () {
-    const $card = $(this).closest('.fault-card');
-    const $qtyInput = $card.find('.parts-qty');
+  $(document).on("input change", ".parts-select", function () {
+    const $card = $(this).closest(".fault-card");
+    const $qtyInput = $card.find(".parts-qty");
     syncQtyOnSelection($(this), $qtyInput);
   });
 
-  $(document).on('change', '.consumables-select', function () {
-    const $card = $(this).closest('.fault-card');
-    const $qtyInput = $card.find('.consumables-qty');
+  $(document).on("change", ".consumables-select", function () {
+    const $card = $(this).closest(".fault-card");
+    const $qtyInput = $card.find(".consumables-qty");
     syncQtyOnSelection($(this), $qtyInput);
   });
 
-  $(document).on('input', '.equipment-qty, .parts-qty, .consumables-qty', function () {
-    limitQtyInput($(this));
-  });
+  $(document).on(
+    "input",
+    ".equipment-qty, .parts-qty, .consumables-qty",
+    function () {
+      limitQtyInput($(this));
+    },
+  );
 
-  $(document).on('blur', '.equipment-qty, .parts-qty, .consumables-qty', function () {
-    clampQtyValue($(this));
-  });
+  $(document).on(
+    "blur",
+    ".equipment-qty, .parts-qty, .consumables-qty",
+    function () {
+      clampQtyValue($(this));
+    },
+  );
 
   // Add item handlers for parts, equipment, consumables
-  $(document).on('click', '.add-part-btn', function () {
-    const $card = $(this).closest('.fault-card');
-    const idx = Number($card.data('idx'));
+  $(document).on("click", ".add-part-btn", function () {
+    const $card = $(this).closest(".fault-card");
+    const idx = Number($card.data("idx"));
     if (isNaN(idx)) return;
-    const name = String($card.find('.parts-select').val() || '').trim();
-    const qty = Math.max(1, Number($card.find('.parts-qty').val() || 1));
+    const name = String($card.find(".parts-select").val() || "").trim();
+    const qty = Math.max(1, Number($card.find(".parts-qty").val() || 1));
     if (!name) return;
 
     jobData.faults[idx].partsItems = jobData.faults[idx].partsItems || [];
-    const existingItem = jobData.faults[idx].partsItems.find(item => String(item.name || '').trim().toLowerCase() === name.toLowerCase());
-    const $list = $card.find('.parts-list');
+    const existingItem = jobData.faults[idx].partsItems.find(
+      (item) =>
+        String(item.name || "")
+          .trim()
+          .toLowerCase() === name.toLowerCase(),
+    );
+    const $list = $card.find(".parts-list");
 
     if (existingItem) {
       existingItem.qty += qty;
-      const $existingLabel = $list.find(`.added-item[data-name="${$.escapeSelector(existingItem.name)}"]`);
+      const $existingLabel = $list.find(
+        `.added-item[data-name="${$.escapeSelector(existingItem.name)}"]`,
+      );
       if ($existingLabel.length) {
-        $existingLabel.attr('data-qty', existingItem.qty);
-        $existingLabel.find('.rounded-pill').text(existingItem.qty);
+        $existingLabel.attr("data-qty", existingItem.qty);
+        $existingLabel.find(".rounded-pill").text(existingItem.qty);
       }
     } else {
       jobData.faults[idx].partsItems.push({ name, qty });
-      $list.append(`<div class="list-group-item d-flex justify-content-between align-items-center added-item" data-name="${name}" data-qty="${qty}"><span class="d-flex align-items-center gap-1"><span class="rounded-pill">${qty}</span><span class="item-label">${name}</span></span><button type="button" class="btn-sm remove-added-item" aria-label="Remove item" title="Remove item" style="color: #dc3545;"><i class="fa-solid fa-xmark" aria-hidden="true"></i></button></div>`);
+      $list.append(
+        `<div class="list-group-item d-flex justify-content-between align-items-center added-item" data-name="${name}" data-qty="${qty}"><span class="d-flex align-items-center gap-1"><span class="rounded-pill">${qty}</span><span class="item-label">${name}</span></span><button type="button" class="btn-sm remove-added-item" aria-label="Remove item" title="Remove item" style="color: #dc3545;"><i class="fa-solid fa-xmark" aria-hidden="true"></i></button></div>`,
+      );
     }
 
-    $card.find('.parts-select').val('');
-    $card.find('.parts-select option[value=""]').prop('selected', true);
-    $card.find('.parts-qty').val(0);
+    $card.find(".parts-select").val("");
+    $card.find('.parts-select option[value=""]').prop("selected", true);
+    $card.find(".parts-qty").val(0);
   });
 
-  $(document).on('click', '.add-equipment-btn', function () {
-    const $card = $(this).closest('.fault-card');
-    const idx = Number($card.data('idx'));
+  $(document).on("click", ".add-equipment-btn", function () {
+    const $card = $(this).closest(".fault-card");
+    const idx = Number($card.data("idx"));
     if (isNaN(idx)) return;
-    const name = String($card.find('.equipment-select').val() || '').trim();
-    const qty = Math.max(1, Number($card.find('.equipment-qty').val() || 1));
+    const name = String($card.find(".equipment-select").val() || "").trim();
+    const $selectedOption = $card.find(".equipment-select option:selected");
+    const toolId = String($selectedOption.attr("data-tool-id") || "").trim();
+    const qty = Math.max(1, Number($card.find(".equipment-qty").val() || 1));
     if (!name) return;
 
-    jobData.faults[idx].equipmentItems = jobData.faults[idx].equipmentItems || [];
-    const existingItem = jobData.faults[idx].equipmentItems.find(item => String(item.name || '').trim().toLowerCase() === name.toLowerCase());
-    const $list = $card.find('.equipment-list');
+    jobData.faults[idx].equipmentItems =
+      jobData.faults[idx].equipmentItems || [];
+    const existingItem = jobData.faults[idx].equipmentItems.find(
+      (item) =>
+        String(item.name || "")
+          .trim()
+          .toLowerCase() === name.toLowerCase() &&
+        String(item.toolId || "").trim() === toolId,
+    );
+    const $list = $card.find(".equipment-list");
 
     if (existingItem) {
       existingItem.qty += qty;
-      const $existingLabel = $list.find(`.added-item[data-name="${$.escapeSelector(existingItem.name)}"]`);
+      const $existingLabel = $list.find(
+        `.added-item[data-name="${$.escapeSelector(existingItem.name)}"][data-tool-id="${$.escapeSelector(String(existingItem.toolId || ""))}"]`,
+      );
       if ($existingLabel.length) {
-        $existingLabel.attr('data-qty', existingItem.qty);
-        $existingLabel.find('.rounded-pill').text(existingItem.qty);
+        $existingLabel.attr("data-qty", existingItem.qty);
+        $existingLabel.find(".rounded-pill").text(existingItem.qty);
       }
     } else {
-      jobData.faults[idx].equipmentItems.push({ name, qty });
-      $list.append(`<div class="list-group-item d-flex justify-content-between align-items-center added-item" data-name="${name}" data-qty="${qty}"><span class="d-flex align-items-center gap-1"><span class="rounded-pill" >${qty}</span><span class="item-label">${name}</span></span><button type="button" class="btn-sm remove-added-item" aria-label="Remove item" title="Remove item" style="color: #dc3545;"><i class="fa-solid fa-xmark" aria-hidden="true"></i></button></div>`);
+      jobData.faults[idx].equipmentItems.push({ name, qty, toolId });
+      $list.append(
+        `<div class="list-group-item d-flex justify-content-between align-items-center added-item" data-name="${name}" data-qty="${qty}" data-tool-id="${toolId}"><span class="d-flex align-items-center gap-1"><span class="rounded-pill" >${qty}</span><span class="item-label">${name}</span></span><button type="button" class="btn-sm remove-added-item" aria-label="Remove item" title="Remove item" style="color: #dc3545;"><i class="fa-solid fa-xmark" aria-hidden="true"></i></button></div>`,
+      );
     }
 
-    $card.find('.equipment-select').val('');
-    $card.find('.equipment-select option[value=""]').prop('selected', true);
-    $card.find('.equipment-qty').val(0);
+    $card.find(".equipment-select").val("");
+    $card.find('.equipment-select option[value=""]').prop("selected", true);
+    $card.find(".equipment-qty").val(0);
   });
 
-  $(document).on('click', '.add-consumable-btn', function () {
-    const $card = $(this).closest('.fault-card');
-    const idx = Number($card.data('idx'));
+  $(document).on("click", ".add-consumable-btn", function () {
+    const $card = $(this).closest(".fault-card");
+    const idx = Number($card.data("idx"));
     if (isNaN(idx)) return;
-    const name = String($card.find('.consumables-select').val() || '').trim();
-    const qty = Math.max(1, Number($card.find('.consumables-qty').val() || 1));
+    const name = String($card.find(".consumables-select").val() || "").trim();
+    const qty = Math.max(1, Number($card.find(".consumables-qty").val() || 1));
     if (!name) return;
 
-    jobData.faults[idx].consumablesItems = jobData.faults[idx].consumablesItems || [];
-    const existingItem = jobData.faults[idx].consumablesItems.find(item => String(item.name || '').trim().toLowerCase() === name.toLowerCase());
-    const $list = $card.find('.consumables-list');
+    jobData.faults[idx].consumablesItems =
+      jobData.faults[idx].consumablesItems || [];
+    const existingItem = jobData.faults[idx].consumablesItems.find(
+      (item) =>
+        String(item.name || "")
+          .trim()
+          .toLowerCase() === name.toLowerCase(),
+    );
+    const $list = $card.find(".consumables-list");
 
     if (existingItem) {
       existingItem.qty += qty;
-      const $existingLabel = $list.find(`.added-item[data-name="${$.escapeSelector(existingItem.name)}"]`);
+      const $existingLabel = $list.find(
+        `.added-item[data-name="${$.escapeSelector(existingItem.name)}"]`,
+      );
       if ($existingLabel.length) {
-        $existingLabel.attr('data-qty', existingItem.qty);
-        $existingLabel.find('.rounded-pill').text(existingItem.qty);
+        $existingLabel.attr("data-qty", existingItem.qty);
+        $existingLabel.find(".rounded-pill").text(existingItem.qty);
       }
     } else {
       jobData.faults[idx].consumablesItems.push({ name, qty });
-      $list.append(`<div class="list-group-item d-flex justify-content-between align-items-center added-item" data-name="${name}" data-qty="${qty}"><span class="d-flex align-items-center gap-1"><span class="rounded-pill" >${qty}</span><span class="item-label">${name}</span></span><button type="button" class="btn-sm remove-added-item" aria-label="Remove item" title="Remove item" style="color: #dc3545;"><i class="fa-solid fa-xmark" aria-hidden="true"></i></button></div>`);
+      $list.append(
+        `<div class="list-group-item d-flex justify-content-between align-items-center added-item" data-name="${name}" data-qty="${qty}"><span class="d-flex align-items-center gap-1"><span class="rounded-pill" >${qty}</span><span class="item-label">${name}</span></span><button type="button" class="btn-sm remove-added-item" aria-label="Remove item" title="Remove item" style="color: #dc3545;"><i class="fa-solid fa-xmark" aria-hidden="true"></i></button></div>`,
+      );
     }
 
-    $card.find('.consumables-select').val('');
-    $card.find('.consumables-select option[value=""]').prop('selected', true);
-    $card.find('.consumables-qty').val(0);
+    $card.find(".consumables-select").val("");
+    $card.find('.consumables-select option[value=""]').prop("selected", true);
+    $card.find(".consumables-qty").val(0);
   });
 
   // remove added item
-  $(document).on('click', '.remove-added-item', function (event) {
+  $(document).on("click", ".remove-added-item", function (event) {
     event.preventDefault();
     event.stopPropagation();
 
     const $button = $(this);
-    const $item = $button.closest('.added-item');
-    const $card = $button.closest('.fault-card');
-    const idx = Number($card.data('idx'));
+    const $item = $button.closest(".added-item");
+    const $card = $button.closest(".fault-card");
+    const idx = Number($card.data("idx"));
     if (isNaN(idx)) return;
-    const name = $item.data('name');
-    const qty = Number($item.data('qty'));
+    const name = $item.data("name");
+    const qty = Number($item.data("qty"));
 
-    if ($item.closest('.parts-list').length) {
-      jobData.faults[idx].partsItems = (jobData.faults[idx].partsItems || []).filter(i => !(i.name === name && Number(i.qty) === qty));
-    } else if ($item.closest('.equipment-list').length) {
-      jobData.faults[idx].equipmentItems = (jobData.faults[idx].equipmentItems || []).filter(i => !(i.name === name && Number(i.qty) === qty));
-    } else if ($item.closest('.consumables-list').length) {
-      jobData.faults[idx].consumablesItems = (jobData.faults[idx].consumablesItems || []).filter(i => !(i.name === name && Number(i.qty) === qty));
+    if ($item.closest(".parts-list").length) {
+      jobData.faults[idx].partsItems = (
+        jobData.faults[idx].partsItems || []
+      ).filter((i) => !(i.name === name && Number(i.qty) === qty));
+    } else if ($item.closest(".equipment-list").length) {
+      const toolId = String($item.data("tool-id") || "").trim();
+      jobData.faults[idx].equipmentItems = (
+        jobData.faults[idx].equipmentItems || []
+      ).filter(
+        (i) =>
+          !(
+            i.name === name &&
+            Number(i.qty) === qty &&
+            String(i.toolId || "").trim() === toolId
+          ),
+      );
+    } else if ($item.closest(".consumables-list").length) {
+      jobData.faults[idx].consumablesItems = (
+        jobData.faults[idx].consumablesItems || []
+      ).filter((i) => !(i.name === name && Number(i.qty) === qty));
     }
 
     $item.remove();
@@ -1633,11 +1804,11 @@ $("#nextBtn").html('Next <span><i class="fa-solid fa-angle-right"></i></span>&nb
     const apprentice = Number($("#apprentice").val() || 0);
     const tech = technicians;
     const hrs = Number($("#hours").val() || 0);
-    const totalHours = (tech+apprentice) * hrs;
+    const totalHours = (tech + apprentice) * hrs;
     const faults = jobData.faults.length || 0;
 
     $("#statFaults").text(faults || "-");
-    $("#statTech").text(tech+apprentice || "-");
+    $("#statTech").text(tech + apprentice || "-");
     $("#statHours").text(totalHours || "-");
 
     jobData.estimates.technicians = tech;
@@ -1646,53 +1817,65 @@ $("#nextBtn").html('Next <span><i class="fa-solid fa-angle-right"></i></span>&nb
     jobData.estimates.apprentice = Number($("#apprentice").val() || 0);
     jobData.estimates.afterHours = $("#afterHours").is(":checked");
   }
-  
+
   // Spinner button handlers
-  $("#techniciansMinus").on("click", function(e) {
+  $("#techniciansMinus").on("click", function (e) {
     e.preventDefault();
     const current = Number($("#technicians").val() || 1);
     if (current > 1) {
-      $("#technicians").val(current - 1).trigger("change");
-    }
-  });
-  
-  $("#techniciansPlus").on("click", function(e) {
-    e.preventDefault();
-    const current = Number($("#technicians").val() || 1);
-    $("#technicians").val(Math.min(1000, current + 1)).trigger("change");
-  });
-  
-  $("#apprenticeMinus").on("click", function(e) {
-    e.preventDefault();
-    const current = Number($("#apprentice").val() || 0);
-    if (current > 0) {
-      $("#apprentice").val(current - 1).trigger("change");
-    }
-  });
-  
-  $("#apprenticePlus").on("click", function(e) {
-    e.preventDefault();
-    const current = Number($("#apprentice").val() || 0);
-    $("#apprentice").val(Math.min(1000, current + 1)).trigger("change");
-  });
-  
-  $("#hoursMinus").on("click", function(e) {
-    e.preventDefault();
-    const current = Number($("#hours").val() || 0);
-    if (current > 0) {
-      $("#hours").val(Math.max(0, current - 1)).trigger("change");
-    }
-  });
-  
-  $("#hoursPlus").on("click", function(e) {
-    e.preventDefault();
-    const current = Number($("#hours").val() || 0);
-    if (current < 24) {
-      $("#hours").val(Math.min(24, current + 1)).trigger("change");
+      $("#technicians")
+        .val(current - 1)
+        .trigger("change");
     }
   });
 
-    $("#technicians,#hours,#apprentice,#afterHours").on(
+  $("#techniciansPlus").on("click", function (e) {
+    e.preventDefault();
+    const current = Number($("#technicians").val() || 1);
+    $("#technicians")
+      .val(Math.min(1000, current + 1))
+      .trigger("change");
+  });
+
+  $("#apprenticeMinus").on("click", function (e) {
+    e.preventDefault();
+    const current = Number($("#apprentice").val() || 0);
+    if (current > 0) {
+      $("#apprentice")
+        .val(current - 1)
+        .trigger("change");
+    }
+  });
+
+  $("#apprenticePlus").on("click", function (e) {
+    e.preventDefault();
+    const current = Number($("#apprentice").val() || 0);
+    $("#apprentice")
+      .val(Math.min(1000, current + 1))
+      .trigger("change");
+  });
+
+  $("#hoursMinus").on("click", function (e) {
+    e.preventDefault();
+    const current = Number($("#hours").val() || 0);
+    if (current > 0) {
+      $("#hours")
+        .val(Math.max(0, current - 1))
+        .trigger("change");
+    }
+  });
+
+  $("#hoursPlus").on("click", function (e) {
+    e.preventDefault();
+    const current = Number($("#hours").val() || 0);
+    if (current < 24) {
+      $("#hours")
+        .val(Math.min(24, current + 1))
+        .trigger("change");
+    }
+  });
+
+  $("#technicians,#hours,#apprentice,#afterHours").on(
     "input change",
     calculate,
   );
@@ -1780,7 +1963,10 @@ $("#nextBtn").html('Next <span><i class="fa-solid fa-angle-right"></i></span>&nb
     barcodeScannerActive = false;
 
     // Stop html5-qrcode instance if present
-    if (barcodeScannerInstance && typeof barcodeScannerInstance.clear === 'function') {
+    if (
+      barcodeScannerInstance &&
+      typeof barcodeScannerInstance.clear === "function"
+    ) {
       Promise.resolve()
         .then(() => barcodeScannerInstance.clear())
         .catch(() => {})
@@ -1804,7 +1990,7 @@ $("#nextBtn").html('Next <span><i class="fa-solid fa-angle-right"></i></span>&nb
 
   async function startBarcodeScanner() {
     // prefer Html5Qrcode, but fall back to Quagga on iOS or when Html5Qrcode isn't available/working
-    const isIOS = /iP(ad|hone|od)/.test(navigator.userAgent || '');
+    const isIOS = /iP(ad|hone|od)/.test(navigator.userAgent || "");
 
     if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) {
       if (window.alert) {
@@ -1826,25 +2012,25 @@ $("#nextBtn").html('Next <span><i class="fa-solid fa-angle-right"></i></span>&nb
           const constraints = {
             width: { min: 320 },
             height: { min: 240 },
-            facingMode: 'environment',
+            facingMode: "environment",
           };
 
           window.Quagga.init(
             {
               inputStream: {
-                type: 'LiveStream',
-                target: document.querySelector('#barcodeScannerContainer'),
+                type: "LiveStream",
+                target: document.querySelector("#barcodeScannerContainer"),
                 constraints: constraints,
                 singleChannel: false,
               },
               decoder: {
                 readers: [
-                  'code_128_reader',
-                  'ean_reader',
-                  'ean_8_reader',
-                  'code_39_reader',
-                  'upc_reader',
-                  'upc_e_reader',
+                  "code_128_reader",
+                  "ean_reader",
+                  "ean_8_reader",
+                  "code_39_reader",
+                  "upc_reader",
+                  "upc_e_reader",
                 ],
                 multiple: false,
               },
@@ -1853,14 +2039,23 @@ $("#nextBtn").html('Next <span><i class="fa-solid fa-angle-right"></i></span>&nb
             },
             function (err) {
               if (err) {
-                console.warn('Quagga init failed, falling back to Html5Qrcode if available', err);
+                console.warn(
+                  "Quagga init failed, falling back to Html5Qrcode if available",
+                  err,
+                );
                 // fallback to Html5Qrcode if available
                 if (window.Html5QrcodeScanner) {
                   startHtml5QrcodeScanner().catch(() => {
-                    if (window.alert) showAlertDialog('Camera scanning is not available on this browser.');
+                    if (window.alert)
+                      showAlertDialog(
+                        "Camera scanning is not available on this browser.",
+                      );
                   });
                 } else {
-                  if (window.alert) showAlertDialog('Camera scanning is not available on this browser.');
+                  if (window.alert)
+                    showAlertDialog(
+                      "Camera scanning is not available on this browser.",
+                    );
                 }
                 return;
               }
@@ -1868,10 +2063,13 @@ $("#nextBtn").html('Next <span><i class="fa-solid fa-angle-right"></i></span>&nb
               try {
                 window.Quagga.start();
               } catch (e) {
-                console.warn('Quagga start failed', e);
+                console.warn("Quagga start failed", e);
                 if (window.Html5QrcodeScanner) {
                   startHtml5QrcodeScanner().catch(() => {
-                    if (window.alert) showAlertDialog('Camera scanning is not available on this browser.');
+                    if (window.alert)
+                      showAlertDialog(
+                        "Camera scanning is not available on this browser.",
+                      );
                   });
                 }
                 return;
@@ -1879,15 +2077,19 @@ $("#nextBtn").html('Next <span><i class="fa-solid fa-angle-right"></i></span>&nb
 
               window.Quagga.onDetected(function (result) {
                 try {
-                  const code = (result && result.codeResult && result.codeResult.code) || null;
+                  const code =
+                    (result && result.codeResult && result.codeResult.code) ||
+                    null;
                   if (code) {
                     $("#customerAssetId").val(String(code).trim());
-                    if (window.lookupAssetByValue) window.lookupAssetByValue(code);
-                    if (window.alert) showAlertDialog('Barcode read successfully.');
+                    if (window.lookupAssetByValue)
+                      window.lookupAssetByValue(code);
+                    if (window.alert)
+                      showAlertDialog("Barcode read successfully.");
                     stopBarcodeScanner();
                   }
                 } catch (e) {
-                  console.warn('Error handling Quagga detection', e);
+                  console.warn("Error handling Quagga detection", e);
                 }
               });
             },
@@ -1895,7 +2097,7 @@ $("#nextBtn").html('Next <span><i class="fa-solid fa-angle-right"></i></span>&nb
 
           return; // Quagga started (or initializing), exit function
         } catch (e) {
-          console.warn('Quagga init threw', e);
+          console.warn("Quagga init threw", e);
           // fall through to Html5Qrcode below
         }
       }
@@ -1906,7 +2108,8 @@ $("#nextBtn").html('Next <span><i class="fa-solid fa-angle-right"></i></span>&nb
       return startHtml5QrcodeScanner();
     }
 
-    if (window.alert) showAlertDialog('Camera scanning is not available on this browser.');
+    if (window.alert)
+      showAlertDialog("Camera scanning is not available on this browser.");
   }
 
   // Extracted helper to start Html5Qrcode scanner so it can be called from fallback paths
@@ -1918,7 +2121,7 @@ $("#nextBtn").html('Next <span><i class="fa-solid fa-angle-right"></i></span>&nb
     }
 
     barcodeScannerInstance = new window.Html5QrcodeScanner(
-      'barcodeScannerContainer',
+      "barcodeScannerContainer",
       {
         fps: 10,
         qrbox: { width: 240, height: 240 },
@@ -1926,7 +2129,7 @@ $("#nextBtn").html('Next <span><i class="fa-solid fa-angle-right"></i></span>&nb
         showTorchButtonIfSupported: true,
         rememberLastUsedCamera: true,
         videoConstraints: {
-          facingMode: { ideal: 'environment' },
+          facingMode: { ideal: "environment" },
         },
       },
       false,
@@ -1934,25 +2137,29 @@ $("#nextBtn").html('Next <span><i class="fa-solid fa-angle-right"></i></span>&nb
 
     await barcodeScannerInstance.render(
       (decodedText) => {
-        const value = String(decodedText || '').trim();
+        const value = String(decodedText || "").trim();
         if (value) {
-          $('#customerAssetId').val(value);
+          $("#customerAssetId").val(value);
           if (window.lookupAssetByValue) {
             window.lookupAssetByValue(value);
           }
           if (window.alert) {
-            showAlertDialog('Barcode read successfully.');
+            showAlertDialog("Barcode read successfully.");
           }
         } else if (window.alert) {
-          showAlertDialog('Barcode could not be read. Please enter the value manually.');
+          showAlertDialog(
+            "Barcode could not be read. Please enter the value manually.",
+          );
         }
         stopBarcodeScanner();
       },
       (error) => {
         if (!barcodeScannerActive) return;
-        const message = String(error || '');
-        if (message && !message.toLowerCase().includes('no qr code')) {
-          $('#barcodeScannerMessage').text('Scanning… keep the barcode centered.');
+        const message = String(error || "");
+        if (message && !message.toLowerCase().includes("no qr code")) {
+          $("#barcodeScannerMessage").text(
+            "Scanning… keep the barcode centered.",
+          );
         }
       },
     );
@@ -1974,11 +2181,14 @@ $("#nextBtn").html('Next <span><i class="fa-solid fa-angle-right"></i></span>&nb
     formData.append("file", file, file.name || "barcode-image");
 
     try {
-      const response = await fetch("https://api.qrserver.com/v1/read-qr-code/", {
-        method: "POST",
-        body: formData,
-        mode: "cors",
-      });
+      const response = await fetch(
+        "https://api.qrserver.com/v1/read-qr-code/",
+        {
+          method: "POST",
+          body: formData,
+          mode: "cors",
+        },
+      );
 
       if (!response.ok) {
         throw new Error(`Barcode API returned ${response.status}`);
@@ -1986,7 +2196,9 @@ $("#nextBtn").html('Next <span><i class="fa-solid fa-angle-right"></i></span>&nb
 
       const data = await response.json();
       const firstSymbol = Array.isArray(data?.symbol) ? data.symbol[0] : null;
-      const value = String(firstSymbol?.data || data?.decodedText || data?.data || "").trim();
+      const value = String(
+        firstSymbol?.data || data?.decodedText || data?.data || "",
+      ).trim();
       if (value) {
         return value;
       }
@@ -2001,7 +2213,8 @@ $("#nextBtn").html('Next <span><i class="fa-solid fa-angle-right"></i></span>&nb
     if (!file) return "";
 
     const fileName = (file.name || "").toLowerCase();
-    const isHeicOrHeif = /(heic|heif)$/i.test(fileName) || /heic|heif/i.test(file.type || "");
+    const isHeicOrHeif =
+      /(heic|heif)$/i.test(fileName) || /heic|heif/i.test(file.type || "");
 
     const apiValue = await readBarcodeFromImageWithApi(file);
     if (apiValue) {
@@ -2009,7 +2222,9 @@ $("#nextBtn").html('Next <span><i class="fa-solid fa-angle-right"></i></span>&nb
     }
 
     if (isHeicOrHeif) {
-      console.warn("HEIC/HEIF image detected; trying browser-based fallback decoding.");
+      console.warn(
+        "HEIC/HEIF image detected; trying browser-based fallback decoding.",
+      );
     }
 
     if (window.Html5Qrcode) {
@@ -2044,7 +2259,15 @@ $("#nextBtn").html('Next <span><i class="fa-solid fa-angle-right"></i></span>&nb
           if (window.BarcodeDetector) {
             try {
               const detector = new window.BarcodeDetector({
-                formats: ["code_128", "qr_code", "ean_13", "ean_8", "code_39", "upc_a", "upc_e"],
+                formats: [
+                  "code_128",
+                  "qr_code",
+                  "ean_13",
+                  "ean_8",
+                  "code_39",
+                  "upc_a",
+                  "upc_e",
+                ],
               });
               const barcode = await detector.detect(bitmap);
               const value = barcode?.[0]?.rawValue || "";
@@ -2070,7 +2293,15 @@ $("#nextBtn").html('Next <span><i class="fa-solid fa-angle-right"></i></span>&nb
       if (window.BarcodeDetector) {
         try {
           const detector = new window.BarcodeDetector({
-            formats: ["code_128", "qr_code", "ean_13", "ean_8", "code_39", "upc_a", "upc_e"],
+            formats: [
+              "code_128",
+              "qr_code",
+              "ean_13",
+              "ean_8",
+              "code_39",
+              "upc_a",
+              "upc_e",
+            ],
           });
           const barcode = await detector.detect(image);
           const value = barcode?.[0]?.rawValue || "";
@@ -2078,7 +2309,10 @@ $("#nextBtn").html('Next <span><i class="fa-solid fa-angle-right"></i></span>&nb
             return String(value).trim();
           }
         } catch (error) {
-          console.warn("Built-in barcode detection with image element failed:", error);
+          console.warn(
+            "Built-in barcode detection with image element failed:",
+            error,
+          );
         }
       }
 
@@ -2088,7 +2322,9 @@ $("#nextBtn").html('Next <span><i class="fa-solid fa-angle-right"></i></span>&nb
 
           if (typeof codeReader.decodeFromImageElement === "function") {
             const result = await codeReader.decodeFromImageElement(image);
-            const value = result?.getText ? result.getText() : result?.text || "";
+            const value = result?.getText
+              ? result.getText()
+              : result?.text || "";
             if (value) {
               return String(value).trim();
             }
@@ -2096,7 +2332,9 @@ $("#nextBtn").html('Next <span><i class="fa-solid fa-angle-right"></i></span>&nb
 
           if (typeof codeReader.decodeFromImageUrl === "function") {
             const result = await codeReader.decodeFromImageUrl(imageUrl);
-            const value = result?.getText ? result.getText() : result?.text || "";
+            const value = result?.getText
+              ? result.getText()
+              : result?.text || "";
             if (value) {
               return String(value).trim();
             }
@@ -2122,7 +2360,10 @@ $("#nextBtn").html('Next <span><i class="fa-solid fa-angle-right"></i></span>&nb
 
   $("#barcodeFileInput").on("change", async function (event) {
     const input = this;
-    const file = event.target?.files?.[0] || event.originalEvent?.dataTransfer?.files?.[0] || null;
+    const file =
+      event.target?.files?.[0] ||
+      event.originalEvent?.dataTransfer?.files?.[0] ||
+      null;
 
     if (!file) {
       return;
@@ -2147,12 +2388,16 @@ $("#nextBtn").html('Next <span><i class="fa-solid fa-angle-right"></i></span>&nb
           console.log("Barcode read successfully.");
         }
       } else if (window.alert) {
-        showAlertDialog("Barcode could not be read from this image. Please enter the value manually.");
+        showAlertDialog(
+          "Barcode could not be read from this image. Please enter the value manually.",
+        );
       }
     } catch (error) {
       console.error("Barcode scan failed:", error);
       if (window.alert) {
-        showAlertDialog("Barcode scan is not available in this browser. Please enter the value manually.");
+        showAlertDialog(
+          "Barcode scan is not available in this browser. Please enter the value manually.",
+        );
       }
     } finally {
       try {
@@ -2166,30 +2411,25 @@ $("#nextBtn").html('Next <span><i class="fa-solid fa-angle-right"></i></span>&nb
   $("#customerAssetId").on("input change", function () {
     // const value = $(this).val().trim();
     // jobData.asset.customerAssetId = value;
-
     // if (customerAssetLookupTimer) {
     //   clearTimeout(customerAssetLookupTimer);
     //   customerAssetLookupTimer = null;
     // }
-
     // if (!value) {
     //   resetAssetFields({ keepCustomerAssetId: true });
     //   jobData.asset.customerAssetId = "";
     //   return;
     // }
-
     // if (value.length < 4) {
     //   resetAssetFields({ keepCustomerAssetId: true });
     //   jobData.asset.customerAssetId = value;
     //   return;
     // }
-
     // customerAssetLookupTimer = setTimeout(() => {
     //   const currentValue = String($("#customerAssetId").val() || "").trim();
     //   if (currentValue !== value) {
     //     return;
     //   }
-
     //   if (window.lookupAssetByValue) {
     //     window.lookupAssetByValue(currentValue);
     //   }
@@ -2224,7 +2464,9 @@ $("#nextBtn").html('Next <span><i class="fa-solid fa-angle-right"></i></span>&nb
     }
 
     if (files.length > spaceLeft) {
-      showAlertDialog(`Only ${spaceLeft} more image(s) can be added (Max ${MAX_PHOTOS} images)`);
+      showAlertDialog(
+        `Only ${spaceLeft} more image(s) can be added (Max ${MAX_PHOTOS} images)`,
+      );
       clearInput();
       return;
     }
@@ -2261,7 +2503,9 @@ $("#nextBtn").html('Next <span><i class="fa-solid fa-angle-right"></i></span>&nb
         return;
       }
       if (files.length > spaceLeft) {
-        showAlertDialog(`Only ${spaceLeft} more image(s) can be added (max ${MAX_PHOTOS})`);
+        showAlertDialog(
+          `Only ${spaceLeft} more image(s) can be added (max ${MAX_PHOTOS})`,
+        );
         return;
       }
       const allowed = files.slice(0, spaceLeft);
@@ -2342,19 +2586,29 @@ $("#nextBtn").html('Next <span><i class="fa-solid fa-angle-right"></i></span>&nb
       const tech = Number($("#technicians").val() || 0);
       const hrs = Number($("#hours").val() || 0);
       const costCenter = String($("#costCenterSelect").val() || "").trim();
-      const serviceManager = String($("#serviceManagerSelect").val() || "").trim();
+      const serviceManager = String(
+        $("#serviceManagerSelect").val() || "",
+      ).trim();
       const tags = String($("#tagsSelect").val() || "").trim();
       let valid = true;
 
       if (serviceManager === "") {
-        showError("#serviceManagerSelect", "#serviceManagerError", "Service Manager is required.");
+        showError(
+          "#serviceManagerSelect",
+          "#serviceManagerError",
+          "Service Manager is required.",
+        );
         valid = false;
       } else {
         clearError("#serviceManagerSelect", "#serviceManagerError");
       }
 
       if (costCenter === "") {
-        showError("#costCenterSelect", "#costCenterError", "Cost Center is required.");
+        showError(
+          "#costCenterSelect",
+          "#costCenterError",
+          "Cost Center is required.",
+        );
         valid = false;
       } else {
         clearError("#costCenterSelect", "#costCenterError");
@@ -2398,38 +2652,66 @@ $("#nextBtn").html('Next <span><i class="fa-solid fa-angle-right"></i></span>&nb
     if (idx === 0) {
       syncLookupContextToJobData();
       jobData.customer.jobNumber = String($("#jobNumber").val() || "").trim();
-      const selectedContactValue = String($("#customerName").val() || "").trim();
-      const selectedContactLabel = String($("#customerName option:selected").text() || "").trim();
-      const manualContactName = String($("#customerNameInput").val() || "").trim();
-      const selectedContactId = selectedContactValue && selectedContactValue !== "other" ? selectedContactValue : "";
+      const selectedContactValue = String(
+        $("#customerName").val() || "",
+      ).trim();
+      const selectedContactLabel = String(
+        $("#customerName option:selected").text() || "",
+      ).trim();
+      const manualContactName = String(
+        $("#customerNameInput").val() || "",
+      ).trim();
+      const selectedContactId =
+        selectedContactValue && selectedContactValue !== "other"
+          ? selectedContactValue
+          : "";
       jobData.customer.name = String($("#autoJobBtn").val() || "").trim();
       jobData.customer.phone = String($("#customerPhone").val() || "").trim();
       jobData.customer.email = String($("#customerEmail").val() || "").trim();
-      jobData.customer.tenancy = String($("#customerTenancy").val() || "").trim();
-      jobData.customer.tenancyLabel = String($("#customerTenancy option:selected").text() || "").trim();
+      jobData.customer.tenancy = String(
+        $("#customerTenancy").val() || "",
+      ).trim();
+      jobData.customer.tenancyLabel = String(
+        $("#customerTenancy option:selected").text() || "",
+      ).trim();
       jobData.customer.notes = String($("#customerNotes").val() || "").trim();
       jobData.customer.siteContact = selectedContactId;
-      jobData.customer.siteContactLabel = String($("#siteContractName").text() || "").trim() || jobData.customer.siteContactLabel;
+      jobData.customer.siteContactLabel =
+        String($("#siteContractName").text() || "").trim() ||
+        jobData.customer.siteContactLabel;
       jobData.customer.customerContact = selectedContactId;
-      jobData.customer.contactName = selectedContactValue === "other"
-        ? manualContactName
-        : selectedContactValue
-          ? selectedContactLabel
-          : "";
+      jobData.customer.contactName =
+        selectedContactValue === "other"
+          ? manualContactName
+          : selectedContactValue
+            ? selectedContactLabel
+            : "";
     }
     if (idx === 1) {
-      const customerAssetIdSelectValue = String($("#customerAssetId").val() || "").trim();
-      const customerAssetIdInputValue = String($("#customerAssetIdInput").val() || "").trim();
-      const assetDescriptionValue = String($("#assetDescriptionInput").val() || "").trim();
+      const customerAssetIdSelectValue = String(
+        $("#customerAssetId").val() || "",
+      ).trim();
+      const customerAssetIdInputValue = String(
+        $("#customerAssetIdInput").val() || "",
+      ).trim();
+      const assetDescriptionValue = String(
+        $("#assetDescriptionInput").val() || "",
+      ).trim();
       const assetLocationValue = String($("#assetLocation").val() || "").trim();
       jobData.asset.description = assetDescriptionValue;
       jobData.asset.descriptionLabel = assetDescriptionValue;
       jobData.asset.location = assetLocationValue;
       jobData.asset.locationLabel = assetLocationValue;
-      jobData.asset.customerAssetId = customerAssetIdInputValue || (customerAssetIdSelectValue && customerAssetIdSelectValue !== "other" ? customerAssetIdSelectValue : "");
+      jobData.asset.customerAssetId =
+        customerAssetIdInputValue ||
+        (customerAssetIdSelectValue && customerAssetIdSelectValue !== "other"
+          ? customerAssetIdSelectValue
+          : "");
       jobData.asset.make = String($("#assertMake").val() || "").trim();
       jobData.asset.model = String($("#assertModel").val() || "").trim();
-      jobData.asset.serialNumber = String($("#assertSerialNumber").val() || "").trim();
+      jobData.asset.serialNumber = String(
+        $("#assertSerialNumber").val() || "",
+      ).trim();
       // faults already bound
     }
     if (idx === 2) {
@@ -2443,10 +2725,16 @@ $("#nextBtn").html('Next <span><i class="fa-solid fa-angle-right"></i></span>&nb
       jobData.estimates.totalHours = totalHours;
       jobData.estimates.apprentice = apprentice;
       jobData.estimates.afterHours = $("#afterHours").is(":checked");
-      jobData.estimates.costCenter = String($("#costCenterSelect").val() || "").trim();
-      jobData.estimates.costCenterLabel = String($("#costCenterSelect option:selected").text() || "").trim();
+      jobData.estimates.costCenter = String(
+        $("#costCenterSelect").val() || "",
+      ).trim();
+      jobData.estimates.costCenterLabel = String(
+        $("#costCenterSelect option:selected").text() || "",
+      ).trim();
       jobData.estimates.tags = String($("#tagsSelect").val() || "").trim();
-      jobData.estimates.tagsLabel = String($("#tagsSelect option:selected").text() || "").trim();
+      jobData.estimates.tagsLabel = String(
+        $("#tagsSelect option:selected").text() || "",
+      ).trim();
     }
   }
 
@@ -2464,10 +2752,14 @@ $("#nextBtn").html('Next <span><i class="fa-solid fa-angle-right"></i></span>&nb
 
   function buildLeadDescriptionHtml() {
     const customerName = String(jobData.customer.name || "").trim();
-    const customerContactName = String(jobData.customer.contactName || "").trim();
+    const customerContactName = String(
+      jobData.customer.contactName || "",
+    ).trim();
     const customerPhone = String(jobData.customer.phone || "").trim();
     const customerEmail = String(jobData.customer.email || "").trim();
-    const siteLabel = String(jobData.customer.tenancyLabel || jobData.customer.tenancy || "").trim();
+    const siteLabel = String(
+      jobData.customer.tenancyLabel || jobData.customer.tenancy || "",
+    ).trim();
     const assetDescription = String(jobData.asset.description || "").trim();
     const assetLocation = String(jobData.asset.location || "").trim();
     const customerAssetId = String(jobData.asset.customerAssetId || "").trim();
@@ -2479,9 +2771,15 @@ $("#nextBtn").html('Next <span><i class="fa-solid fa-angle-right"></i></span>&nb
     const apprenticeCount = Number(jobData.estimates.apprentice || 0);
     const hours = Number(jobData.estimates.hours || 0);
     const afterHoursValue = jobData.estimates.afterHours ? "Yes" : "No";
-    const costCenterLabel = String(jobData.estimates.costCenterLabel || "").trim();
-    const serviceManagerLabel = String($("#serviceManagerSelect option:selected").text() || "").trim();
-    const tagLabel = String($("#tagsSelect option:selected").text() || "").trim();
+    const costCenterLabel = String(
+      jobData.estimates.costCenterLabel || "",
+    ).trim();
+    const serviceManagerLabel = String(
+      $("#serviceManagerSelect option:selected").text() || "",
+    ).trim();
+    const tagLabel = String(
+      $("#tagsSelect option:selected").text() || "",
+    ).trim();
     const totalHours = Number(jobData.estimates.totalHours || 0);
 
     const userData = (() => {
@@ -2494,7 +2792,7 @@ $("#nextBtn").html('Next <span><i class="fa-solid fa-angle-right"></i></span>&nb
       }
     })();
 
-    const salespersonValue = userData?.Name
+    const salespersonValue = userData?.Name;
 
     const detailRows = [
       ["Customer Name", customerName],
@@ -2511,7 +2809,12 @@ $("#nextBtn").html('Next <span><i class="fa-solid fa-angle-right"></i></span>&nb
       ["Technicians", technicianCount ? String(technicianCount) : ""],
       ["Apprentice", apprenticeCount ? String(apprenticeCount) : ""],
       ["Hours", hours ? String(hours) : ""],
-      ["Total Technicians", technicianCount + apprenticeCount ? String(technicianCount + apprenticeCount) : ""],
+      [
+        "Total Technicians",
+        technicianCount + apprenticeCount
+          ? String(technicianCount + apprenticeCount)
+          : "",
+      ],
       ["Total Hours", totalHours ? String(totalHours) : ""],
       ["After Hours", afterHoursValue],
       ["Cost Center", costCenterLabel],
@@ -2527,13 +2830,22 @@ $("#nextBtn").html('Next <span><i class="fa-solid fa-angle-right"></i></span>&nb
       const parts = String(fault.parts || "").trim();
       const equipment = String(fault.equipment || "").trim();
       const partsItems = (fault.partsItems || [])
-        .map((item) => `${String(item.name || "").trim()} x ${String(item.qty || "").trim()}`)
+        .map(
+          (item) =>
+            `${String(item.name || "").trim()} x ${String(item.qty || "").trim()}`,
+        )
         .join(", ");
       const equipmentItems = (fault.equipmentItems || [])
-        .map((item) => `${String(item.name || "").trim()} x ${String(item.qty || "").trim()}`)
+        .map(
+          (item) =>
+            `${String(item.name || "").trim()} x ${String(item.qty || "").trim()}`,
+        )
         .join(", ");
       const consumablesItems = (fault.consumablesItems || [])
-        .map((item) => `${String(item.name || "").trim()} x ${String(item.qty || "").trim()}`)
+        .map(
+          (item) =>
+            `${String(item.name || "").trim()} x ${String(item.qty || "").trim()}`,
+        )
         .join(", ");
 
       if (description) detailRows.push([`Fault - Description`, description]);
@@ -2541,8 +2853,10 @@ $("#nextBtn").html('Next <span><i class="fa-solid fa-angle-right"></i></span>&nb
       if (parts) detailRows.push([`Fault - Parts & Material`, parts]);
       if (partsItems) detailRows.push([`Fault - Parts Items`, partsItems]);
       if (equipment) detailRows.push([`Fault - Equipment`, equipment]);
-      if (equipmentItems) detailRows.push([`Fault - Equipment Items`, equipmentItems]);
-      if (consumablesItems) detailRows.push([`Fault - Consumables`, consumablesItems]);
+      if (equipmentItems)
+        detailRows.push([`Fault - Equipment Items`, equipmentItems]);
+      if (consumablesItems)
+        detailRows.push([`Fault - Consumables`, consumablesItems]);
     });
 
     const detailTable = detailRows.length
@@ -2554,35 +2868,44 @@ $("#nextBtn").html('Next <span><i class="fa-solid fa-angle-right"></i></span>&nb
       `<p><strong>Lead Details: Created by ${salespersonValue}, Job#${jobData.customer.jobNumber}</strong></p>`,
       detailTable,
       `</div>`,
-    ].filter(Boolean).join("");
+    ]
+      .filter(Boolean)
+      .join("");
   }
 
   function buildLeadPayload() {
     const customerJobNumber = String(jobData.customer.jobNumber || "").trim();
-    const customerId = Number(jobData.customer.customerId || jobData.customer.id || 0) || Number(customerJobNumber || 0);
+    const customerId =
+      Number(jobData.customer.customerId || jobData.customer.id || 0) ||
+      Number(customerJobNumber || 0);
     const customerName = String(jobData.customer.name || "").trim();
     const customerPhone = String(jobData.customer.phone || "").trim();
     const customerNotes = String(jobData.customer.notes || "").trim();
     const siteValue = String(jobData.customer.tenancy || "").trim();
-    const customerContactId = Number(jobData.customer.customerContact || 0) || 0;
+    const customerContactId =
+      Number(jobData.customer.customerContact || 0) || 0;
     const siteLabel = String(jobData.customer.tenancyLabel || "").trim();
-    const selectedCostCenter = jobData.estimates.costCenter || String($("#costCenterSelect").val() || "").trim();
+    const selectedCostCenter =
+      jobData.estimates.costCenter ||
+      String($("#costCenterSelect").val() || "").trim();
     const selectedTagValue = String($("#tagsSelect").val() || "").trim();
     const selectedTagId = Number(selectedTagValue) || 0;
     const notes = String($("#customerNotes").val() || "").trim();
     const description = buildLeadDescriptionHtml();
-  
+
     const contactNumber = Number(customerPhone.replace(/\D/g, "")) || 0;
     const userData = localStorage.getItem("user");
     const user = JSON.parse(userData);
     console.log("Name:", user);
 
-    const projectManager = String($("#serviceManagerSelect").val() || "").trim();
+    const projectManager = String(
+      $("#serviceManagerSelect").val() || "",
+    ).trim();
     const today = new Date();
     const yyyy = today.getFullYear(); // Returns a 4-digit number (e.g., 2026)
-    const mm = today.getMonth() + 1 //String(today.getMonth() + 1).padStart(2, '0'); // Ensures a 2-digit format (e.g., '07')
-    const MM1 = String(today.getMonth() + 1).padStart(2, '0'); // Ensures a 2-digit format (e.g., '07')
-    const dd = String(today.getDate()).padStart(2, '0'); // Ensures a 2-digit format (e.g., '17')
+    const mm = today.getMonth() + 1; //String(today.getMonth() + 1).padStart(2, '0'); // Ensures a 2-digit format (e.g., '07')
+    const MM1 = String(today.getMonth() + 1).padStart(2, "0"); // Ensures a 2-digit format (e.g., '07')
+    const dd = String(today.getDate()).padStart(2, "0"); // Ensures a 2-digit format (e.g., '17')
     const yyyyMmDd = `${yyyy}-${MM1}-${dd}`;
 
     const customFields = [
@@ -2596,9 +2919,11 @@ $("#nextBtn").html('Next <span><i class="fa-solid fa-angle-right"></i></span>&nb
       Customer: customerId || 0,
       Site: Number(siteValue) || 0,
       LeadName: customerJobNumber,
-      CustomerContact: customerContactId || contactNumber || Number(customerJobNumber) || 0,
-      AdditionalContacts:  [],
-      SiteContact: customerContactId || contactNumber || Number(customerJobNumber) || 0,
+      CustomerContact:
+        customerContactId || contactNumber || Number(customerJobNumber) || 0,
+      AdditionalContacts: [],
+      SiteContact:
+        customerContactId || contactNumber || Number(customerJobNumber) || 0,
       Stage: "Open",
       FollowUpDate: yyyyMmDd,
       Description: description || "",
@@ -2614,9 +2939,146 @@ $("#nextBtn").html('Next <span><i class="fa-solid fa-angle-right"></i></span>&nb
         ExpectedYear: yyyy,
         ExpectedMonth: mm,
       },
-      AutoAdjustStatus: true
+      AutoAdjustStatus: true,
       //CustomFields: customFields,
     };
+  }
+
+  function buildQuotePayload() {
+    const lead = buildLeadPayload();
+    // Reuse most lead fields for quote creation; include Notes and Description
+    return Object.assign(
+      {},
+      {
+        Customer: lead.Customer || 0,
+        Site: lead.Site || 0,
+        CustomerContact: lead.CustomerContact || 0,
+        AdditionalContacts: lead.AdditionalContacts || [],
+        SiteContact: lead.SiteContact || 0,
+        Type: "Service",
+        Notes: lead.Description || "",
+        Description: lead.Notes || "",
+        Tags: lead.Tags || [],
+        Salesperson: lead.Salesperson || 0,
+        ProjectManager: lead.ProjectManager || 0,
+        // Technicians: lead.Salesperson || 0,
+        // Technician: lead.Salesperson || 0,
+        LinkedJobID: Number(jobData.customer.jobNumber) || 0,
+        Tags: lead.Tags || [],
+        AutoAdjustStatus: !!lead.AutoAdjustStatus,
+      },
+    );
+  }
+
+  function getTotalRecoveryItemByToolId(toolId) {
+    const items = Array.isArray(window.totalRecoveryItems)
+      ? window.totalRecoveryItems
+      : [];
+    return (
+      items.find((it) => {
+        const id =
+          Number(
+            (it && it.Catalog && (it.Catalog.ID || it.Catalog.Id)) ||
+              it.ID ||
+              it.Id ||
+              0,
+          ) || 0;
+        return id && String(id) === String(toolId);
+      }) || null
+    );
+  }
+
+  function getRecoveryField(item, field) {
+    if (!item) return 0;
+    const value =
+      (item && item.Catalog && item.Catalog[field]) || item[field] || 0;
+    return Number(value || 0);
+  }
+
+  function buildSelectedRecoveryCatalogPayload() {
+    const payloads = [];
+
+    for (const fault of jobData.faults || []) {
+      for (const equipmentItem of fault.equipmentItems || []) {
+        const toolId = String(equipmentItem.toolId || "").trim();
+        const qty = Number(equipmentItem.qty || 0);
+        if (!toolId || !qty) {
+          continue;
+        }
+
+        const item = getTotalRecoveryItemByToolId(toolId);
+        const catalogId = Number(
+          (item && item.Catalog && (item.Catalog.ID || item.Catalog.Id)) ||
+            item?.ID ||
+            item?.Id ||
+            toolId ||
+            0,
+        );
+        if (!catalogId) {
+          continue;
+        }
+
+        payloads.push({
+          Catalog: catalogId,
+          Total: {
+            Qty: qty,
+          },
+        });
+      }
+    }
+
+    return payloads.length ? payloads : null;
+  }
+
+  function buildSelectedRecoveryLaborPayload() {
+    const payloads = [];
+
+    // Add technician/apprentice labour entries based on estimates
+    try {
+      const techCount = Number(jobData.estimates.technicians || 0);
+      const apprCount = Number(jobData.estimates.apprentice || 0);
+      const hrs = Number(jobData.estimates.hours || 0);
+      const afterHours = Boolean(jobData.estimates.afterHours);
+
+      const techQty = techCount * hrs;
+      const apprQty = apprCount * hrs;
+
+      if (techQty > 0) {
+        const techLaborType =
+          typeof window.getLaborTypeId === "function"
+            ? window.getLaborTypeId("Technician", afterHours)
+            : 0;
+
+        if (techLaborType) {
+          payloads.push({
+            LaborType: techLaborType,
+            Total: { Qty: techQty },
+          });
+        }
+      }
+
+      if (apprQty > 0) {
+        const apprLaborType =
+          typeof window.getLaborTypeId === "function"
+            ? window.getLaborTypeId("Apprentice", afterHours)
+            : 0;
+
+        if (apprLaborType) {
+          payloads.push({
+            LaborType: apprLaborType,
+            Total: { Qty: apprQty },
+          });
+        }
+      }
+      payloads.push({
+        LaborType: window.getLaborTypeId("Technician", false),
+        Total: { Qty: 8 },
+      });
+    } catch (e) {
+      console.warn("Failed to append technician/apprentice labor payloads:", e);
+    }
+
+    return payloads.length ? payloads : null;
   }
 
   function submitJob(options = {}) {
@@ -2634,39 +3096,81 @@ $("#nextBtn").html('Next <span><i class="fa-solid fa-angle-right"></i></span>&nb
 
     if (window.submitLeadToSimpro) {
       window.submitLeadToSimpro(payload, {
+        deferLoadingEnd: true,
         onSuccess: async function (response) {
           console.log(response);
           const leadId = response.ID;
           const hasPhotos = Array.isArray(photoFiles) && photoFiles.length > 0;
 
-          // Upload generated PDF
+          // Upload generated PDF (for Lead)
           const pdfFile = await createLeadPdfFile();
           if (pdfFile && typeof window.uploadLeadAttachments === "function") {
             window.uploadLeadAttachments(leadId, [pdfFile], {
               onComplete: function () {
-                console.log("PDF uploaded successfully.");
+                console.log("Lead PDF uploaded successfully.");
               },
               onError: function (error) {
-                console.log("PDF upload failed:", error);
+                console.log("Lead PDF upload failed:", error);
               },
             });
           }
-          
-          if (leadId && hasPhotos && typeof window.uploadLeadAttachments === "function") {
+
+          // Upload photos to Lead
+          if (
+            leadId &&
+            hasPhotos &&
+            typeof window.uploadLeadAttachments === "function"
+          ) {
             window.uploadLeadAttachments(leadId, photoFiles, {
               onComplete: function () {
                 showAlertDialogSuccess("Lead created successfully.");
               },
               onError: function (error) {
                 console.error("Lead attachment upload failed:", error);
-                showAlertDialog("Lead created, but one or more image uploads failed.");
+                showAlertDialog(
+                  "Lead created, but one or more image uploads failed.",
+                );
               },
             });
           } else {
             // No photos attached or upload function unavailable
             showAlertDialogSuccess("Lead created successfully.");
           }
-          
+
+          // --- Create Quote automatically using same data ---
+          try {
+            const quotePayload = buildQuotePayload();
+            if (window.submitQuoteToSimpro) {
+              try {
+                await window.submitQuoteToSimpro(quotePayload, {
+                  autoCreateSection: true,
+                  costCenterId: Number($("#costCenterSelect").val() || 0) || 0,
+                  costCenterName: String(
+                    $("#costCenterSelect option:selected").text() || "",
+                  ).trim(),
+                  catalogPayload: buildSelectedRecoveryCatalogPayload(),
+                  laborPayload: buildSelectedRecoveryLaborPayload(),
+                  photos: Array.isArray(photoFiles) ? photoFiles : [],
+                  pdfFile: pdfFile || null,
+                });
+                console.log(
+                  "Quote created successfully and section request sent.",
+                );
+              } catch (qerr) {
+                console.error("Quote creation failed:", qerr);
+              }
+            } else {
+              console.warn("submitQuoteToSimpro is not available.");
+            }
+          } catch (err) {
+            console.error("Failed to create quote:", err);
+          }
+
+          // finish loading only after quote flow completes
+          if (typeof window.setLeadSubmitLoading === "function") {
+            window.setLeadSubmitLoading(false);
+          }
+
           if (typeof onSuccess === "function") {
             onSuccess(response, payload, json);
             return;
@@ -2675,12 +3179,19 @@ $("#nextBtn").html('Next <span><i class="fa-solid fa-angle-right"></i></span>&nb
           resetWizard();
         },
         onError: function (error) {
+          // Ensure loading ends even when lead creation fails
+          if (typeof window.setLeadSubmitLoading === "function") {
+            window.setLeadSubmitLoading(false);
+          }
+
           if (typeof onError === "function") {
             onError(error, payload, json);
             return;
           }
 
-          showAlertDialog("Failed to create lead. Please try again. Staff not found.");
+          showAlertDialog(
+            "Failed to create lead. Please try again. Staff not found.",
+          );
         },
       });
     } else {
@@ -2741,58 +3252,48 @@ $("#nextBtn").html('Next <span><i class="fa-solid fa-angle-right"></i></span>&nb
     this.style.height = this.scrollHeight + "px";
   });
 
-
-
-
   //convert lead description to PDF
   async function createLeadPdfFile() {
+    const html = buildLeadDescriptionHtml();
 
-        const html = buildLeadDescriptionHtml();
+    const container = document.createElement("div");
 
-        const container = document.createElement("div");
+    container.innerHTML = html;
 
-        container.innerHTML = html;
+    container.style.position = "fixed";
+    container.style.left = "-9999px";
+    container.style.top = "0";
+    container.style.width = "794px"; // A4 width
+    container.style.background = "#fff";
+    container.style.padding = "20px";
 
-        container.style.position = "fixed";
-        container.style.left = "-9999px";
-        container.style.top = "0";
-        container.style.width = "794px"; // A4 width
-        container.style.background = "#fff";
-        container.style.padding = "20px";
+    document.body.appendChild(container);
 
-        document.body.appendChild(container);
+    //await new Promise(resolve => setTimeout(resolve, 300));
 
-        //await new Promise(resolve => setTimeout(resolve, 300));
+    const canvas = await html2canvas(container, {
+      scale: 1.2,
+      useCORS: true,
+      backgroundColor: "#ffffff",
+    });
 
-        const canvas = await html2canvas(container, {
-            scale: 1.2,
-            useCORS: true,
-            backgroundColor: "#ffffff"
-        });
+    document.body.removeChild(container);
 
-        document.body.removeChild(container);
+    const imgData = canvas.toDataURL("image/jpeg", 0.85);
 
-        const imgData = canvas.toDataURL("image/jpeg", 0.85);
+    const { jsPDF } = window.jspdf;
 
-        const { jsPDF } = window.jspdf;
+    const pdf = new jsPDF("p", "mm", "a4");
 
-        const pdf = new jsPDF("p", "mm", "a4");
+    const pdfWidth = 210;
+    const pdfHeight = (canvas.height * pdfWidth) / canvas.width;
 
-        const pdfWidth = 210;
-        const pdfHeight = (canvas.height * pdfWidth) / canvas.width;
+    pdf.addImage(imgData, "JPEG", 0, 0, pdfWidth, pdfHeight);
 
-        pdf.addImage(imgData, "JPEG", 0, 0, pdfWidth, pdfHeight);
+    const blob = pdf.output("blob");
 
-        const blob = pdf.output("blob");
-
-        return new File(
-            [blob],
-            "Lead Description.pdf",
-            {
-                type: "application/pdf"
-            }
-        );
-    }
-
-
+    return new File([blob], "Lead Description.pdf", {
+      type: "application/pdf",
+    });
+  }
 });

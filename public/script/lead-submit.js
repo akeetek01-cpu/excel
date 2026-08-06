@@ -138,9 +138,15 @@
         }
       })
       .always(function () {
-        setLeadSubmitLoading(false);
+        // If caller requested to defer ending the loading state (e.g., create Quote after Lead),
+        // keep the loading indicator active until caller clears it.
+        if (!options?.deferLoadingEnd) {
+          setLeadSubmitLoading(false);
+        }
       });
   }
 
+  // Expose loading control so callers can clear it after related workflows complete.
+  window.setLeadSubmitLoading = setLeadSubmitLoading;
   window.submitLeadToSimpro = submitLeadToSimpro;
 })(jQuery);
