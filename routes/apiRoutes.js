@@ -6,6 +6,8 @@ const auth = require("../middleware/auth");
 router.get("/dashboard", auth, controller.dashboard);
 
 router.post("/register", auth, controller.registerUser);
+router.post("/lead", controller.submitLeadToSimpro);
+router.post("/quote", controller.submitQuoteToSimpro);
 router.get("/users", controller.getUsers);
 router.put("/users", controller.updateUser);
 
