@@ -2911,8 +2911,8 @@ $(function () {
     const customFields = [
       { CustomField: 7, Value: "QUOTE Request - LEAD Form" },
       { CustomField: 4, Value: user.Name || "" },
-      { CustomField: 6, Value: user.col3 || "" },
-      { CustomField: 5, Value: user.TeamName || "" },
+      { CustomField: 6, Value: normalizeLeadTeamName(user.TeamName) || "" },
+      { CustomField: 5, Value: normalizeSalerPersonPosition(user.col3) || "" },
     ].filter((field) => String(field.Value || "").trim() !== "");
 
     return {
@@ -2944,14 +2944,107 @@ $(function () {
     };
   }
 
+  async function fileToBase64(file) {
+    if (!file) {
+      return null;
+    }
+
+    return new Promise((resolve, reject) => {
+      const reader = new FileReader();
+      reader.onload = function () {
+        const dataUrl = reader.result || "";
+        const parts = String(dataUrl).split(",");
+        resolve(parts[1] || "");
+      };
+      reader.onerror = function (err) {
+        reject(err);
+      };
+      reader.readAsDataURL(file);
+    });
+  }
+
+  async function buildLeadSubmissionJobData() {
+    const payload = buildLeadPayload();
+    const user = JSON.parse(localStorage.getItem("user") || "{}");
+
+    const customFields = [
+      { CustomField: 7, Value: "QUOTE Request - LEAD Form" },
+      { CustomField: 4, Value: user.Name || "" },
+      { CustomField: 6, Value: normalizeLeadTeamName(user.TeamName) || ""  },
+      { CustomField: 5, Value: normalizeSalerPersonPosition(user.col3) || "" },
+    ].filter((field) => String(field.Value || "").trim() !== "");
+
+    const attachments = [];
+    const pdfFile = await createLeadPdfFile();
+
+    if (pdfFile) {
+      const base64 = await fileToBase64(pdfFile);
+      if (base64) {
+        attachments.push({
+          fileName: pdfFile.name || "Lead Description.pdf",
+          contentType: pdfFile.type || "application/pdf",
+          base64,
+        });
+      }
+    }
+
+    for (const file of photoFiles || []) {
+      if (!file || typeof file !== "object") {
+        continue;
+      }
+
+      const base64 = await fileToBase64(file);
+      if (base64) {
+        attachments.push({
+          fileName: file.name || "lead-photo.jpg",
+          contentType: file.type || "application/octet-stream",
+          base64,
+        });
+      }
+    }
+
+    return {
+      ...payload,
+      customFields,
+      attachments,
+    };
+  }
+
+  function normalizeLeadTeamName(teamName) {
+    const value = String(teamName || "").trim();
+    if (!value) {
+      return "";
+    }
+
+    const normalized = value.toLowerCase();
+    if(value =="Service One Team") return "Service ONE";
+    if(value =="Service Two Team") return "Service TWO";
+    if(value =="Service Three Team") return "Service THREE";
+    if(value =="Apprentice Team") return "Apprentice Team";
+    return value;
+  }
+
+  function normalizeSalerPersonPosition(teamGroup) {
+    const value = String(teamGroup || "").trim();
+    if (!value) {
+      return "";
+    }
+
+   if(value =="Apprentice") return "Industrial (RAC) Apprentice";
+   if(value =="HVAC Service Manager") return "Commercial (HVAC) Service Manager";
+   if(value =="RAC Supervisor") return "Industrial (RAC) Supervisor";
+   if(value =="Technician") return "Industrial (RAC) Technician";
+   if(value =="Maintenance Technician") return "Industrial (RAC) Technician";
+    return value;
+  }
+
   function buildQuotePayload() {
     const lead = buildLeadPayload();
-    // const tags = [
-    //   ...(Array.isArray(lead.Tags) ? lead.Tags : []),
-    //   lead.Salesperson,
-    //   lead.ProjectManager,
-    // ].filter((value, index, array) => value != null && value !== "" && array.indexOf(value) === index);
-    // Reuse most lead fields for quote creation; include Notes and Description
+    const tags = [
+      ...(Array.isArray(lead.Tags) ? lead.Tags : []),
+      lead.Salesperson,
+      lead.ProjectManager,
+    ].filter((value, index, array) => value != null && value !== "" && array.indexOf(value) === index);
     return Object.assign(
       {},
       {
@@ -3079,7 +3172,7 @@ $(function () {
         }
       }
       payloads.push({
-        LaborType: window.getLaborTypeId("Technician", false),
+        LaborType: window.getLaborTypeId("Senior Technician", false),
         Total: { Qty: 8 },
       });
     } catch (e) {
@@ -3089,7 +3182,7 @@ $(function () {
     return payloads.length ? payloads : null;
   }
 
-  function submitJob(options = {}) {
+  async function submitJob(options = {}) {
     const { onSuccess, onError } = options || {};
 
     if (!validateStep(2)) {
@@ -3103,47 +3196,12 @@ $(function () {
     const json = JSON.stringify(payload, null, 2);
 
     if (window.submitLeadToSimpro) {
-      window.submitLeadToSimpro(payload, {
+      const jobData = await buildLeadSubmissionJobData();
+
+      window.submitLeadToSimpro(jobData, {
         deferLoadingEnd: true,
         onSuccess: async function (response) {
           console.log(response);
-          const leadId = response.ID;
-          const hasPhotos = Array.isArray(photoFiles) && photoFiles.length > 0;
-
-          // Upload generated PDF (for Lead)
-          const pdfFile = await createLeadPdfFile();
-          if (pdfFile && typeof window.uploadLeadAttachments === "function") {
-            window.uploadLeadAttachments(leadId, [pdfFile], {
-              onComplete: function () {
-                console.log("Lead PDF uploaded successfully.");
-              },
-              onError: function (error) {
-                console.log("Lead PDF upload failed:", error);
-              },
-            });
-          }
-
-          // Upload photos to Lead
-          if (
-            leadId &&
-            hasPhotos &&
-            typeof window.uploadLeadAttachments === "function"
-          ) {
-            window.uploadLeadAttachments(leadId, photoFiles, {
-              onComplete: function () {
-                showAlertDialogSuccess("Lead created successfully.");
-              },
-              onError: function (error) {
-                console.error("Lead attachment upload failed:", error);
-                showAlertDialog(
-                  "Lead created, but one or more image uploads failed.",
-                );
-              },
-            });
-          } else {
-            // No photos attached or upload function unavailable
-            showAlertDialogSuccess("Lead created successfully.");
-          }
 
           // --- Create Quote automatically using same data ---
           try {
@@ -3158,8 +3216,10 @@ $(function () {
                   ).trim(),
                   catalogPayload: buildSelectedRecoveryCatalogPayload(),
                   laborPayload: buildSelectedRecoveryLaborPayload(),
-                  photos: Array.isArray(photoFiles) ? photoFiles : [],
-                  pdfFile: pdfFile || null,
+                  attachments: Array.isArray(jobData.attachments) ? jobData.attachments : [],
+                  customFields: Array.isArray(jobData.customFields)
+                    ? jobData.customFields
+                    : [],
                 });
                 console.log(
                   "Quote created successfully and section request sent.",

@@ -54,6 +54,67 @@ function showAlertDialog(message, title = "Email Verification", onConfirm) {
     },
   });
 }
+
+function parseApiErrorPayload(payload) {
+  if (!payload) {
+    return null;
+  }
+
+  const apiErrors = payload.error?.errors || payload.errors;
+  if (Array.isArray(apiErrors) && apiErrors.length) {
+    return apiErrors
+      .map((error) => {
+        const path = error?.path ? `${error.path}: ` : "";
+        const message = error?.message || error?.value || error?.text || "";
+        return `${path}${message}`.trim();
+      })
+      .filter(Boolean)
+      .join("\n");
+  }
+
+  if (typeof payload.error === "string") {
+    return payload.error;
+  }
+
+  if (typeof payload.message === "string") {
+    return payload.message;
+  }
+
+  if (typeof payload === "string") {
+    return payload;
+  }
+
+  return null;
+}
+
+function parseAjaxError(xhr, status, errorMessage) {
+  if (xhr?.responseJSON) {
+    const parsed = parseApiErrorPayload(xhr.responseJSON);
+    if (parsed) {
+      return parsed;
+    }
+  }
+
+  if (xhr?.responseText) {
+    try {
+      const parsedBody = JSON.parse(xhr.responseText);
+      const parsed = parseApiErrorPayload(parsedBody);
+      if (parsed) {
+        return parsed;
+      }
+    } catch (e) {
+      // ignore invalid JSON
+    }
+  }
+
+  return errorMessage || status || "An unexpected error occurred.";
+}
+
+function showApiErrorDialog(xhr, status, errorMessage, title = "Error") {
+  const message = parseAjaxError(xhr, status, errorMessage);
+  showAlertDialog(message, title);
+}
+
 function showCustomDialogConfirm(title, message, onConfirm, onCancel) {
   showCustomDialog({
     title: title,

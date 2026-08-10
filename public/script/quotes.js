@@ -354,191 +354,38 @@
   }
 
   function submitQuoteToSimpro(payload, options) {
-    const config = window.SIMPRO_CONFIG || {};
-    const baseUrl = String(config.baseUrl || "").trim();
-    const authToken = String(config.authToken || "").trim();
-
-    if (!baseUrl || !authToken) {
-      const errorMessage = "SIMPRO configuration is missing.";
-      console.error(errorMessage);
-      if (typeof options?.onError === "function") {
-        options.onError(null, "config_error", errorMessage);
-      }
-      return $.Deferred().reject(errorMessage);
-    }
-
-    const requestBody = typeof payload === "string" ? payload : JSON.stringify(payload, null, 2);
-
-    const settings = {
-      url: `${baseUrl}/companies/${window.SIMPRO_CONFIG.companyId}/quotes/`,
-      method: "POST",
-      timeout: 0,
-      headers: {
-        "Content-Type": "application/json",
-        Accept: "application/json",
-        Authorization: `Bearer ${authToken}`,
-      },
-      data: requestBody,
+    const requestBody = {
+      quoteData: payload,
+      options: options || {},
     };
 
-    // Return a Promise that resolves only after custom fields and attachments are processed
-    return new Promise(function (resolve, reject) {
-      $.ajax(settings)
-        .done(async function (response) {
-          const quoteId = response?.ID || response?.Id || response?.id || response?.QuoteId || response?.quoteId;
+    return $.ajax({
+      url: "/api/quote",
+      method: "POST",
+      timeout: 0,
+      contentType: "application/json",
+      dataType: "json",
+      data: JSON.stringify(requestBody),
+    })
+      .done(function (response) {
+        if (typeof options?.onSuccess === "function") {
+          options.onSuccess(response.data || response);
+          return;
+        }
+      })
+      .fail(function (xhr, status, error) {
+        if (typeof options?.onError === "function") {
+          options.onError(xhr, status, error);
+          return;
+        }
 
-          if (quoteId) {
-            // Update custom fields
-            updateQuoteCustomFields(quoteId, baseUrl, authToken)
-              .done(function () {
-                console.log("Quote custom fields updated successfully.");
-              })
-              .fail(function () {
-                console.error("One or more quote custom field updates failed.");
-              });
+        if (typeof showApiErrorDialog === "function") {
+          showApiErrorDialog(xhr, status, error, "Quote creation failed");
+          return;
+        }
 
-            // Create a quote section and then call catalog and labor APIs using the section ID
-            if (options?.autoCreateSection || options?.catalogPayload || options?.laborPayload) {
-              try {
-                const sectionResult = await createQuoteSection(quoteId);
-                const sectionId = extractEntityId(sectionResult.response);
-
-                if (sectionId) {
-                  console.log("Quote section created:", sectionId);
-
-                  const costCenterId = Number(options?.costCenterId || 0);
-                  const costCenterName = String(options?.costCenterName || "").trim();
-                  let sectionCostCenterId = costCenterId;
-                  const catalogPayload = options?.catalogPayload;
-                  const laborPayload = options?.laborPayload;
-                  const requestPromises = [];
-
-                  if (costCenterId > 0 && costCenterName) {
-                    try {
-                      const costCenterResult = await createQuoteSectionCostCenter(quoteId, sectionId, costCenterId, costCenterName);
-                      const createdCostCenterId = extractEntityId(costCenterResult.response);
-                      if (createdCostCenterId) {
-                        sectionCostCenterId = createdCostCenterId;
-                        console.log("Quote section cost center created:", sectionCostCenterId);
-                      } else {
-                        console.warn("Quote section cost center creation did not return an ID; using original costCenterId.");
-                      }
-                    } catch (costCenterErr) {
-                      console.error("Quote section cost center creation failed:", costCenterErr);
-                      if (typeof options?.onCostCenterError === "function") {
-                        options.onCostCenterError(costCenterErr);
-                      }
-                    }
-                  }
-
-                  const catalogPayloads = Array.isArray(options?.catalogPayload)
-                    ? options.catalogPayload
-                    : options?.catalogPayload
-                      ? [options.catalogPayload]
-                      : [];
-                  const laborPayloads = Array.isArray(options?.laborPayload)
-                    ? options.laborPayload
-                    : options?.laborPayload
-                      ? [options.laborPayload]
-                      : [];
-
-                  if (laborPayloads.length && sectionCostCenterId > 0) {
-                    await createQuoteSectionCostCenterLabor(quoteId, sectionId, sectionCostCenterId, laborPayloads)
-                      .then((laborResult) => {
-                        console.log("Quote labor created:", laborResult);
-                        if (typeof options?.onLaborSuccess === "function") {
-                          options.onLaborSuccess(laborResult);
-                        }
-                      })
-                      .catch((laborErr) => {
-                        console.error("Quote labor creation failed:", laborErr);
-                        if (typeof options?.onLaborError === "function") {
-                          options.onLaborError(laborErr);
-                        }
-                      });
-
-                    await new Promise((resolve) => setTimeout(resolve, 1000));
-                  }
-
-                  if (catalogPayloads.length && sectionCostCenterId > 0) {
-                    await createQuoteSectionCatalog(quoteId, sectionId, sectionCostCenterId, catalogPayloads)
-                      .then((catalogResult) => {
-                        console.log("Quote catalog created:", catalogResult);
-                        if (typeof options?.onCatalogSuccess === "function") {
-                          options.onCatalogSuccess(catalogResult);
-                        }
-                      })
-                      .catch((catalogErr) => {
-                        console.error("Quote catalog creation failed:", catalogErr);
-                        if (typeof options?.onCatalogError === "function") {
-                          options.onCatalogError(catalogErr);
-                        }
-                      });
-                  }
-                } else {
-                  console.warn("Quote section response did not return a section ID.");
-                }
-              } catch (sectionErr) {
-                console.error("Quote section creation failed:", sectionErr);
-                if (typeof options?.onSectionError === "function") {
-                  options.onSectionError(sectionErr);
-                }
-              }
-            }
-
-            // If options provided, allow caller to pass photos/pdf arrays
-            try {
-              const photos = Array.isArray(options?.photos) ? options.photos : [];
-              const pdfFile = options?.pdfFile || null;
-
-              // Upload photos first (if any)
-              if (photos.length && typeof window.uploadQuoteAttachments === "function") {
-                await uploadQuoteAttachments(quoteId, photos, {
-                  onComplete: function () {
-                    console.log("Quote photos uploaded successfully.");
-                  },
-                  onError: function (err) {
-                    console.error("Quote photo upload failed:", err);
-                  },
-                });
-              }
-
-              // Upload PDF if provided
-              if (pdfFile && typeof uploadQuoteAttachment === "function") {
-                await uploadQuoteAttachment(quoteId, pdfFile, {
-                  onComplete: function () {
-                    console.log("Quote PDF uploaded successfully.");
-                  },
-                  onError: function (err) {
-                    console.error("Quote PDF upload failed:", err);
-                  },
-                });
-              }
-            } catch (err) {
-              console.error("Error uploading quote attachments:", err);
-            }
-          }
-
-          if (typeof options?.onSuccess === "function") {
-            try {
-              options.onSuccess(response);
-            } catch (e) {
-              // swallow
-            }
-          }
-
-          resolve(response);
-        })
-        .fail(function (xhr, status, error) {
-          if (typeof options?.onError === "function") {
-            try {
-              options.onError(xhr, status, error);
-            } catch (e) {}
-          }
-          console.error("Quote submission failed:", status, error, xhr);
-          reject({ xhr, status, error });
-        });
-    });
+        console.error("Quote submission failed:", status, error, xhr);
+      });
   }
 
   // Expose functions
