@@ -1455,6 +1455,7 @@ $(function () {
     jobData.faults.push({
       description: "",
       work: "",
+      workDescription: "",
       parts: "",
       equipment: "",
       partsItems: [],
@@ -1534,9 +1535,18 @@ $(function () {
     const idx = Number($(this).closest(".fault-card").data("idx"));
     if (!isNaN(idx)) jobData.faults[idx].description = $(this).val();
   });
-  $(document).on("input", ".work-req", function () {
+  $(document).on("change", ".work-req", function () {
     const idx = Number($(this).closest(".fault-card").data("idx"));
-    if (!isNaN(idx)) jobData.faults[idx].work = $(this).val();
+    if (isNaN(idx)) return;
+
+    const $selected = $(this).find("option:selected");
+    const selectedValue = String($(this).val() || "").trim();
+    const selectedHtmlContent = String($selected.data("htmlContent") || "").trim();
+
+    jobData.faults[idx].work = selectedValue;
+    jobData.faults[idx].workDescription =
+      selectedHtmlContent || selectedValue;
+
     updateAiLabelState($(this).closest(".fault-card"));
   });
   $(document).on("input", ".parts", function () {
@@ -2809,13 +2819,13 @@ $(function () {
       ["Technicians", technicianCount ? String(technicianCount) : ""],
       ["Apprentice", apprenticeCount ? String(apprenticeCount) : ""],
       ["Hours", hours ? String(hours) : ""],
-      [
-        "Total Technicians",
-        technicianCount + apprenticeCount
-          ? String(technicianCount + apprenticeCount)
-          : "",
-      ],
-      ["Total Hours", totalHours ? String(totalHours) : ""],
+      // [
+      //   "Total Technicians",
+      //   technicianCount + apprenticeCount
+      //     ? String(technicianCount + apprenticeCount)
+      //     : "",
+      // ],
+      // ["Total Hours", totalHours ? String(totalHours) : ""],
       ["After Hours", afterHoursValue],
       ["Cost Center", costCenterLabel],
       ["Service Manager", serviceManagerLabel],
@@ -3045,6 +3055,15 @@ $(function () {
       lead.Salesperson,
       lead.ProjectManager,
     ].filter((value, index, array) => value != null && value !== "" && array.indexOf(value) === index);
+
+    const quoteWorkDescription =
+      Array.isArray(jobData.faults)
+        ? jobData.faults
+            .map((fault) => String(fault.workDescription || fault.work || "").trim())
+            .filter(Boolean)
+            .join("\n")
+        : "";
+
     return Object.assign(
       {},
       {
@@ -3055,7 +3074,7 @@ $(function () {
         SiteContact: lead.SiteContact || 0,
         Type: "Service",
         Notes: lead.Description || "",
-        Description: lead.Notes || "",
+        Description: quoteWorkDescription || "",
         Tags: lead.Tags || [],
         Salesperson: lead.Salesperson || 0,
         ProjectManager: lead.ProjectManager || 0,
@@ -3174,7 +3193,7 @@ $(function () {
       }
       payloads.push({
         LaborType: window.getLaborTypeId("Senior Technician", false),
-        Total: { Qty: 8 },
+        Total: { Qty: 1 },
       });
     } catch (e) {
       console.warn("Failed to append technician/apprentice labor payloads:", e);
