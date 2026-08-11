@@ -20,6 +20,9 @@
           return {
             key: String(key),
             name: String(item.name || item.Name || "").trim(),
+            htmlContent: String(
+              item.htmlContent || item.HtmlContent || item.HTMLContent || "",
+            ).trim(),
           };
         })
         .filter((item) => item.name);
@@ -44,7 +47,11 @@
       .map((item) => {
         const name = String(item && item.name ? item.name : "").trim();
         const safeName = escapeHtml(name);
-        return `<option value="${safeName}">${safeName}</option>`;
+        const safeHtmlContent = escapeHtml(item.htmlContent || "");
+        const htmlAttr = safeHtmlContent
+          ? ` data-html-content="${safeHtmlContent}"`
+          : "";
+        return `<option value="${safeName}"${htmlAttr}>${safeName}</option>`;
       })
       .join("");
 

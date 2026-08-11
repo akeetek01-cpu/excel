@@ -31,12 +31,14 @@
       .map((it) => {
         const name = ((it && it.Catalog && it.Catalog.Name) || it.Name || "").toString();
         const partNo = ((it && it.Catalog && it.Catalog.PartNo) || it.PartNo || "").toString();
+        const toolId = String((it && it.Catalog && (it.Catalog.ID || it.Catalog.Id)) || it.ID || it.Id || "").trim();
+        const dataAttrs = toolId ? ` data-tool-id="${toolId}" data-catalog-id="${toolId}"` : "";
         if (partNo && name) {
-          return `<option value="${name} - ${partNo}">${name} - ${partNo}</option>`;
+          return `<option value="${name} - ${partNo}"${dataAttrs}>${name} - ${partNo}</option>`;
         } else if (name) {
-          return `<option value="${name}">${name}</option>`;
+          return `<option value="${name}"${dataAttrs}>${name}</option>`;
         } else if (partNo) {
-          return `<option value="${partNo}">${partNo}</option>`;
+          return `<option value="${partNo}"${dataAttrs}>${partNo}</option>`;
         }
         return "";
       })
