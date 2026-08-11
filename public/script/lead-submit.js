@@ -13,7 +13,8 @@
   function submitLeadToSimpro(payload, options) {
     setLeadSubmitLoading(true);
 
-    const requestBody = JSON.stringify({ jobData: payload });
+    const simproEnv = window.localStorage?.getItem("SIMPRO_ENV") || "PROD";
+    const requestBody = JSON.stringify({ jobData: payload, simproEnv });
 
     const settings = {
       url: "/api/lead",

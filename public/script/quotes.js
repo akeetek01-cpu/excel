@@ -354,9 +354,11 @@
   }
 
   function submitQuoteToSimpro(payload, options) {
+    const simproEnv = window.localStorage?.getItem("SIMPRO_ENV") || "PROD";
     const requestBody = {
       quoteData: payload,
       options: options || {},
+      simproEnv,
     };
 
     return $.ajax({

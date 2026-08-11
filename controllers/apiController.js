@@ -1,15 +1,35 @@
 const nodemailer = require("nodemailer");
 const axios = require("axios");
 
-const SIMPRO_CONFIG = {
-  baseUrl: process.env.SIMPRO_BASE_URL || "https://excel-uat.simprocloud.com/api/v1.0",
-  authToken:
-    process.env.SIMPRO_AUTH_TOKEN ||
-    "4eaf76846bcaf8104343397586480856b8a34f7c",
-  companyId: process.env.SIMPRO_COMPANY_ID
-    ? Number(process.env.SIMPRO_COMPANY_ID)
-    : 6,
+const SIMPRO_CONFIGS = {
+  UAT: {
+    baseUrl:
+      process.env.SIMPRO_UAT_BASE_URL ||
+      process.env.SIMPRO_BASE_URL ||
+      "https://excel-uat.simprocloud.com/api/v1.0",
+    authToken:
+      process.env.SIMPRO_AUTH_TOKEN_UAT ||
+      process.env.SIMPRO_AUTH_TOKEN ||
+      "4eaf76846bcaf8104343397586480856b8a34f7c",
+    companyId: process.env.SIMPRO_COMPANY_ID ? Number(process.env.SIMPRO_COMPANY_ID) : 6,
+  },
+  PROD: {
+    baseUrl:
+      process.env.SIMPRO_PROD_BASE_URL ||
+      process.env.SIMPRO_BASE_URL ||
+      "https://excel.simprocloud.com/api/v1.0",
+    authToken:
+      process.env.SIMPRO_AUTH_TOKEN_PROD ||
+      process.env.SIMPRO_AUTH_TOKEN ||
+      "c9c47eab18f514ad102ae8c78ce2a444e3bc4dab",
+    companyId: process.env.SIMPRO_COMPANY_ID ? Number(process.env.SIMPRO_COMPANY_ID) : 6,
+  },
 };
+
+function getSimproConfig(env) {
+  const key = String(env || process.env.SIMPRO_ENV || "PROD").trim().toUpperCase();
+  return SIMPRO_CONFIGS[key] || SIMPRO_CONFIGS.PROD;
+}
 
 const transporter = nodemailer.createTransport({
     service: "gmail",
@@ -410,7 +430,7 @@ exports.sendEmail = async (req, res) => {
 
 };
 
-async function patchLeadCustomFields(jobData, leadId) {
+async function patchLeadCustomFields(jobData, leadId, simproConfig) {
   const customFields = Array.isArray(jobData.customFields)
     ? jobData.customFields
     : [];
@@ -428,13 +448,13 @@ async function patchLeadCustomFields(jobData, leadId) {
       return Promise.resolve();
     }
 
-    const url = `${SIMPRO_CONFIG.baseUrl}/companies/${SIMPRO_CONFIG.companyId}/leads/${leadId}/customFields/${fieldId}`;
+    const url = `${simproConfig.baseUrl}/companies/${simproConfig.companyId}/leads/${leadId}/customFields/${fieldId}`;
     return axios.request({
       method: "patch",
       url,
       data: JSON.stringify({ Value: fieldValue }),
       headers: {
-        Authorization: `Bearer ${SIMPRO_CONFIG.authToken}`,
+        Authorization: `Bearer ${simproConfig.authToken}`,
         "Content-Type": "application/json",
       },
     });
@@ -451,7 +471,7 @@ async function patchLeadCustomFields(jobData, leadId) {
   });
 }
 
-async function uploadLeadAttachments(jobData, leadId) {
+async function uploadLeadAttachments(jobData, leadId, simproConfig) {
   const attachments = Array.isArray(jobData.attachments)
     ? jobData.attachments
     : [];
@@ -479,11 +499,11 @@ async function uploadLeadAttachments(jobData, leadId) {
       Email: true,
     };
 
-    const url = `${SIMPRO_CONFIG.baseUrl}/companies/${SIMPRO_CONFIG.companyId}/leads/${leadId}/attachments/files/`;
+    const url = `${simproConfig.baseUrl}/companies/${simproConfig.companyId}/leads/${leadId}/attachments/files/`;
     return axios
       .post(url, payload, {
         headers: {
-          Authorization: `Bearer ${SIMPRO_CONFIG.authToken}`,
+          Authorization: `Bearer ${simproConfig.authToken}`,
           "Content-Type": "application/json",
           Accept: "application/json",
         },
@@ -508,11 +528,11 @@ async function uploadLeadAttachments(jobData, leadId) {
   });
 }
 
-async function processLeadBackgroundTasks(jobData, leadId) {
+async function processLeadBackgroundTasks(jobData, leadId, simproConfig) {
   try {
     await Promise.all([
-      patchLeadCustomFields(jobData, leadId),
-      uploadLeadAttachments(jobData, leadId),
+      patchLeadCustomFields(jobData, leadId, simproConfig),
+      uploadLeadAttachments(jobData, leadId, simproConfig),
     ]);
   } catch (err) {
     console.error(`Background lead processing failed for lead ${leadId}:`, err);
@@ -556,14 +576,14 @@ async function processLeadBackgroundTasks(jobData, leadId) {
 //   });
 // }
 
-async function createQuoteSection(quoteId) {
-  const url = `${SIMPRO_CONFIG.baseUrl}/companies/${SIMPRO_CONFIG.companyId}/quotes/${quoteId}/sections/`;
+async function createQuoteSection(quoteId, simproConfig) {
+  const url = `${simproConfig.baseUrl}/companies/${simproConfig.companyId}/quotes/${quoteId}/sections/`;
   const response = await axios.post(
     url,
     {},
     {
       headers: {
-        Authorization: `Bearer ${SIMPRO_CONFIG.authToken}`,
+        Authorization: `Bearer ${simproConfig.authToken}`,
         "Content-Type": "application/json",
         Accept: "application/json",
       },
@@ -572,12 +592,12 @@ async function createQuoteSection(quoteId) {
   return response.data;
 }
 
-async function createQuoteSectionCostCenter(quoteId, sectionId, costCenterId, name) {
+async function createQuoteSectionCostCenter(quoteId, sectionId, costCenterId, name, simproConfig) {
   if (!quoteId || !sectionId || !costCenterId) {
     return null;
   }
 
-  const url = `${SIMPRO_CONFIG.baseUrl}/companies/${SIMPRO_CONFIG.companyId}/quotes/${quoteId}/sections/${sectionId}/costCenters/`;
+  const url = `${simproConfig.baseUrl}/companies/${simproConfig.companyId}/quotes/${quoteId}/sections/${sectionId}/costCenters/`;
   const payload = {
     CostCenter: Number(costCenterId) || 0,
     Name: String(name || "").trim(),
@@ -585,7 +605,7 @@ async function createQuoteSectionCostCenter(quoteId, sectionId, costCenterId, na
 
   const response = await axios.post(url, payload, {
     headers: {
-      Authorization: `Bearer ${SIMPRO_CONFIG.authToken}`,
+      Authorization: `Bearer ${simproConfig.authToken}`,
       "Content-Type": "application/json",
       Accept: "application/json",
     },
@@ -593,18 +613,18 @@ async function createQuoteSectionCostCenter(quoteId, sectionId, costCenterId, na
   return response.data;
 }
 
-async function createQuoteSectionCatalog(quoteId, sectionId, costCenterId, payload) {
+async function createQuoteSectionCatalog(quoteId, sectionId, costCenterId, payload, simproConfig) {
   if (!quoteId || !sectionId || !costCenterId || !payload) {
     return null;
   }
 
-  const url = `${SIMPRO_CONFIG.baseUrl}/companies/${SIMPRO_CONFIG.companyId}/quotes/${quoteId}/sections/${sectionId}/costCenters/${costCenterId}/catalogs/`;
+  const url = `${simproConfig.baseUrl}/companies/${simproConfig.companyId}/quotes/${quoteId}/sections/${sectionId}/costCenters/${costCenterId}/catalogs/`;
   const isArrayPayload = Array.isArray(payload);
   const method = isArrayPayload ? "put" : "post";
 
   const response = await axios[method](url, payload, {
     headers: {
-      Authorization: `Bearer ${SIMPRO_CONFIG.authToken}`,
+      Authorization: `Bearer ${simproConfig.authToken}`,
       "Content-Type": "application/json",
       Accept: "application/json",
     },
@@ -612,18 +632,18 @@ async function createQuoteSectionCatalog(quoteId, sectionId, costCenterId, paylo
   return response.data;
 }
 
-async function createQuoteSectionCostCenterLabor(quoteId, sectionId, costCenterId, payload) {
+async function createQuoteSectionCostCenterLabor(quoteId, sectionId, costCenterId, payload, simproConfig) {
   if (!quoteId || !sectionId || !costCenterId || !payload) {
     return null;
   }
 
-  const url = `${SIMPRO_CONFIG.baseUrl}/companies/${SIMPRO_CONFIG.companyId}/quotes/${quoteId}/sections/${sectionId}/costCenters/${costCenterId}/labor/`;
+  const url = `${simproConfig.baseUrl}/companies/${simproConfig.companyId}/quotes/${quoteId}/sections/${sectionId}/costCenters/${costCenterId}/labor/`;
   const isArrayPayload = Array.isArray(payload);
   const method = isArrayPayload ? "put" : "post";
 
   const response = await axios[method](url, payload, {
     headers: {
-      Authorization: `Bearer ${SIMPRO_CONFIG.authToken}`,
+      Authorization: `Bearer ${simproConfig.authToken}`,
       "Content-Type": "application/json",
       Accept: "application/json",
     },
@@ -631,7 +651,7 @@ async function createQuoteSectionCostCenterLabor(quoteId, sectionId, costCenterI
   return response.data;
 }
 
-async function uploadQuoteAttachment(quoteId, attachment) {
+async function uploadQuoteAttachment(quoteId, attachment, simproConfig) {
   const base64 = String(attachment.base64 || attachment.Base64Data || "").trim();
   const fileName = String(attachment.fileName || attachment.Filename || "attachment");
 
@@ -646,10 +666,10 @@ async function uploadQuoteAttachment(quoteId, attachment) {
     Email: true,
   };
 
-  const url = `${SIMPRO_CONFIG.baseUrl}/companies/${SIMPRO_CONFIG.companyId}/quotes/${quoteId}/attachments/files/`;
+  const url = `${simproConfig.baseUrl}/companies/${simproConfig.companyId}/quotes/${quoteId}/attachments/files/`;
   const response = await axios.post(url, payload, {
     headers: {
-      Authorization: `Bearer ${SIMPRO_CONFIG.authToken}`,
+      Authorization: `Bearer ${simproConfig.authToken}`,
       "Content-Type": "application/json",
       Accept: "application/json",
     },
@@ -657,14 +677,14 @@ async function uploadQuoteAttachment(quoteId, attachment) {
   return response.data;
 }
 
-async function uploadQuoteAttachments(quoteId, attachments) {
+async function uploadQuoteAttachments(quoteId, attachments, simproConfig) {
   const quoteAttachments = Array.isArray(attachments) ? attachments : [];
   if (!quoteAttachments.length) {
     return;
   }
 
   const requests = quoteAttachments.map((attachment) =>
-    uploadQuoteAttachment(quoteId, attachment),
+    uploadQuoteAttachment(quoteId, attachment, simproConfig),
   );
 
   const results = await Promise.allSettled(requests);
@@ -678,7 +698,7 @@ async function uploadQuoteAttachments(quoteId, attachments) {
   });
 }
 
-async function processQuoteBackgroundTasks(quoteData, options, quoteId) {
+async function processQuoteBackgroundTasks(quoteData, options, quoteId, simproConfig) {
   try {
     await Promise.all([
       (async () => {
@@ -689,7 +709,7 @@ async function processQuoteBackgroundTasks(quoteData, options, quoteId) {
         if (!quoteId) return null;
 
         if (options?.autoCreateSection || options?.catalogPayload || options?.laborPayload) {
-          const sectionResult = await createQuoteSection(quoteId);
+          const sectionResult = await createQuoteSection(quoteId, simproConfig);
           const sectionId = sectionResult?.ID || sectionResult?.Id || sectionResult?.id || 0;
           if (!sectionId) {
             return null;
@@ -704,6 +724,7 @@ async function processQuoteBackgroundTasks(quoteData, options, quoteId) {
               sectionId,
               sectionCostCenterId,
               costCenterName,
+              simproConfig,
             );
             const createdCostCenterId =
               Number(costCenterResult?.ID || costCenterResult?.Id || costCenterResult?.id || 0) || 0;
@@ -718,6 +739,7 @@ async function processQuoteBackgroundTasks(quoteData, options, quoteId) {
               sectionId,
               sectionCostCenterId,
               options.laborPayload,
+              simproConfig,
             );
           }
 
@@ -727,11 +749,12 @@ async function processQuoteBackgroundTasks(quoteData, options, quoteId) {
               sectionId,
               sectionCostCenterId,
               options.catalogPayload,
+              simproConfig,
             );
           }
         }
       })(),
-      uploadQuoteAttachments(quoteId, options?.attachments || quoteData?.attachments),
+      uploadQuoteAttachments(quoteId, options?.attachments || quoteData?.attachments, simproConfig),
     ]);
   } catch (err) {
     console.error(`Background quote processing failed for quote ${quoteId}:`, err);
@@ -751,15 +774,17 @@ function extractLeadPayload(jobData) {
 exports.submitLeadToSimpro = async (req, res) => {
   try {
     const jobData = req.body?.jobData;
+    const simproConfig = getSimproConfig(req.body?.simproEnv);
+
     if (!jobData || typeof jobData !== "object") {
       return res.status(400).json({ error: "jobData is required in the request body." });
     }
 
     const leadPayload = extractLeadPayload(jobData);
-    const url = `${SIMPRO_CONFIG.baseUrl}/companies/${SIMPRO_CONFIG.companyId}/leads/`;
+    const url = `${simproConfig.baseUrl}/companies/${simproConfig.companyId}/leads/`;
     const response = await axios.post(url, leadPayload, {
       headers: {
-        Authorization: `Bearer ${SIMPRO_CONFIG.authToken}`,
+        Authorization: `Bearer ${simproConfig.authToken}`,
         "Content-Type": "application/json",
         Accept: "application/json",
       },
@@ -769,7 +794,7 @@ exports.submitLeadToSimpro = async (req, res) => {
     const leadId = simproResponse?.ID || simproResponse?.Id || simproResponse?.id || simproResponse?.LeadId || simproResponse?.leadId;
 
     if (leadId) {
-      void processLeadBackgroundTasks(jobData, leadId);
+      void processLeadBackgroundTasks(jobData, leadId, simproConfig);
     }
 
     return res.status(200).json(simproResponse);
@@ -785,15 +810,16 @@ exports.submitQuoteToSimpro = async (req, res) => {
   try {
     const quoteData = req.body?.quoteData;
     const options = req.body?.options || {};
+    const simproConfig = getSimproConfig(req.body?.simproEnv);
 
     if (!quoteData || typeof quoteData !== "object") {
       return res.status(400).json({ error: "quoteData is required in the request body." });
     }
 
-    const url = `${SIMPRO_CONFIG.baseUrl}/companies/${SIMPRO_CONFIG.companyId}/quotes/`;
+    const url = `${simproConfig.baseUrl}/companies/${simproConfig.companyId}/quotes/`;
     const response = await axios.post(url, quoteData, {
       headers: {
-        Authorization: `Bearer ${SIMPRO_CONFIG.authToken}`,
+        Authorization: `Bearer ${simproConfig.authToken}`,
         "Content-Type": "application/json",
         Accept: "application/json",
       },
@@ -804,7 +830,7 @@ exports.submitQuoteToSimpro = async (req, res) => {
       simproResponse?.ID || simproResponse?.Id || simproResponse?.id || simproResponse?.QuoteId || simproResponse?.quoteId;
 
     if (quoteId) {
-      void processQuoteBackgroundTasks(quoteData, options, quoteId);
+      void processQuoteBackgroundTasks(quoteData, options, quoteId, simproConfig);
     }
 
     return res.status(200).json(simproResponse);
