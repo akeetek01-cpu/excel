@@ -12,7 +12,7 @@ const cors = require('cors');
 
 
 const app = express();
-const PORT = 3000;
+const PORT = process.env.PORT || 3000;
 
 app.use(logger);
 app.use(express.json({ limit: "50mb" }));
@@ -33,6 +33,6 @@ app.use(express.static(path.join(__dirname, "public")));
 app.use("/", webRoutes);
 app.use("/api", apiRoutes);
 
-app.listen(PORT, () => {
+app.listen(PORT, '0.0.0.0', () => {
     console.log(`Server running at http://localhost:${PORT}`);
 });
