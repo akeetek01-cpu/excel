@@ -3141,34 +3141,35 @@ $(function () {
       const hrs = Number(jobData.estimates.hours || 0);
       const afterHours = Boolean(jobData.estimates.afterHours);
 
-      const techQty = techCount * hrs;
-      const apprQty = apprCount * hrs;
-
-      if (techQty > 0) {
+      if (techCount > 0) {
         const techLaborType =
           typeof window.getLaborTypeId === "function"
             ? window.getLaborTypeId("Technician", afterHours)
             : 0;
 
         if (techLaborType) {
-          payloads.push({
-            LaborType: techLaborType,
-            Total: { Qty: techQty },
-          });
+          for (let index = 0; index < techCount; index += 1) {
+            payloads.push({
+              LaborType: techLaborType,
+              Total: { Qty: hrs },
+            });
+          }
         }
       }
 
-      if (apprQty > 0) {
+      if (apprCount > 0) {
         const apprLaborType =
           typeof window.getLaborTypeId === "function"
             ? window.getLaborTypeId("Apprentice", afterHours)
             : 0;
 
         if (apprLaborType) {
-          payloads.push({
-            LaborType: apprLaborType,
-            Total: { Qty: apprQty },
-          });
+          for (let index = 0; index < apprCount; index += 1) {
+            payloads.push({
+              LaborType: apprLaborType,
+              Total: { Qty: hrs },
+            });
+          }
         }
       }
       payloads.push({
