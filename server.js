@@ -4,6 +4,7 @@ const swaggerUi = require("swagger-ui-express");
 const swaggerDocument = require("./swagger.json");
 
 const logger = require("./middleware/logger");
+const webController = require("./controllers/webController");
 
 const webRoutes = require("./routes/webRoutes");
 const apiRoutes = require("./routes/apiRoutes");
@@ -20,6 +21,9 @@ app.use(cors());
 
 // Swagger
 app.use("/api-docs", swaggerUi.serve, swaggerUi.setup(swaggerDocument));
+
+// Root route should show login instead of index
+app.get("/", webController.login);
 
 // Static
 app.use(express.static(path.join(__dirname, "public")));
