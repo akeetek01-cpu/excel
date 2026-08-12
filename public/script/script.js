@@ -399,6 +399,12 @@ $(function () {
     });
   }
 
+  window.showCustomDialog = showCustomDialog;
+  window.showAlertDialog = showAlertDialog;
+  window.showAlertDialogSuccess = showAlertDialogSuccess;
+  window.dismissCustomDialog = dismissCustomDialog;
+  window.showApiErrorDialog = showApiErrorDialog;
+
   function completeCreateNewLeadChoice(preserveCustomerDetails) {
     dismissCustomDialog();
     if (preserveCustomerDetails) {
