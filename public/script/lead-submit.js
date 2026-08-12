@@ -27,13 +27,26 @@
 
     return $.ajax(settings)
       .done(function (response) {
+        const successPayload = response.data || response;
+
         if (typeof options?.onSuccess === "function") {
-          options.onSuccess(response.data || response);
+          options.onSuccess(successPayload);
+
+          if (options?.showSuccessAlert !== false) {
+            if (typeof showAlertDialogSuccess === "function") {
+              showAlertDialogSuccess("Lead created successfully.");
+            } else if (window.alert) {
+              window.alert("Lead created successfully.");
+            }
+          }
+
           return;
         }
 
-        if (window.alert) {
+        if (typeof showAlertDialogSuccess === "function") {
           showAlertDialogSuccess("Lead created successfully.");
+        } else if (window.alert) {
+          window.alert("Lead created successfully.");
         }
       })
       .fail(function (xhr, status, error) {

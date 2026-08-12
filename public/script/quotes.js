@@ -370,9 +370,26 @@
       data: JSON.stringify(requestBody),
     })
       .done(function (response) {
+        const successPayload = response.data || response;
+
         if (typeof options?.onSuccess === "function") {
-          options.onSuccess(response.data || response);
+          options.onSuccess(successPayload);
+
+          if (options?.showSuccessAlert !== false) {
+            if (typeof showAlertDialogSuccess === "function") {
+              showAlertDialogSuccess("Quotes created successfully.");
+            } else if (window.alert) {
+              window.alert("Quotes created successfully.");
+            }
+          }
+
           return;
+        }
+
+        if (typeof showAlertDialogSuccess === "function") {
+          showAlertDialogSuccess("Quotes created successfully.");
+        } else if (window.alert) {
+          window.alert("Quotes created successfully.");
         }
       })
       .fail(function (xhr, status, error) {

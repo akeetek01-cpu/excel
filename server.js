@@ -25,6 +25,13 @@ app.use("/api-docs", swaggerUi.serve, swaggerUi.setup(swaggerDocument));
 // Root route should show login instead of index
 app.get("/", webController.login);
 
+// Favicon fallback to prevent browser 404 noise
+app.get("/favicon.ico", (req, res) => {
+    res.sendFile(path.join(__dirname, "public", "images", "excel_log.png"), {
+        headers: { "Content-Type": "image/png" }
+    });
+});
+
 // Static
 app.use(express.static(path.join(__dirname, "public")));
 

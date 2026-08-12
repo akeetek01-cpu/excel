@@ -21,11 +21,58 @@
 
     if (!Array.isArray(items) || items.length === 0) return placeholder;
 
-    const sortedItems = [...items].sort((a, b) => {
-      const nameA = ((a && a.Catalog && a.Catalog.Name) || a.Name || "").toString();
-      const nameB = ((b && b.Catalog && b.Catalog.Name) || b.Name || "").toString();
-      return nameA.localeCompare(nameB, undefined, { sensitivity: "base" });
-    });
+    const priorityNames = [
+      "consumables",
+      "Auckland - Vehicle Trip Charge",
+      "Leak Test (per use)",
+      "Vacuum Pump (per use)",
+      "Nitrogen (per use)",
+      "Welding (per Usage)",
+      "Silphos (per use)",
+      "Wiring charge",
+      "Electrical Safety Certificate (each)",
+      "Electrical Test Equipment",
+      "Decant Freon (per use)",
+      "Certified Harness - per day (per job)",
+      "Wet & Dry Vac (per use)",
+      "Recovery Cylinder - large 56kg (per job)",
+      "Recovery Cylinder - Small",
+    ];
+
+    const normalizeName = (name) =>
+      String(name || "")
+        .toLowerCase()
+        .replace(/\s+/g, " ")
+        .trim();
+
+    const getName = (item) =>
+      ((item && item.Catalog && item.Catalog.Name) || item.Name || "")
+        .toString()
+        .trim();
+
+    const priorityMap = new Map(
+      priorityNames.map((name, index) => [normalizeName(name), index]),
+    );
+
+    const sortedItems = items
+      .map((item, originalIndex) => {
+        const name = getName(item);
+        const normalized = normalizeName(name);
+        const priorityIndex = priorityMap.get(normalized);
+
+        return {
+          item,
+          originalIndex,
+          priorityIndex: priorityIndex === undefined ? Number.MAX_SAFE_INTEGER : priorityIndex,
+        };
+      })
+      .sort((a, b) => {
+        if (a.priorityIndex !== b.priorityIndex) {
+          return a.priorityIndex - b.priorityIndex;
+        }
+        return a.originalIndex - b.originalIndex;
+      })
+      .map((entry) => entry.item);
 
     const optionHtml = sortedItems
       .map((it) => {

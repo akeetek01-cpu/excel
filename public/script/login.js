@@ -119,8 +119,8 @@ $(function () {
   $("#loginBtn").on("click", function () {
     showLoader();
     const loginBtnText = $(this).text().trim();
-    //var email = $("#email").val().trim();
-    var email = "pal@akeetek.com";
+    var email = $("#email").val().trim();
+    //var email = "pal@akeetek.com";
     if (loginBtnText === "Activate Account") {
       const tempPw = getTempassword();
       updateCurrentUserWithTempPassword(email, tempPw, false, false);
@@ -196,16 +196,16 @@ $(function () {
   $("#forgotPasswordLink").on("click", function() {
     showLoader();
         const tempPw = getTempassword();
-        //var email = $("#email").val().trim();
-    var email = "pal@akeetek.com";
+        var email = $("#email").val().trim();
+    //var email = "pal@akeetek.com";
       updateCurrentUserWithTempPassword(email, tempPw, true, false);
     });
   
      $("#resendPassword").on("click", function() {
     showLoader();
         const tempPw = getTempassword();
-        //var email = $("#email").val().trim();
-    var email = "pal@akeetek.com";
+        var email = $("#email").val().trim();
+    //var email = "pal@akeetek.com";
       updateCurrentUserWithTempPassword(email, tempPw, true, true);
     });
 });
