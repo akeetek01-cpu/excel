@@ -803,8 +803,8 @@ textarea {
   margin-bottom: 3px;
 }
 
-.rounded-pill{
-color: #12c8c0;
+.rounded-pill, .fault-material-section .text-muted{
+color: #12c8c0 !important;
 }
 .switch {
   position: relative;
