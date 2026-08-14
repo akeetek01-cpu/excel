@@ -71,8 +71,9 @@
                                 <div class="col-8 mb-3 align-items-start">
                                     <label class="form-label me-2 mb-0" style="min-width:100px">Customer Name</label>
                                     <div class="flex-grow-1">
-                                        <input type="text" id="autoJobBtn" class="form-control border-dashed" maxlength="150" placeholder="" readonly="">
-                                    
+                                        <input type="text" id="autoJobBtn" class="form-control border-dashed"
+                                            maxlength="150" placeholder="" readonly="">
+
                                     </div>
                                 </div>
 
@@ -84,7 +85,8 @@
                                     </label>
 
                                     <div class="flex-grow-1">
-                                        <select data-hcg-select data-placeholder="Select Site" id="customerTenancy" class="form-select" aria-label="Site">
+                                        <select data-hcg-select data-placeholder="Select Site" id="customerTenancy"
+                                            class="form-select" aria-label="Site">
                                             <option value="" selected disabled hidden>Select Site</option>
                                             <option value="Other">Other</option>
                                         </select>
@@ -113,7 +115,8 @@
                                     <div class="flex-grow-1">
                                         <div class="row g-2 align-items-start">
                                             <div id="customerNameSelectWrapper" class="col-12">
-                                                <select data-hcg-select data-placeholder="Select Contact" id="customerName" class="form-select"
+                                                <select data-hcg-select data-placeholder="Select Contact"
+                                                    id="customerName" class="form-select"
                                                     aria-label="Customer contact name">
                                                     <option value="" selected disabled>Select Contact</option>
                                                     <option value="other">Other</option>
@@ -181,7 +184,9 @@
                                 <div class="flex-grow-1">
                                     <div class="row g-2 align-items-start">
                                         <div id="customerAssetIdSelectWrapper" class="col-12">
-                                            <select data-hcg-select data-placeholder="Select / Enter" id="customerAssetId" class="form-select" data-placeholder="Select / Enter"
+                                            <select data-hcg-select data-placeholder="Select / Enter"
+                                                id="customerAssetId" class="form-select"
+                                                data-placeholder="Select / Enter"
                                                 aria-label="Customer asset ID or Excel barcode">
                                                 <option value="" selected disabled>Select / Enter</option>
                                                 <option value="other">Other</option>
@@ -198,7 +203,7 @@
                                         class="d-none">
                                 </div>
                             </div>
-                             <div class="mb-3 align-items-start">
+                            <div class="mb-3 align-items-start">
                                 <label class="form-label me-2 mb-0" style="min-width:100px">
                                     Asset Description
                                 </label>
@@ -248,7 +253,7 @@
                                     </div>
                                 </div>
                             </div>
-                           
+
 
                             <div class="mb-3 align-items-start">
                                 <label class="form-label me-2 mb-0" style="min-width:100px">
@@ -282,36 +287,81 @@
 
 
 
-                    <div class="row g-3 align-items-start">
-                        <div class="col-4">
-                            <label class="form-label">Technicians</label>
-                            <div class="spinner-control">
-                                <button type="button" class="spinner-btn spinner-minus" id="techniciansMinus">−</button>
-                                <input type="number" id="technicians" class="form-control spinner-input" min="1"
-                                    max="10" value="1">
-                                <button type="button" class="spinner-btn spinner-plus" id="techniciansPlus">+</button>
+
+
+                    <!-- OT (After Hours) counts block: matches above layout and style -->
+                    <div class="p-3 rounded-12 border" style="border: 1px dashed #12c8c0 !important">
+                        <div class="row g-3 align-items-start">
+                            <div class="col-4">
+                                <label class="form-label">Technicians</label>
+                                <div class="spinner-control">
+                                    <button type="button" class="spinner-btn spinner-minus"
+                                        id="techniciansMinus">−</button>
+                                    <input type="number" id="technicians" class="form-control spinner-input" min="1"
+                                        max="10" value="1">
+                                    <button type="button" class="spinner-btn spinner-plus"
+                                        id="techniciansPlus">+</button>
+                                </div>
+                                <div id="techniciansError" class="invalid-feedback"></div>
                             </div>
-                            <div id="techniciansError" class="invalid-feedback"></div>
+                            <div class="col-4">
+                                <label class="form-label">Apprentice</label>
+                                <div class="spinner-control">
+                                    <button type="button" class="spinner-btn spinner-minus"
+                                        id="apprenticeMinus">−</button>
+                                    <input type="number" id="apprentice" class="form-control spinner-input" min="0"
+                                        max="10" value="0">
+                                    <button type="button" class="spinner-btn spinner-plus"
+                                        id="apprenticePlus">+</button>
+                                </div>
+                                <div id="apprenticeError" class="invalid-feedback"></div>
+                            </div>
+                            <div class="col-4">
+                                <label class="form-label">Hours</label>
+                                <div class="spinner-control">
+                                    <button type="button" class="spinner-btn spinner-minus" id="hoursMinus">−</button>
+                                    <input type="number" id="hours" class="form-control spinner-input" min="0" step="1"
+                                        value="0">
+                                    <button type="button" class="spinner-btn spinner-plus" id="hoursPlus">+</button>
+                                </div>
+                                <div id="hoursError" class="invalid-feedback"></div>
+                            </div>
                         </div>
-                        <div class="col-4">
-                            <label class="form-label">Apprentice</label>
-                            <div class="spinner-control">
-                                <button type="button" class="spinner-btn spinner-minus" id="apprenticeMinus">−</button>
-                                <input type="number" id="apprentice" class="form-control spinner-input" min="0" max="10"
-                                    value="0">
-                                <button type="button" class="spinner-btn spinner-plus" id="apprenticePlus">+</button>
+                        <div class="mt-1 row g-3 align-items-start">
+                            <div class="col-4">
+                                <label class="form-label">OT Technicians</label>
+                                <div class="spinner-control">
+                                    <button type="button" class="spinner-btn spinner-minus"
+                                        id="otTechniciansMinus">−</button>
+                                    <input type="number" id="otTechnicians" class="form-control spinner-input" min="0"
+                                        max="10" value="0">
+                                    <button type="button" class="spinner-btn spinner-plus"
+                                        id="otTechniciansPlus">+</button>
+                                </div>
+                                <div id="otTechniciansError" class="invalid-feedback"></div>
                             </div>
-                            <div id="apprenticeError" class="invalid-feedback"></div>
-                        </div>
-                        <div class="col-4">
-                            <label class="form-label">Hours</label>
-                            <div class="spinner-control">
-                                <button type="button" class="spinner-btn spinner-minus" id="hoursMinus">−</button>
-                                <input type="number" id="hours" class="form-control spinner-input" min="0" step="1"
-                                    value="0">
-                                <button type="button" class="spinner-btn spinner-plus" id="hoursPlus">+</button>
+                            <div class="col-4">
+                                <label class="form-label">OT Apprentice</label>
+                                <div class="spinner-control">
+                                    <button type="button" class="spinner-btn spinner-minus"
+                                        id="otApprenticeMinus">−</button>
+                                    <input type="number" id="otApprentice" class="form-control spinner-input" min="0"
+                                        max="10" value="0">
+                                    <button type="button" class="spinner-btn spinner-plus"
+                                        id="otApprenticePlus">+</button>
+                                </div>
+                                <div id="otApprenticeError" class="invalid-feedback"></div>
                             </div>
-                            <div id="hoursError" class="invalid-feedback"></div>
+                            <div class="col-4">
+                                <label class="form-label">OT Hours</label>
+                                <div class="spinner-control">
+                                    <button type="button" class="spinner-btn spinner-minus" id="otHoursMinus">−</button>
+                                    <input type="number" id="otHours" class="form-control spinner-input" min="0"
+                                        step="1" value="0">
+                                    <button type="button" class="spinner-btn spinner-plus" id="otHoursPlus">+</button>
+                                </div>
+                                <div id="otHoursError" class="invalid-feedback"></div>
+                            </div>
                         </div>
                     </div>
 
@@ -340,11 +390,11 @@
                             style="display:none;"></div>
                         <div id="uploadStatus" class="photo-status mt-2" style="display:none;"></div>
                     </div>
-                     <div>
-                                <label class="form-label">Notes</label>
-                                <textarea id="customerNotes" class="form-control auto-resize" rows="1" maxlength="150"
-                                    placeholder="Enter notes"></textarea>
-                            </div>
+                    <div>
+                        <label class="form-label">Notes</label>
+                        <textarea id="customerNotes" class="form-control auto-resize" rows="1" maxlength="150"
+                            placeholder="Enter notes"></textarea>
+                    </div>
                     <div class="summary-title mt-3">Org & Tags</div>
 
                     <div class="summary-estimates">
@@ -367,7 +417,8 @@
                         <div class="row g-3 align-items-start ms-2 me-2 mb-2">
                             <div class="col-6">
                                 <label class="form-label">Cost Center</label>
-                                <select data-hcg-select data-placeholder="Select Cost Center" id="costCenterSelect" class="form-select" aria-label="Cost Center">
+                                <select data-hcg-select data-placeholder="Select Cost Center" id="costCenterSelect"
+                                    class="form-select" aria-label="Cost Center">
                                     <option value="">Select Cost Center</option>
                                 </select>
                                 <div id="costCenterError" class="invalid-feedback"></div>
@@ -379,7 +430,8 @@
                             </div>
                             <div class="col-6">
                                 <label class="form-label">Service Manager</label>
-                                <select data-hcg-select data-placeholder="Select Service Manager" id="serviceManagerSelect" class="form-select" aria-label="Service Manager">
+                                <select data-hcg-select data-placeholder="Select Service Manager"
+                                    id="serviceManagerSelect" class="form-select" aria-label="Service Manager">
                                     <option value="">Select Service Manager</option>
                                 </select>
                                 <div id="serviceManagerError" class="invalid-feedback"></div>
@@ -388,21 +440,13 @@
                         <div class="row g-3 align-items-start ms-2 me-2 mb-2">
                             <div class="col-6">
                                 <label class="form-label">Tags</label>
-                                <select data-hcg-select data-placeholder="Select Tags" id="tagsSelect" class="form-select" aria-label="Tags">
+                                <select data-hcg-select data-placeholder="Select Tags" id="tagsSelect"
+                                    class="form-select" aria-label="Tags">
                                     <option value="">Select Tags</option>
                                 </select>
                                 <div id="tagsError" class="invalid-feedback"></div>
                             </div>
-                            <div class="col-6 d-flex align-items-center afterhrs-container">
-                                <label class="after-hours-label">After Hours (OT)?</label>
-                                <div class="form-check form-switch">
-                                    <!-- <input class="form-check-input" type="checkbox" id="afterHours"> -->
-                                    <label class="switch">
-                                        <input type="checkbox" id="afterHours">
-                                        <span class="slider round"></span>
-                                    </label>
-                                </div>
-                            </div>
+                            
                         </div>
 
                     </div>
@@ -419,13 +463,14 @@
             <button class="btn1 btn btn-outline-secondary btn-sm" id="backBtn" aria-label="Back" style="display: none;">
                 <i class="fa-solid fa-arrow-left"></i>Back
             </button>
-            
-                <button id="nextBtn" type="button" class="customer-next-btn btn1 btn btn-primary">Next <span><i class="fa-solid fa-angle-right"></i></span>&nbsp;&nbsp;Asset & Fault</button>
 
-                <button style="display: none;" type="button" class="btn1 btn btn-outline-secondary btn-sm"
-                    id="createNewBtn">+ New</button>
+            <button id="nextBtn" type="button" class="customer-next-btn btn1 btn btn-primary">Next <span><i
+                        class="fa-solid fa-angle-right"></i></span>&nbsp;&nbsp;Asset & Fault</button>
 
-            
+            <button style="display: none;" type="button" class="btn1 btn btn-outline-secondary btn-sm"
+                id="createNewBtn">+ New</button>
+
+
 
         </div>
         <!-- <div class="d-flex justify-content-center align-items-center">
@@ -457,15 +502,20 @@
         </div>
     </div>
 
-    <div id="createNewConfirmModal" style="display:none; position:fixed; inset:0; background:rgba(0,0,0,0.4); align-items:center; justify-content:center; z-index:99999;">
-        <div style="background:#fff; border-radius:10px; width:min(92vw, 420px); box-shadow:0 10px 30px rgba(0,0,0,0.2); padding:20px;">
+    <div id="createNewConfirmModal"
+        style="display:none; position:fixed; inset:0; background:rgba(0,0,0,0.4); align-items:center; justify-content:center; z-index:99999;">
+        <div
+            style="background:#fff; border-radius:10px; width:min(92vw, 420px); box-shadow:0 10px 30px rgba(0,0,0,0.2); padding:20px;">
             <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:12px;">
                 <h5 id="createNewConfirmModalTitle" style="margin:0; color:#222;">Create New Lead?</h5>
-                <button type="button" class="confirm-close" aria-label="Close" style="border:none; background:transparent; font-size:24px; line-height:1; color:#666; cursor:pointer; padding:0;">×</button>
+                <button type="button" class="confirm-close" aria-label="Close"
+                    style="border:none; background:transparent; font-size:24px; line-height:1; color:#666; cursor:pointer; padding:0;">×</button>
             </div>
-            <p id="createNewConfirmModalMessage" style="margin:0 0 16px; color:#555;">Do you want to keep the customer details and start a new lead with the rest cleared?</p>
+            <p id="createNewConfirmModalMessage" style="margin:0 0 16px; color:#555;">Do you want to keep the customer
+                details and start a new lead with the rest cleared?</p>
             <div style="display:flex; justify-content:flex-end; gap:10px;">
-                <button type="button" class="btn btn2 btn-border btn-outline-secondary confirm-no" style="display:none;">No</button>
+                <button type="button" class="btn btn2 btn-border btn-outline-secondary confirm-no"
+                    style="display:none;">No</button>
                 <button type="button" class="btn btn2 btn-primary confirm-yes">OK</button>
             </div>
         </div>
@@ -477,9 +527,9 @@
     <script src="https://cdn.jsdelivr.net/npm/html5-qrcode@2.3.8/minified/html5-qrcode.min.js"></script>
     <!-- QuaggaJS fallback for devices/browsers where Html5Qrcode doesn't work (e.g., some iOS Safari cases) -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/quagga/0.12.1/quagga.min.js"></script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
-<script src="https://unpkg.com/hcg-searchable-select@1/hcg-select.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+    <script src="https://unpkg.com/hcg-searchable-select@1/hcg-select.js"></script>
 
     <script src="script/config.js"></script>
     <script src="script/lead-submit.js"></script>

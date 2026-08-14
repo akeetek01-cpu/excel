@@ -32,7 +32,9 @@ $(function () {
       hours: 0,
       totalHours: 0,
       apprentice: 0,
-      afterHours: false,
+      otTechnicians: 0,
+      otApprentice: 0,
+      otHours: 0,
       costCenter: "",
       costCenterLabel: "",
       tags: "",
@@ -235,7 +237,9 @@ $(function () {
     $("#technicians").val(1);
     $("#hours").val(0);
     $("#apprentice").val(0);
-    $("#afterHours").prop("checked", false);
+    $("#otTechnicians").val(0);
+    $("#otApprentice").val(0);
+    $("#otHours").val(0);
     jobData.customer = {
       customerId: "",
       id: "",
@@ -268,7 +272,9 @@ $(function () {
       hours: 0,
       totalHours: 0,
       apprentice: 0,
-      afterHours: false,
+      otTechnicians: 0,
+      otApprentice: 0,
+      otHours: 0,
       costCenter: "",
       costCenterLabel: "",
       tags: "",
@@ -330,6 +336,28 @@ $(function () {
     $(".fault-card").removeClass("fault-card-invalid");
     $(".fault-header").removeClass("fault-header-invalid");
     addFault();
+    // Ensure searchable select UI reflects cleared values
+    try {
+      [
+        '#serviceManagerSelect',
+        '#costCenterSelect',
+        '#tagsSelect',
+        '#customerTenancy',
+        '#customerName'
+      ].forEach(function(sel) {
+        try {
+          $(sel).trigger('change');
+          const api = typeof hcgSelect === 'function' ? hcgSelect(sel) : null;
+          if (api && typeof api.refresh === 'function') api.refresh();
+        } catch (_) {}
+      });
+      // refresh all form-select wrappers as a fallback
+      const allApi = typeof hcgSelect === 'function' ? hcgSelect('.form-select') : null;
+      if (allApi && typeof allApi.refresh === 'function') allApi.refresh();
+    } catch (e) {
+      // ignore if hcgSelect not present
+    }
+
     showStep(0);
     calculate();
   }
@@ -1185,6 +1213,60 @@ $(function () {
     }
   });
 
+  // OT fields (after-hours) - mirror behavior of normal fields
+  $("#otTechnicians")
+    .on("input", function () {
+      const value = Number($(this).val() || 0);
+      if (!Number.isNaN(value) && value >= 0) {
+        $(this).val(Math.min(1000, Math.floor(value)));
+      }
+    })
+    .on("blur", function () {
+      const tech = Number($(this).val() || 0);
+      if (!Number.isInteger(tech) || tech < 0) {
+        showError(
+          "#otTechnicians",
+          "#otTechniciansError",
+          "No. of OT technicians must be a whole number greater than or equal to 0.",
+        );
+      } else {
+        clearError("#otTechnicians", "#otTechniciansError");
+      }
+    });
+
+  $("#otApprentice")
+    .on("input", function () {
+      const value = Number($(this).val() || 0);
+      if (!Number.isNaN(value) && value >= 0) {
+        $(this).val(Math.min(1000, Math.floor(value)));
+      }
+    })
+    .on("blur", function () {
+      const apprentice = Number($(this).val() || 0);
+      if (!Number.isInteger(apprentice) || apprentice < 0) {
+        showError(
+          "#otApprentice",
+          "#otApprenticeError",
+          "No. of OT apprentices must be a whole number greater than or equal to 0.",
+        );
+      } else {
+        clearError("#otApprentice", "#otApprenticeError");
+      }
+    });
+
+  $("#otHours").on("blur", function () {
+    const hrs = Number($(this).val() || 0);
+    if (isNaN(hrs) || hrs < 0.1 || hrs > 24) {
+      showError(
+        "#otHours",
+        "#otHoursError",
+        "OT Hours required must be between 0 and 24.",
+      );
+    } else {
+      clearError("#otHours", "#otHoursError");
+    }
+  });
+
   $(document).on("blur", ".fault-desc", function () {
     const $field = $(this);
     const $error = $field.closest(".fault-card").find(".fault-desc-error");
@@ -1881,7 +1963,9 @@ $(function () {
     jobData.estimates.hours = hrs;
     jobData.estimates.totalHours = totalHours;
     jobData.estimates.apprentice = Number($("#apprentice").val() || 0);
-    jobData.estimates.afterHours = $("#afterHours").is(":checked");
+    jobData.estimates.otTechnicians = Number($("#otTechnicians").val() || 0);
+    jobData.estimates.otApprentice = Number($("#otApprentice").val() || 0);
+    jobData.estimates.otHours = Number($("#otHours").val() || 0);
   }
 
   // Spinner button handlers
@@ -1941,7 +2025,64 @@ $(function () {
     }
   });
 
-  $("#technicians,#hours,#apprentice,#afterHours").on(
+  // OT spinner handlers
+  $("#otTechniciansMinus").on("click", function (e) {
+    e.preventDefault();
+    const current = Number($("#otTechnicians").val() || 0);
+    if (current > 0) {
+      $("#otTechnicians")
+        .val(current - 1)
+        .trigger("change");
+    }
+  });
+
+  $("#otTechniciansPlus").on("click", function (e) {
+    e.preventDefault();
+    const current = Number($("#otTechnicians").val() || 0);
+    $("#otTechnicians")
+      .val(Math.min(1000, current + 1))
+      .trigger("change");
+  });
+
+  $("#otApprenticeMinus").on("click", function (e) {
+    e.preventDefault();
+    const current = Number($("#otApprentice").val() || 0);
+    if (current > 0) {
+      $("#otApprentice")
+        .val(current - 1)
+        .trigger("change");
+    }
+  });
+
+  $("#otApprenticePlus").on("click", function (e) {
+    e.preventDefault();
+    const current = Number($("#otApprentice").val() || 0);
+    $("#otApprentice")
+      .val(Math.min(1000, current + 1))
+      .trigger("change");
+  });
+
+  $("#otHoursMinus").on("click", function (e) {
+    e.preventDefault();
+    const current = Number($("#otHours").val() || 0);
+    if (current > 0) {
+      $("#otHours")
+        .val(Math.max(0, current - 1))
+        .trigger("change");
+    }
+  });
+
+  $("#otHoursPlus").on("click", function (e) {
+    e.preventDefault();
+    const current = Number($("#otHours").val() || 0);
+    if (current < 24) {
+      $("#otHours")
+        .val(Math.min(24, current + 1))
+        .trigger("change");
+    }
+  });
+
+  $("#technicians,#hours,#apprentice,#otTechnicians,#otApprentice,#otHours").on(
     "input change",
     calculate,
   );
@@ -2790,7 +2931,9 @@ $(function () {
       jobData.estimates.hours = hours;
       jobData.estimates.totalHours = totalHours;
       jobData.estimates.apprentice = apprentice;
-      jobData.estimates.afterHours = $("#afterHours").is(":checked");
+      jobData.estimates.otTechnicians = Number($("#otTechnicians").val() || 0);
+      jobData.estimates.otApprentice = Number($("#otApprentice").val() || 0);
+      jobData.estimates.otHours = Number($("#otHours").val() || 0);
       jobData.estimates.costCenter = String(
         $("#costCenterSelect").val() || "",
       ).trim();
@@ -2836,7 +2979,9 @@ $(function () {
     const technicianCount = Number(jobData.estimates.technicians || 0);
     const apprenticeCount = Number(jobData.estimates.apprentice || 0);
     const hours = Number(jobData.estimates.hours || 0);
-    const afterHoursValue = jobData.estimates.afterHours ? "Yes" : "No";
+    const otTechnicians = Number(jobData.estimates.otTechnicians || 0);
+    const otApprentice = Number(jobData.estimates.otApprentice || 0);
+    const otHours = Number(jobData.estimates.otHours || 0);
     const costCenterLabel = String(
       jobData.estimates.costCenterLabel || "",
     ).trim();
@@ -2874,7 +3019,6 @@ $(function () {
       ["Asset Serial Number", assetSerialNumber],
       ["Technicians", technicianCount ? String(technicianCount) : ""],
       ["Apprentice", apprenticeCount ? String(apprenticeCount) : ""],
-      ["Hours", hours ? String(hours) : ""],
       // [
       //   "Total Technicians",
       //   technicianCount + apprenticeCount
@@ -2882,7 +3026,10 @@ $(function () {
       //     : "",
       // ],
       // ["Total Hours", totalHours ? String(totalHours) : ""],
-      ["After Hours", afterHoursValue],
+      ["Hours", hours ? String(hours) : ""],
+      ...(otTechnicians ? [["OT Technicians", String(otTechnicians)]] : []),
+      ...(otApprentice ? [["OT Apprentice", String(otApprentice)]] : []),
+      ...(otHours ? [["OT Hours", String(otHours)]] : []),
       ["Cost Center", costCenterLabel],
       ["Service Manager", serviceManagerLabel],
       ["Tag", tagLabel],
@@ -2925,8 +3072,41 @@ $(function () {
         detailRows.push([`Fault - Consumables`, consumablesItems]);
     });
 
-    const detailTable = detailRows.length
-      ? `<table style="border-collapse: collapse; width: 100%; font-family: Arial, sans-serif; font-size:14px; color:#222; line-height:1.5;">${detailRows.map(([label, value]) => `<tr><td style="border:1px solid #ddd; padding:6px 8px; font-weight:bold; width:35%;">${escapeHtml(label)}</td><td style="border:1px solid #ddd; padding:6px 8px;">${escapeHtml(value)}</td></tr>`).join("")}</table>`
+    // Ensure Notes appears just above any 'Parts Items' rows.
+    const partsItemsRows = detailRows.filter(([label]) => /Parts Items/i.test(label));
+    const otherPartsRows = detailRows.filter(
+      ([label]) => /Parts/i.test(label) && !/Parts Items/i.test(label),
+    );
+    const nonPartsRows = detailRows.filter(([label]) => !/Parts/i.test(label));
+
+    // Extract the Notes row from non-parts rows so we can place it before partsItemsRows
+    let notesRow = null;
+    const remainingNonParts = [];
+    for (const row of nonPartsRows) {
+      if (String(row[0] || "").trim() === "Notes") {
+        notesRow = row;
+      } else {
+        remainingNonParts.push(row);
+      }
+    }
+
+    const orderedDetailRows = [
+      ...remainingNonParts,
+      ...otherPartsRows,
+      ...(notesRow ? [notesRow] : []),
+      ...partsItemsRows,
+    ];
+
+    const detailTable = orderedDetailRows.length
+      ? `<table style="border-collapse: collapse; width: 100%; font-family: Arial, sans-serif; font-size:14px; color:#222; line-height:1.5;">${orderedDetailRows
+          .map(([label, value]) => {
+            const isParts = /Parts/i.test(label) || String(label).trim() === "Notes";
+            const valueHtml = isParts
+              ? `<span style=\"color:red\">${escapeHtml(value)}</span>`
+              : escapeHtml(value);
+            return `<tr><td style="border:1px solid #ddd; padding:6px 8px; font-weight:bold; width:35%;">${escapeHtml(label)}</td><td style="border:1px solid #ddd; padding:6px 8px;">${valueHtml}</td></tr>`;
+          })
+          .join("")}</table>`
       : "";
 
     return [
@@ -3214,7 +3394,7 @@ $(function () {
       const techCount = Number(jobData.estimates.technicians || 0);
       const apprCount = Number(jobData.estimates.apprentice || 0);
       const hrs = Number(jobData.estimates.hours || 0);
-      const afterHours = Boolean(jobData.estimates.afterHours);
+      const afterHours = false;
 
       if (techCount > 0) {
         const techLaborType =
@@ -3251,6 +3431,38 @@ $(function () {
         LaborType: window.getLaborTypeId("Senior Technician", false),
         Total: { Qty: 1 },
       });
+      // OT (after-hours) labour entries if provided
+      try {
+        const otTechCount = Number(jobData.estimates.otTechnicians || 0);
+        const otApprCount = Number(jobData.estimates.otApprentice || 0);
+        const otHrs = Number(jobData.estimates.otHours || 0);
+
+        if (otTechCount > 0 && otHrs > 0) {
+          const otTechLaborType =
+            typeof window.getLaborTypeId === "function"
+              ? window.getLaborTypeId("Technician", true)
+              : 0;
+          if (otTechLaborType) {
+            for (let i = 0; i < otTechCount; i += 1) {
+              payloads.push({ LaborType: otTechLaborType, Total: { Qty: otHrs } });
+            }
+          }
+        }
+
+        if (otApprCount > 0 && otHrs > 0) {
+          const otApprLaborType =
+            typeof window.getLaborTypeId === "function"
+              ? window.getLaborTypeId("Apprentice", true)
+              : 0;
+          if (otApprLaborType) {
+            for (let i = 0; i < otApprCount; i += 1) {
+              payloads.push({ LaborType: otApprLaborType, Total: { Qty: otHrs } });
+            }
+          }
+        }
+      } catch (err) {
+        console.warn("Failed to append OT labour payloads:", err);
+      }
     } catch (e) {
       console.warn("Failed to append technician/apprentice labor payloads:", e);
     }
