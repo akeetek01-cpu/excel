@@ -741,6 +741,8 @@ async function processQuoteBackgroundTasks(quoteData, options, quoteId, simproCo
               options.laborPayload,
               simproConfig,
             );
+            // small delay to give backend time to process cost center labour before adding catalog
+            await new Promise((resolve) => setTimeout(resolve, 1000));
           }
 
           if (options?.catalogPayload && sectionCostCenterId > 0) {
