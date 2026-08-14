@@ -1,6 +1,14 @@
 $(function () {
-  const savedEnv = localStorage.getItem("SIMPRO_ENV") || "PROD";
+    const PROD_UAT_ENABLE = "YES"; // Set to "YES" to enable the environment select dropdown, "NO" to hide it.
+    if (PROD_UAT_ENABLE !== "YES") {
+        $("#simproEnvSelect").closest("div").hide();
+         localStorage.setItem("SIMPRO_ENV", "PROD");
+    } else {
+      const savedEnv = localStorage.getItem("SIMPRO_ENV") || "PROD";
   $("#simproEnvSelect").val(savedEnv);
+        $("#simproEnvSelect").closest("div").show();
+    }
+
 
   if (window.location.pathname === "/login") {
     checkEmailInput();
