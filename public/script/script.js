@@ -442,6 +442,17 @@ $(function () {
     const $field = $(field);
     const $error = $(errorId);
     $field.addClass("is-invalid");
+    // If this is an hcg searchable select, also mark the visible wrapper as invalid
+    try {
+      if ($field.is('select')) {
+        let $wrapper = $field.next('.hcg-select');
+        if (!$wrapper.length) $wrapper = $field.closest('.hcg-select');
+        if (!$wrapper.length) $wrapper = $field.parent().find('.hcg-select').first();
+        if ($wrapper.length) $wrapper.addClass('is-invalid');
+      }
+    } catch (e) {
+      // silent
+    }
     $error.text(message);
   }
 
@@ -493,6 +504,17 @@ $(function () {
     const $field = $(field);
     const $error = $(errorId);
     $field.removeClass("is-invalid");
+    // also clear any hcg-select wrapper invalid state
+    try {
+      if ($field.is('select')) {
+        let $wrapper = $field.next('.hcg-select');
+        if (!$wrapper.length) $wrapper = $field.closest('.hcg-select');
+        if (!$wrapper.length) $wrapper = $field.parent().find('.hcg-select').first();
+        if ($wrapper.length) $wrapper.removeClass('is-invalid');
+      }
+    } catch (e) {
+      // silent
+    }
     if ($error.length) $error.text("");
   }
 
@@ -1231,6 +1253,17 @@ $(function () {
     if ($field.hasClass("is-invalid")) {
       $field.removeClass("is-invalid");
     }
+    // if this is an hcg searchable select, also clear wrapper invalid state
+    try {
+      if ($field.is('select')) {
+        let $wrapper = $field.next('.hcg-select');
+        if (!$wrapper.length) $wrapper = $field.closest('.hcg-select');
+        if (!$wrapper.length) $wrapper = $field.parent().find('.hcg-select').first();
+        if ($wrapper.length) $wrapper.removeClass('is-invalid');
+      }
+    } catch (e) {
+      // silent
+    }
 
     if ($field.hasClass("fault-desc")) {
       $field.closest(".fault-card").find(".fault-desc-error").text("");
@@ -1728,6 +1761,13 @@ $(function () {
     $card.find(".equipment-select").val("");
     $card.find('.equipment-select option[value=""]').prop("selected", true);
     $card.find(".equipment-qty").val(0);
+    // Refresh hcg searchable select UI so the visible wrapper shows placeholder (not previous value)
+    try {
+      const api = hcgSelect('.totalRecovery-select');
+      if (api && typeof api.refresh === 'function') api.refresh();
+    } catch (e) {
+      // ignore if hcgSelect not available
+    }
   });
 
   $(document).on("click", ".add-consumable-btn", function () {

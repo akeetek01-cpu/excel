@@ -902,6 +902,9 @@ input:checked + .slider:before {
   white-space: normal !important;
 }
 
+.summary-estimates .hcg-select-search {
+  display: none !important;
+}
 
 
 /* Responsive */
