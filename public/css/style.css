@@ -871,6 +871,28 @@ input:checked + .slider:before {
   margin: 0.5rem 1rem;
 }
 
+.hcg-select-control{
+      font-size: 13px !important;
+          padding: .375rem .75rem !important;
+          line-height:normal !important;
+
+}
+
+.fault-material-section .hcg-select {
+    width: 300px !important;
+    max-width: 300px !important;
+    min-width: 0 !important;
+}
+
+.fault-material-section .hcg-select__trigger {
+    overflow-x: auto !important;
+}
+
+.fault-material-section .hcg-select__value {
+    display: inline-block !important;
+    max-width: none !important;
+    white-space: nowrap !important;
+}
 /* Responsive */
 @media (max-width: 480px) {
   /* .container {

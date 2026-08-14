@@ -1356,7 +1356,7 @@ $(function () {
                 <div class="d-flex justify-content-between align-items-center">
                   <label class="form-label mb-0">Work Required (Select script)</label>
                 </div>
-                <select class="form-select work-req work-required-select" aria-label="Work Required" title="${f.work || ""}">
+                <select data-hcg-select data-placeholder="Select Work Required" class="form-select work-req work-required-select" aria-label="Work Required" title="${f.work || ""}">
                   <option value="">Select Work Required</option>
                 </select>
                 <div class="invalid-feedback work-req-error"></div>
@@ -1368,7 +1368,7 @@ $(function () {
                     <div class="fault-material-block">
                       <label class="form-label">Tool Recovery (Special Equipments & Consumables)</label>
                       <div class="d-flex align-items-center gap-2">
-                        <select class="form-select equipment-select totalRecovery-select" aria-label="Select equipment">
+                        <select data-hcg-select data-placeholder="Select Equipment" class="form-select equipment-select totalRecovery-select" aria-label="Select equipment">
                           <option value="">Select equipment</option>
                         </select>
                         <input type="text" inputmode="numeric" maxlength="2" class="form-control equipment-qty" value="0" style="max-width:65px;">
@@ -1454,6 +1454,16 @@ $(function () {
       updateAiLabelState($card);
     });
     calculate();
+     const api = hcgSelect('.form-select.work-req', {
+      maxResults: 10
+     });
+      api.refresh();
+
+       const api1 = hcgSelect('.totalRecovery-select', {
+        maxResults: 10
+       });
+      api1.refresh();
+
   }
 
   function addFault(autos = false) {

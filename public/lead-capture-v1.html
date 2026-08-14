@@ -12,6 +12,7 @@
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
     <!-- Google Fonts -->
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://unpkg.com/hcg-searchable-select@1/hcg-select.css">
     <link rel="stylesheet" href="css/style.css">
     <link rel="stylesheet" href="css/lead-style.css">
 
@@ -164,12 +165,6 @@
 
                             </div>
 
-                            <div>
-                                <label class="form-label">Notes</label>
-                                <textarea id="customerNotes" class="form-control auto-resize" rows="1" maxlength="150"
-                                    placeholder="Enter notes"></textarea>
-                            </div>
-
                         </form>
 
                     </div>
@@ -186,7 +181,7 @@
                                 <div class="flex-grow-1">
                                     <div class="row g-2 align-items-start">
                                         <div id="customerAssetIdSelectWrapper" class="col-12">
-                                            <select id="customerAssetId" class="form-select"
+                                            <select data-hcg-select id="customerAssetId" class="form-select" data-placeholder="Select / Enter"
                                                 aria-label="Customer asset ID or Excel barcode">
                                                 <option value="" selected disabled>Select / Enter</option>
                                                 <option value="other">Other</option>
@@ -345,6 +340,11 @@
                             style="display:none;"></div>
                         <div id="uploadStatus" class="photo-status mt-2" style="display:none;"></div>
                     </div>
+                     <div>
+                                <label class="form-label">Notes</label>
+                                <textarea id="customerNotes" class="form-control auto-resize" rows="1" maxlength="150"
+                                    placeholder="Enter notes"></textarea>
+                            </div>
                     <div class="summary-title mt-3">Org & Tags</div>
 
                     <div class="summary-estimates">
@@ -479,6 +479,8 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/quagga/0.12.1/quagga.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+<script src="https://unpkg.com/hcg-searchable-select@1/hcg-select.js"></script>
+
     <script src="script/config.js"></script>
     <script src="script/lead-submit.js"></script>
     <script src="script/lead-attachments.js"></script>
