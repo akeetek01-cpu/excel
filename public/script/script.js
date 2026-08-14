@@ -2850,6 +2850,21 @@ $(function () {
         clearError("#hours", "#hoursError");
       }
 
+      // OT validation: if OT technicians or OT apprentice entered, OT Hours must be provided
+      const otTechnicians = Number($("#otTechnicians").val() || 0);
+      const otApprentice = Number($("#otApprentice").val() || 0);
+      const otHours = Number($("#otHours").val() || 0);
+      if ((otTechnicians > 0 || otApprentice > 0) && (!Number.isFinite(otHours) || otHours <= 0 || otHours > 24)) {
+        showError(
+          "#otHours",
+          "#otHoursError",
+          "OT Hours must be between 0 and 24 when OT staff are entered.",
+        );
+        valid = false;
+      } else {
+        clearError("#otHours", "#otHoursError");
+      }
+
       return valid;
     }
     return true;
@@ -3061,21 +3076,21 @@ $(function () {
         )
         .join(", ");
 
-      if (description) detailRows.push([`Fault - Description`, description]);
-      if (work) detailRows.push([`Fault - Work Required`, work]);
+      if (description) detailRows.push([`Fault Description`, description]);
+      if (work) detailRows.push([`Work Required (Select script)`, work]);
       if (parts) detailRows.push([`Fault - Parts & Material`, parts]);
-      if (partsItems) detailRows.push([`Fault - Parts Items`, partsItems]);
+      if (partsItems) detailRows.push([`Parts & Material Required`, partsItems]);
       if (equipment) detailRows.push([`Fault - Equipment`, equipment]);
       if (equipmentItems)
-        detailRows.push([`Fault - Equipment Items`, equipmentItems]);
+        detailRows.push([`Tool Recovery (Special Equipments & Consumables)`, equipmentItems]);
       if (consumablesItems)
         detailRows.push([`Fault - Consumables`, consumablesItems]);
     });
 
-    // Ensure Notes appears just above any 'Parts Items' rows.
-    const partsItemsRows = detailRows.filter(([label]) => /Parts Items/i.test(label));
+    // Ensure Notes appears just above any 'Parts Items' / 'Parts & Material Required' rows.
+    const partsItemsRows = detailRows.filter(([label]) => /Parts\s*&\s*Material\s*Required/i.test(label) || /Parts Items/i.test(label));
     const otherPartsRows = detailRows.filter(
-      ([label]) => /Parts/i.test(label) && !/Parts Items/i.test(label),
+      ([label]) => /Parts/i.test(label) && !/Parts\s*&\s*Material\s*Required/i.test(label) && !/Parts Items/i.test(label),
     );
     const nonPartsRows = detailRows.filter(([label]) => !/Parts/i.test(label));
 
@@ -3427,10 +3442,7 @@ $(function () {
           }
         }
       }
-      payloads.push({
-        LaborType: window.getLaborTypeId("Senior Technician", false),
-        Total: { Qty: 1 },
-      });
+    
       // OT (after-hours) labour entries if provided
       try {
         const otTechCount = Number(jobData.estimates.otTechnicians || 0);
@@ -3463,6 +3475,10 @@ $(function () {
       } catch (err) {
         console.warn("Failed to append OT labour payloads:", err);
       }
+      payloads.push({
+        LaborType: window.getLaborTypeId("Senior Technician", false),
+        Total: { Qty: 1 },
+      });
     } catch (e) {
       console.warn("Failed to append technician/apprentice labor payloads:", e);
     }
@@ -3488,15 +3504,17 @@ $(function () {
 
       window.submitLeadToSimpro(jobData, {
         deferLoadingEnd: true,
+        showSuccessAlert: false,
         onSuccess: async function (response) {
           console.log(response);
 
           // --- Create Quote automatically using same data ---
+          let quoteResponse = null;
           try {
             const quotePayload = buildQuotePayload();
             if (window.submitQuoteToSimpro) {
               try {
-                await window.submitQuoteToSimpro(quotePayload, {
+                quoteResponse = await window.submitQuoteToSimpro(quotePayload, {
                   autoCreateSection: true,
                   costCenterId: Number($("#costCenterSelect").val() || 0) || 0,
                   costCenterName: String(
@@ -3508,12 +3526,12 @@ $(function () {
                   customFields: Array.isArray(jobData.customFields)
                     ? jobData.customFields
                     : [],
+                  showSuccessAlert: false,
                 });
-                console.log(
-                  "Quote created successfully and section request sent.",
-                );
+                console.log("Quote request finished.");
               } catch (qerr) {
-                //console.error("Quote creation failed:", qerr);
+                quoteResponse = qerr && qerr.responseJSON ? qerr.responseJSON : null;
+                console.warn("Quote creation failed:", qerr);
               }
             } else {
               console.warn("submitQuoteToSimpro is not available.");
@@ -3525,6 +3543,106 @@ $(function () {
           // finish loading only after quote flow completes
           if (typeof window.setLeadSubmitLoading === "function") {
             window.setLeadSubmitLoading(false);
+          }
+
+          // Show a single combined dialog for lead + quote results
+          try {
+            const leadResp = response || {};
+            const quoteResp = quoteResponse || {};
+            const leadOk = Boolean(
+              Number(leadResp?.ID || leadResp?.Id || leadResp?.id || leadResp?.leadId || leadResp?.leadCreated || 0),
+            );
+            const quoteOk = Boolean(
+              Number(quoteResp?.ID || quoteResp?.Id || quoteResp?.id || quoteResp?.quoteId || quoteResp?.quoteCreated || 0),
+            );
+            let finalMsg = "";
+            if (leadOk && quoteOk) {
+              finalMsg = "Lead and Quote created successfully.";
+            } else if (leadOk) {
+              finalMsg = "Lead created successfully. Quote creation may have failed.";
+            } else if (quoteOk) {
+              finalMsg = "Quote created successfully. Lead creation may have failed.";
+            } else if (leadResp?.message || quoteResp?.message) {
+              finalMsg = String(leadResp?.message || quoteResp?.message || "Operation completed.");
+            } else {
+              finalMsg = "Operation completed.";
+            }
+
+            // Helper to extract human-readable error text from various possible response shapes
+            function extractMsg(obj) {
+              if (!obj) return null;
+              if (typeof obj === "string") return obj;
+              if (typeof obj.message === "string" && obj.message.trim()) return obj.message.trim();
+              if (typeof obj.error === "string" && obj.error.trim()) return obj.error.trim();
+              if (typeof obj.detail === "string" && obj.detail.trim()) return obj.detail.trim();
+              if (typeof obj.error_description === "string" && obj.error_description.trim()) return obj.error_description.trim();
+
+              const collectErrors = (arr) => {
+                if (!Array.isArray(arr)) return null;
+                const msgs = arr
+                  .map((err) => {
+                    if (!err) return null;
+                    if (typeof err === "string" && err.trim()) return err.trim();
+                    if (typeof err.message === "string" && err.message.trim()) return err.message.trim();
+                    if (typeof err.msg === "string" && err.msg.trim()) return err.msg.trim();
+                    if (typeof err.error === "string" && err.error.trim()) return err.error.trim();
+                    // fallback: stringify the object
+                    try {
+                      return JSON.stringify(err);
+                    } catch (e) {
+                      return null;
+                    }
+                  })
+                  .filter(Boolean);
+                return msgs.length ? msgs.join("; ") : null;
+              };
+
+              // Common shapes: { error: { errors: [ { message } ] } }
+              if (obj.error && Array.isArray(obj.error.errors)) {
+                const m = collectErrors(obj.error.errors);
+                if (m) return m;
+              }
+
+              // Top-level errors array
+              if (Array.isArray(obj.errors) && obj.errors.length) {
+                const m = collectErrors(obj.errors);
+                if (m) return m;
+              }
+
+              // Nested data.errors or data.message
+              if (obj.data) {
+                if (typeof obj.data.message === "string" && obj.data.message.trim()) return obj.data.message.trim();
+                if (Array.isArray(obj.data.errors) && obj.data.errors.length) {
+                  const m = collectErrors(obj.data.errors);
+                  if (m) return m;
+                }
+              }
+
+              // As a last resort, try to stringify an `error` object
+              if (obj.error && typeof obj.error === "object") {
+                try {
+                  const s = JSON.stringify(obj.error);
+                  if (s) return s;
+                } catch (e) {
+                  /* ignore */
+                }
+              }
+
+              return null;
+            }
+
+            const leadErr = !leadOk ? extractMsg(leadResp) : null;
+            const quoteErr = !quoteOk ? extractMsg(quoteResp) : null;
+            if (leadErr) finalMsg += ` Lead error: ${leadErr}`;
+            if (quoteErr) finalMsg += (leadErr ? ";" : "") + ` Quote error: ${quoteErr}`;
+
+            if (typeof showAlertDialogSuccess === "function") {
+              showAlertDialogSuccess(finalMsg);
+            } else if (window.alert) {
+              window.alert(finalMsg);
+            }
+          } catch (e) {
+            console.warn("Error showing combined result dialog:", e);
           }
 
           if (typeof onSuccess === "function") {
