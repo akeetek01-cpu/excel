@@ -878,21 +878,32 @@ input:checked + .slider:before {
 
 }
 
-.fault-material-section .hcg-select {
+.fault-material-section1 .hcg-select {
     width: 300px !important;
     max-width: 300px !important;
     min-width: 0 !important;
 }
 
-.fault-material-section .hcg-select__trigger {
+.fault-material-section1 .hcg-select__trigger {
     overflow-x: auto !important;
 }
 
-.fault-material-section .hcg-select__value {
+.fault-material-section1 .hcg-select__value {
     display: inline-block !important;
     max-width: none !important;
     white-space: nowrap !important;
 }
+
+
+.fault-material-section .hcg-select {
+   flex: 1 !important;
+}
+.fault-material-section .hcg-select .hcg-select-label{
+  white-space: normal !important;
+}
+
+
+
 /* Responsive */
 @media (max-width: 480px) {
   /* .container {
