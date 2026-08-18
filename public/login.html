@@ -1,24 +1,19 @@
 <!DOCTYPE html>
 <html lang="en">
-
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Login</title>
-    <!-- Bootstrap 5 -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
     <!-- Font Awesome -->
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
     <!-- Google Fonts -->
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600&display=swap" rel="stylesheet">
-    <link href="css/style.css" rel="stylesheet">
-    <link href="css/lead-style.css" rel="stylesheet">
+        <link href="css/login-style.css" rel="stylesheet">
 
-</head>
-
-<body>
-
-    <!-- Loader -->
+  </head>
+  <body>
+     <!-- Loader -->
     <div id="containerLoader" class="d-none position-absolute top-0 start-0 w-100 h-100
                 d-flex justify-content-center align-items-center"
         style="background: rgba(255,255,255,.7); z-index:999;">
@@ -28,18 +23,8 @@
         </div>
 
     </div>
-
-    <div class="pre-login container">
-        <!-- Loader -->
-        <div id="loader" class="position-absolute top-0 start-0 w-100 h-100 d-none
-                justify-content-center align-items-center" style="background: rgba(255,255,255,0.8); z-index:1000;">
-
-            <div class="text-center">
-                <div class="spinner-border text-primary" role="status"></div>
-                <div class="mt-2">Please wait...</div>
-            </div>
-
-        </div>
+    <div class="app">
+      <div class="phone">
         <div style="width:20%;justify-content: space-between;position: relative;margin: 8px auto; display: none;">
             <select id="simproEnvSelect"
                 style="width:100%; padding:10px 12px; border:1px solid #ccc; border-radius:8px; background:#fff; color:#333; appearance:none;">
@@ -47,49 +32,21 @@
                 <option value="UAT">UAT</option>
             </select>
         </div>
-        <!-- Logo -->
-        <img class="logo" src="images/excel_log.png" alt="logo">
 
+        <div class="screen-header">
+          <button class="back-btn hidden" id="backBtn" aria-label="Back">
+            <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+              <path d="M15 18L9 12l6-6"/>
+            </svg>
+          </button>
+          <h1 class="title" id="pageTitle">Welcome Back</h1>
+        </div>
 
-        <!-- Title -->
-        <h2>Login</h2>
-        <!-- <div class="sub-text">
-            Don’t have an account? <a href="/register">Sign Up</a>
-        </div> -->
+        <div class="content" id="screenRoot"></div>
+      </div>
+    </div>
 
-        <!-- Form -->
-        <form id="loginForm">
-
-            <div class="card">
-                <div class="input-row">
-                    <!-- <img class="lable_icon" src="images/email.png" alt="email"> -->
-                    <i class="fa-regular fa-envelope"></i>
-                    <input type="email" id="email" placeholder="Enter email" required>
-                </div>
-
-                <div class="input-row">
-                    <!-- <img class="lable_icon" src="images/password.png" alt="password"> -->
-                    <i class="fa-solid fa-lock"></i>
-                    <input type="password" id="password" placeholder="Password" required>
-                    <span class="eye" onclick="togglePassword()"><img id="password_eye" class="lable_icon"
-                            src="images/password_eye_hide.png" alt="password_eye"></span>
-                </div>
-            </div>
-
-            <div id="forgotPassword" class="forgot d-flex justify-content-between d-none">
-                <a id="changePasswordLink" href="/forgotPassword">Change Password?</a>
-                <a id="forgotPasswordLink" href="#">Forgot Password?</a>
-            </div>
-
-            <button id="loginBtn" type="button" class="button btn1 btn d-none login">
-                <span class="button__text">Log In</span>
-            </button>
-            <div class="error" id="errorMsg">
-                Passwords do not match.
-            </div>
-        </form>
-
-        <div id="createNewConfirmModal"
+    <div id="createNewConfirmModal"
             style="display:none; position:fixed; inset:0; background:rgba(0,0,0,0.4); align-items:center; justify-content:center; z-index:99999;">
             <div
                 style="background:#fff; border-radius:10px; width:min(92vw, 420px); box-shadow:0 10px 30px rgba(0,0,0,0.2); padding:20px;">
@@ -107,8 +64,6 @@
                 </div>
             </div>
         </div>
-    </div>
-
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
     <script src="script/common.js"></script>
 
@@ -118,16 +73,311 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"
         crossorigin="anonymous" referrerpolicy="no-referrer" />
     <script>
+      function icon(email) {
+        if (email === 'mail') return '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 6.5h16a1.5 1.5 0 0 1 1.5 1.5v9A1.5 1.5 0 0 1 20 17.5H4A1.5 1.5 0 0 1 2.5 16V8A1.5 1.5 0 0 1 4 6.5z"/><path d="m4 8 8 6 8-6"/></svg>';
+        if (email === 'lock') return '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="5" y="10" width="14" height="10" rx="2"/><path d="M8 10V7.5a4 4 0 1 1 8 0V10"/></svg>';
+        if (email === 'eye') return '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M2.5 12S6.5 5.5 12 5.5 21.5 12 21.5 12 17.5 18.5 12 18.5 2.5 12 2.5 12Z"/><circle cx="12" cy="12" r="2.8"/></svg>';
+        if (email === 'eyeOff') return '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 3l18 18"/><path d="M10.6 10.6A2.8 2.8 0 0 0 13.4 13.4"/><path d="M9.1 5.5A11 11 0 0 1 12 5.5c5.5 0 9.5 6.5 9.5 6.5a17.2 17.2 0 0 1-4.5 5.2"/><path d="M6.2 6.8A16.6 16.6 0 0 0 2.5 12s4 6.5 9.5 6.5a10.7 10.7 0 0 0 4.1-.8"/></svg>';
+        if (email === 'shield') return '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 3 5.5 6v5c0 4.2 2.7 8.1 6.5 10 3.8-1.9 6.5-5.8 6.5-10V6L12 3Z"/><path d="M9.5 12.5 11 14l3.5-4"/></svg>';
+        return '<svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M15 18L9 12l6-6"/></svg>';
+      }
 
-        // Show/Hide Password
-        function togglePassword() {
-            const pwd = document.getElementById("password");
-            pwd.type = pwd.type === "password" ? "text" : "password";
+      function getLoginScreen() {
+        const active = appState.accountStatus === 'ACTIVE';
+        const pwDisabled = !active;
 
-            document.getElementById("password_eye").src = pwd.type === "password" ? "images/password_eye_hide.png" : "images/password_eye_show.png";
+        return `
+          <div class="icon-box" aria-label="Logo"><img class="logo" src="images/excel_log.png" alt="Excel Logo"></div>
+          <div class="subtitle">
+            <h2>Welcome Back</h2>
+            <p>Please login to continue</p>
+          </div>
+
+          <div class="field">
+            <label for="loginEmail">Email</label>
+            <div class="input-wrap">
+              <span class="input-icon">${icon('mail')}</span>
+              <input id="loginEmail" type="email" value="${appState.login.email}" placeholder="Enter your email" autocomplete="off" autocapitalize="none" spellcheck="false" />
+            </div>
+          </div>
+
+          <div class="field">
+            <label for="loginPassword">Password</label>
+            <div class="input-wrap ${pwDisabled ? 'disabled' : ''}">
+              <span class="input-icon">${icon('lock')}</span>
+              <input id="loginPassword" type="${appState.passwordVisible.login ? 'text' : 'password'}" value="${appState.login.password}" placeholder="Enter your password" ${pwDisabled ? 'disabled' : ''} autocomplete="new-password" autocapitalize="none" spellcheck="false" />
+              <button class="toggle-visibility" type="button" aria-label="Toggle password visibility" data-field="login" ${pwDisabled ? 'disabled' : ''}>${appState.passwordVisible.login ? icon('eyeOff') : icon('eye')}</button>
+            </div>
+          </div>
+
+          ${active ? '<button id="loginBtn" class="btn primary-btn" type="button" data-action="login">Login</button>' : '<button id="activateBtn" class="btn btn-outline-primary" type="button" data-action="activate">Activate Account</button>'}
+
+          <div class="divider">or</div>
+
+          <div class="actions">
+            <button id="changePasswordBtn" class="link-btn" type="button" data-action="change-password">Change Password</button>
+            <button class="link-btn" type="button" data-action="forgot-password">Forgot Password?</button>
+          </div>
+
+          <div class="info-box">
+            <div class="info-row">
+              <span class="info-dot">i</span>
+              <div class="message-line">
+                ${active
+                  ? '<div>Account is active.</div><div>Password field is enabled.</div><div>Login button is shown.</div>'
+                  : '<div>Account is not active.</div><div>Password field is disabled.</div><div>Activate Account button is shown.</div>'}
+              </div>
+            </div>
+          </div>
+        `;
+      }
+
+      function getForgotScreen() {
+        return `
+          <div class="icon-box"><img class="logo" src="images/excel_log.png" alt="Excel Logo"></div>
+          <div class="subtitle" style="margin-top:-4px;">
+            <p>Enter your registered email address.</p>
+            <p>We will send you a verification code</p>
+            <p>to reset your password.</p>
+          </div>
+
+          <div class="field">
+            <label for="forgotEmail">Email</label>
+            <div class="input-wrap">
+              <span class="input-icon">${icon('mail')}</span>
+              <input id="forgotEmail" type="email" value="${appState.forgotEmail}" placeholder="Enter your email address" />
+            </div>
+          </div>
+
+          <button id="sendCodeBtn" class="primary-btn" type="button" data-action="send-code">Send Verification Code</button>
+
+          <div class="divider">or</div>
+          <div style="display:flex;justify-content:center;">
+            <button class="link-btn" type="button" data-action="login-back">Back to Login</button>
+          </div>
+
+          <div class="info-box">
+            <div class="info-row">
+              <span class="info-dot">i</span>
+              <div class="message-line">Please check your inbox and spam<br>folder if you don't see the email.</div>
+            </div>
+          </div>
+        `;
+      }
+
+      function getVerificationScreen() {
+        return `
+                  <div class="icon-box" aria-label="Logo"><img class="logo" src="images/excel_log.png" alt="Excel Logo"></div>
+          <div class="subtitle">
+            <h2>Enter the 6-digit code</h2>
+            <p>We sent a verification code to ${appState.verificationEmail}.</p>
+          </div>
+
+          <div class="field">
+            <label for="verificationCode">Verification Code</label>
+            <div class="input-wrap">
+              <span class="input-icon">${icon('lock')}</span>
+              <input id="verificationCode" type="text" value="${appState.verificationCode}" maxlength="6" placeholder="Enter 6-digit code" />
+            </div>
+          </div>
+
+          <button id="verifyCodeBtn" class="primary-btn" type="button" data-action="verify-code">Verify Code</button>
+          <div style="display:flex;justify-content:center;margin-top:14px;">
+            <button id="resendCodeBtn" class="link-btn" type="button" data-action="resend-code">Resend Code</button>
+          </div>
+        `;
+      }
+
+      function getResetScreen() {
+        return `
+          <div class="subtitle">
+            <h2>Create a new password</h2>
+          </div>
+
+          <div class="field">
+            <label for="resetPassword">New Password</label>
+            <div class="input-wrap">
+              <span class="input-icon">${icon('lock')}</span>
+              <input id="resetPassword" type="${appState.passwordVisible.reset ? 'text' : 'password'}" value="${appState.resetPassword}" placeholder="Enter new password" />
+              <button class="toggle-visibility" type="button" aria-label="Toggle password visibility" data-field="reset">${appState.passwordVisible.reset ? icon('eyeOff') : icon('eye')}</button>
+            </div>
+            <div class="helper-text">Password must be at least 8 characters.</div>
+          </div>
+
+          <div class="field">
+            <label for="resetConfirm">Confirm New Password</label>
+            <div class="input-wrap">
+              <span class="input-icon">${icon('lock')}</span>
+              <input id="resetConfirm" type="${appState.passwordVisible.resetConfirm ? 'text' : 'password'}" value="${appState.resetConfirm}" placeholder="Confirm new password" />
+              <button class="toggle-visibility" type="button" aria-label="Toggle password visibility" data-field="resetConfirm">${appState.passwordVisible.resetConfirm ? icon('eyeOff') : icon('eye')}</button>
+            </div>
+          </div>
+
+          <button id="resetPasswordBtn" class="primary-btn" type="button" data-action="reset-submit">Reset Password</button>
+        `;
+      }
+
+      function getChangeScreen() {
+        return `
+          <div class="icon-box" style="width:92px;height:92px;"><img class="logo" src="images/excel_log.png" alt="Excel Logo"></div>
+          <div class="subtitle" style="margin-top:-4px;">
+            <p>Enter your current password and</p>
+            <p>new password to update.</p>
+          </div>
+
+          <div class="field">
+            <label for="currentPassword">Current Password</label>
+            <div class="input-wrap">
+              <span class="input-icon">${icon('lock')}</span>
+              <input id="currentPassword" type="${appState.passwordVisible.current ? 'text' : 'password'}" value="${appState.currentPassword}" placeholder="Enter current password" />
+              <button class="toggle-visibility" type="button" aria-label="Toggle password visibility" data-field="current">${appState.passwordVisible.current ? icon('eyeOff') : icon('eye')}</button>
+            </div>
+          </div>
+
+          <div class="field">
+            <label for="newPassword">New Password</label>
+            <div class="input-wrap">
+              <span class="input-icon">${icon('lock')}</span>
+              <input id="newPassword" type="${appState.passwordVisible.new ? 'text' : 'password'}" value="${appState.newPassword}" placeholder="Enter new password" />
+              <button class="toggle-visibility" type="button" aria-label="Toggle password visibility" data-field="new">${appState.passwordVisible.new ? icon('eyeOff') : icon('eye')}</button>
+            </div>
+          </div>
+
+          <div class="helper-text">Password must be at least 8 characters.</div>
+
+          <div class="field" style="margin-top:18px;">
+            <label for="confirmPassword">Confirm New Password</label>
+            <div class="input-wrap">
+              <span class="input-icon">${icon('lock')}</span>
+              <input id="confirmPassword" type="${appState.passwordVisible.confirm ? 'text' : 'password'}" value="${appState.confirmPassword}" placeholder="Confirm new password" />
+              <button class="toggle-visibility" type="button" aria-label="Toggle password visibility" data-field="confirm">${appState.passwordVisible.confirm ? icon('eyeOff') : icon('eye')}</button>
+            </div>
+          </div>
+
+          <button id="updatePasswordBtn" class="primary-btn" type="button" data-action="change-submit">Update Password</button>
+          <div style="display:flex;justify-content:center;margin-top:16px;">
+            <button class="link-btn" type="button" data-action="login-back">Back to Login</button>
+          </div>
+        `;
+      }
+
+      function render() {
+        const pageTitle = document.getElementById('pageTitle');
+        const screenRoot = document.getElementById('screenRoot');
+        const backBtn = document.getElementById('backBtn');
+
+        if (appState.route === 'login') {
+          pageTitle.textContent = 'Welcome Back';
+          screenRoot.innerHTML = getLoginScreen();
+          backBtn.classList.add('hidden');
+        } else if (appState.route === 'forgot') {
+          pageTitle.textContent = 'Forgot Password';
+          screenRoot.innerHTML = getForgotScreen();
+          backBtn.classList.remove('hidden');
+        } else if (appState.route === 'verification') {
+          pageTitle.textContent = 'Verification';
+          screenRoot.innerHTML = getVerificationScreen();
+          backBtn.classList.remove('hidden');
+        } else if (appState.route === 'reset') {
+          pageTitle.textContent = 'Reset Password';
+          screenRoot.innerHTML = getResetScreen();
+          backBtn.classList.remove('hidden');
+        } else if (appState.route === 'change') {
+          pageTitle.textContent = 'Change Password';
+          screenRoot.innerHTML = getChangeScreen();
+          backBtn.classList.remove('hidden');
         }
+      }
+
+      document.addEventListener('input', (event) => {
+        const target = event.target;
+        if (!target) return;
+
+        if (target.id === 'loginEmail') appState.login.email = target.value;
+        if (target.id === 'loginPassword') appState.login.password = target.value;
+        if (target.id === 'forgotEmail') appState.forgotEmail = target.value;
+        if (target.id === 'verificationCode') appState.verificationCode = target.value;
+        if (target.id === 'resetPassword') appState.resetPassword = target.value;
+        if (target.id === 'resetConfirm') appState.resetConfirm = target.value;
+        if (target.id === 'currentPassword') appState.currentPassword = target.value;
+        if (target.id === 'newPassword') appState.newPassword = target.value;
+        if (target.id === 'confirmPassword') appState.confirmPassword = target.value;
+      });
+
+      document.addEventListener('click', (event) => {
+        const item = event.target.closest('[data-action]');
+        const toggle = event.target.closest('[data-field]');
+
+        if (toggle) {
+          const field = toggle.dataset.field;
+          appState.passwordVisible[field] = !appState.passwordVisible[field];
+          render();
+          return;
+        }
+
+        if (!item) return;
+        const action = item.dataset.action;
+
+        if (action === 'forgot-password') {
+          appState.route = 'forgot';
+          render();
+        }
+
+        if (action === 'login-back') {
+          appState.route = 'login';
+          render();
+        }
+
+        if (action === 'change-password') {
+        //   appState.route = 'change';
+        //   render();
+        }
+
+        if (action === 'send-code') {
+        //   appState.route = 'verification';
+        //   render();
+        }
+
+        if (action === 'verify-code') {
+        //   appState.route = 'reset';
+        //   render();
+        }
+
+        if (action === 'reset-submit') {
+        //   appState.route = 'login';
+        //   render();
+        }
+
+        if (action === 'login') {
+          //appState.accountStatus = 'ACTIVE';
+          //render();
+        }
+
+        if (action === 'activate') {
+          //appState.accountStatus = 'ACTIVE';
+          //render();
+        }
+
+        if (action === 'resend-code') {
+          appState.route = 'verification';
+          render();
+        }
+
+        if (action === 'change-submit') {
+        //   appState.route = 'login';
+        //   render();
+        }
+      });
+
+      document.getElementById('backBtn').addEventListener('click', () => {
+        if (appState.route === 'forgot') appState.route = 'login';
+        else if (appState.route === 'verification') appState.route = 'forgot';
+        else if (appState.route === 'reset') appState.route = 'verification';
+        else if (appState.route === 'change') appState.route = 'login';
+        render();
+      });
+
+      render();
     </script>
-
-</body>
-
+  </body>
 </html>

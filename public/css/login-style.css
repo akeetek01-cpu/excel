@@ -1,0 +1,275 @@
+:root {
+        --bg: #ebebeb;
+        --card: #0b3453;
+        --border: rgba(255,255,255,0.12);
+        --text: #edf2f7;
+        --muted: rgba(237,242,247,0.8);
+        --input-bg: rgba(255,255,255,0.04);
+        --primary: #12c8c0;
+        --primary-text: white;
+        --link: #5ccfe5;
+        --soft: rgba(255,255,255,0.06);
+        --soft-border: rgba(255,255,255,0.12);
+        --disable: #eaeaea;
+        --disable-text: #7c7c7c;
+          --purple: #7c6ceb;
+      }
+
+      * { box-sizing: border-box; }
+      html, body {
+        margin: 0;
+        min-height: 100%;
+        font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+        background: #FFFFFF;
+        color: var(--text);
+      }
+      body {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        min-height: 100vh;
+        padding: 20px;
+        background: #FFFFFF;
+      }
+
+      input:-webkit-autofill,
+input:-webkit-autofill:hover,
+input:-webkit-autofill:focus {
+    -webkit-text-fill-color: #000;
+    transition: background-color 5000s ease-in-out 0s;
+}
+      .app {
+      width: 100%;
+max-width: 520px;
+padding: 25px;
+        display: flex;
+        justify-content: center;
+      }
+      .phone {
+        width: min(100%, 560px);
+        background: linear-gradient(180deg, #0b3453 0%, #0a2d4a 100%);
+        border: 1px solid var(--border);
+        border-radius: 18px;
+        min-height: 700px;
+        padding-bottom: 18px;
+      }
+      .status-bar {
+        display: none !important;
+      }
+      .sensor {
+        display: none !important;
+      }
+      .signal {
+        display: none !important;
+      }
+      .battery {
+        display: none !important;
+      }
+      .screen-header {
+        position: relative;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        padding: 8px 18px 0;
+      }
+      .back-btn {
+        position: absolute;
+        left: 18px;
+        top: 4px;
+        border: 0;
+        background: transparent;
+        color: var(--text);
+        cursor: pointer;
+        width: 28px;
+        height: 28px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        padding: 0;
+      }
+      .title {
+        margin: 0;
+        font-size: 28px;
+        font-weight: 700;
+      }
+      .content {
+        padding: 10px 24px 0;
+      }
+      .icon-box {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        margin: 8px auto 18px;
+        background: rgba(0,0,0,0.01);
+      }
+      .icon-box svg {
+        width: 46px;
+        height: 46px;
+      }
+      .subtitle {
+        text-align: center;
+        margin-bottom: 18px;
+      }
+      .subtitle h2 {
+        font-size: 18px;
+        margin: 0 0 4px;
+      }
+      .subtitle p {
+        margin: 0;
+        font-size: 14px;
+        color: var(--muted);
+      }
+      .field {
+        margin-bottom: 16px;
+      }
+      .field label {
+        display: block;
+        font-size: 15px;
+        font-weight: 600;
+        margin-bottom: 8px;
+      }
+      .input-wrap {
+        display: flex;
+        align-items: center;
+        width: 100%;
+        min-height: 52px;
+        border: 2px solid #4a4a4a;
+        border-radius: 12px;
+        background: #ffffff;
+      }
+      .input-wrap.disabled {
+        background: var(--disable);
+        border-color: #c3c3c3;
+      }
+      .input-icon {
+        width: 42px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: #2e2e2e;
+      }
+      .input-icon svg {
+        width: 18px;
+        height: 18px;
+      }
+      .input-wrap.disabled .input-icon {
+        color: var(--disable-text);
+      }
+      input {
+        flex: 1;
+        border: 0;
+        background: white;
+        outline: none;
+        min-height: 48px;
+        font-size: 16px;
+        padding: 0 8px 0 0;
+        color: black;
+        border-radius: 12px;
+        
+      }
+      input::placeholder {
+        color: #8a8a8a;
+      }
+      input:disabled {
+        color: var(--disable-text);
+      }
+      .disabled #loginPassword{
+        background: var(--disable);
+      }
+      .toggle-visibility {
+        width: 38px;
+        height: 38px;
+        border: 0;
+        background: transparent;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        cursor: pointer;
+        color: #2f2f2f;
+      }
+      .toggle-visibility:disabled {
+        color: var(--disable-text);
+        cursor: not-allowed;
+      }
+      .toggle-visibility svg {
+        width: 18px;
+        height: 18px;
+      }
+      .logo{
+        width: 150px;
+      }
+      .primary-btn,
+      .secondary-btn, .btn-outline-primary {
+        width: 100%;
+        border-radius: 12px;
+        border: 2px solid var(--primary);
+        min-height: 52px;
+        font-size: 16px;
+        cursor: pointer;
+      }
+      .btn-outline-primary {
+       color: var(--primary);
+      }
+
+      .btn:hover {
+    background: var(--purple);
+    color: #fff;
+}
+      .primary-btn {
+        background: var(--primary);
+        color: var(--primary-text);
+      }
+      .secondary-btn {
+        background: #f8f8f8;
+        color: var(--text);
+      }
+      .divider {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        margin: 18px 0 12px;
+        color: #ffffff;
+        font-weight: 600;
+      }
+      .divider::before,
+      .divider::after {
+        content: "";
+        height: 1px;
+        flex: 1;
+        background: rgba(255, 255, 255, 0.5);
+      }
+      .actions {
+        display: flex;
+        justify-content: space-between;
+        gap: 14px;
+      }
+      .link-btn {
+        background: transparent;
+        border: 0;
+        color: var(--link);
+        font-size: 15px;
+        cursor: pointer;
+        padding: 0;
+        font-weight: 600;
+      }
+      .info-box {
+        display: none !important;
+      }
+      .info-row {
+        display: none !important;
+      }
+      .info-dot {
+        display: none !important;
+      }
+      .helper-text {
+        font-size: 12px;
+        color: var(--muted);
+        margin-top: 6px;
+      }
+      .hidden { display: none !important; }
+      .message-line { line-height: 1.5; }
+      @media (max-width: 430px) {
+        body { padding: 12px; }
+        .phone { min-height: 660px; }
+        .content { padding-left: 18px; padding-right: 18px; }
+      }

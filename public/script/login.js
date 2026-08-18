@@ -1,92 +1,92 @@
+window.appState = window.appState || {
+  route: "login",
+  accountStatus: "ACTIVE",
+  login: { email: "", password: "" },
+  forgotEmail: "",
+  verificationCode: "",
+  resetPassword: "",
+  resetConfirm: "",
+  currentPassword: "",
+  newPassword: "",
+  confirmPassword: "",
+  userName: "",
+  verificationEmail: "",
+  tempPassword: "",
+  passwordVisible: {
+    login: false,
+    current: false,
+    new: false,
+    confirm: false,
+    reset: false,
+    resetConfirm: false,
+  },
+};
+
 $(function () {
-    const PROD_UAT_ENABLE = "YES"; // Set to "YES" to enable the environment select dropdown, "NO" to hide it.
-    if (PROD_UAT_ENABLE !== "YES") {
-        $("#simproEnvSelect").closest("div").hide();
-         localStorage.setItem("SIMPRO_ENV", "PROD");
-    } else {
-      const savedEnv = localStorage.getItem("SIMPRO_ENV") || "PROD";
-  $("#simproEnvSelect").val(savedEnv);
-        $("#simproEnvSelect").closest("div").show();
-    }
+  const PROD_UAT_ENABLE = "NO"; // Set to "YES" to enable the environment select dropdown, "NO" to hide it.
+  if (PROD_UAT_ENABLE !== "YES") {
+    $("#simproEnvSelect").closest("div").hide();
+    localStorage.setItem("SIMPRO_ENV", "PROD");
+  } else {
+    const savedEnv = localStorage.getItem("SIMPRO_ENV") || "PROD";
+    $("#simproEnvSelect").val(savedEnv);
+    $("#simproEnvSelect").closest("div").show();
+  }
 
+  $(document).on("input", "#loginEmail", function () {
+    // Fires while user is typing, pasting, deleting, etc.
+    console.log("Typing/Input:", this.value);
 
-  if (window.location.pathname === "/login") {
-    checkEmailInput();
-}
-  
-
-  $("#email").on("input", function () {
-    const email = $(this).val().trim();
-    if (email) {
-        $("#changePasswordLink").attr(
-            "href",
-            "/forgotPassword?email=" + encodeURIComponent(email)
-        );
-
-        //$("#forgotPassword").removeClass("d-none");
-    } else {
-        $("#changePasswordLink").attr("href", "/forgotPassword");
-        //$("#forgotPassword").addClass("d-none");
-    }
-
-    checkEmailInput();
+    handleInput($(this), "input");
   });
 
-  function callLogin() {
-    localStorage.removeItem("user");
-    const selectedEnv = $("#simproEnvSelect").val() || "PROD";
-    localStorage.setItem("SIMPRO_ENV", selectedEnv);
+  $(document).on("keydown", "#loginEmail", function (e) {
+    if (e.key === "Enter" || e.which === 13) {
+      e.preventDefault();
 
-    $("#errorMsg").css("visibility", "hidden");
-    $("#loginBtn").addClass("button--loading");
-    var data = {
-      email: $("#email").val(),
-      password: $("#password").val(),
-    };
-    $.ajax({
-      url: "/api/login",
-      method: "POST",
-      contentType: "application/json",
-      data: JSON.stringify(data),
-      success: function (result) {
-        hideLoader();
-        console.log("Login successful:", result.user);
-        localStorage.setItem("user", JSON.stringify(result.user));
-        $("#loginBtn").removeClass("button--loading");
-        window.location.href = "/dashboard";
-      },
-      error: function (xhr) {
-         hideLoader();
-        localStorage.removeItem("user");
-        $("#loginBtn").removeClass("button--loading");
-        var msg =
-          xhr.responseJSON && xhr.responseJSON.error
-            ? xhr.responseJSON.error
-            : "Login failed";
-        $("#errorMsg").text(msg);
-        $("#errorMsg").css("visibility", "visible");
-      },
+      console.log("Enter:", this.value);
+
+      handleInput($(this), "enter");
+    }
+  });
+
+  $(document).on("blur", "#loginEmail", function () {
+    // Fires when user clicks outside / tabs outside
+    console.log("Outside/Blur:", this.value);
+
+    handleInput($(this), "blur");
+  });
+
+  $(document).on("change", "#loginEmail", function () {
+    // Fires when value changes and input loses focus
+    console.log("Change:", this.value);
+
+    handleInput($(this), "change");
+  });
+
+  $(document).on("animationstart", "#loginEmail", function (e) {
+    if (e.originalEvent.animationName === "autofillDetected") {
+      // Browser saved value/autofill
+      console.log("Browser Autofill:", this.value);
+
+      handleInput($(this), "autofill");
+    }
+  });
+
+  function handleInput($input, eventType) {
+    const value = $.trim($input.val());
+    var emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    appState.verificationEmail = value;
+    if (emailRegex.test(value)) {
+      validateEmailFromApi(value);
+    }
+    console.log({
+      event: eventType,
+      value: value,
     });
   }
 
-  function checkEmailInput() {
-    $("#password").val("").trigger("input").trigger("change");
-    // Email regex
-    var emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-
-    var email = $("#email").val().trim();
-    if (emailRegex.test(email)) {
-      callUsersByEmail(email);
-    } else {
-      $("#password")
-        .prop("disabled", true)
-        .val("")
-        .trigger("input")
-        .trigger("change");
-    }
-  }
-  function callUsersByEmail() {
-    var email = $("#email").val().trim();
+  function validateEmailFromApi(email) {
     var settings = {
       url: "/api/usersbyemail",
       method: "POST",
@@ -100,77 +100,198 @@ $(function () {
     };
     $.ajax(settings)
       .done(function (response) {
-        if (
+        const nextStatus =
           response &&
           response.isAccountActive &&
           response.isAccountActive === true
-        ) {
-          $("#password").prop("disabled", false);
-          $("#forgotPassword").removeClass("d-none");
-          $("#loginBtn").removeClass("d-none");
-          $("#loginBtn").text("Login");
-        } else {
-          $("#password").prop("disabled", true);
-          $("#forgotPassword").addClass("d-none");
-          $("#loginBtn").removeClass("d-none");
-          $("#loginBtn").text("Activate Account");
+            ? "ACTIVE"
+            : "INACTIVE";
+
+        if (appState.accountStatus !== nextStatus) {
+          appState.accountStatus = nextStatus;
+          updateRender();
         }
-        console.log(response.Name);
+        appState.userName = response.Name;
+        console.log(response && response.Name ? response.Name : "No Name");
       })
       .fail(function (err) {
-        $("#password").prop("disabled", true);
-        $("#forgotPassword").addClass("d-none");
-        $("#loginBtn").addClass("d-none");
+        appState.accountStatus = "ACTIVE";
+        updateRender();
       });
   }
 
-  $("#loginBtn").on("click", function () {
-    showLoader();
-    const loginBtnText = $(this).text().trim();
-    var email = $("#email").val().trim();
-    if (loginBtnText === "Activate Account") {
-      const tempPw = getTempassword();
-      updateCurrentUserWithTempPassword(email, tempPw, false, false);
-    } else if (loginBtnText === "Login") {
-      callLogin();
+  function updateRender() {
+    if (typeof window.render === "function") {
+      window.render();
+    }
+  }
+
+  $(document).on("click", "#loginBtn", function () {
+    callLogin();
+  });
+
+  $(document).on("click", "#activateBtn", function () {
+    callActivate((isResendTempPw = false));
+  });
+
+  $(document).on("click", "#resendCodeBtn", function () {
+    $("#verificationCode").val("");
+    appState.tempPassword = "";
+    callActivate((isResendTempPw = true));
+  });
+
+  $(document).on("click", "#resetPasswordBtn", function () {
+    updatePassword(isTempFlow = true);
+  });
+   $(document).on("click", "#updatePasswordBtn", function () {
+    updatePassword(isTempFlow = false);
+  });
+
+   $(document).on("click", "#changePasswordBtn", function () {
+    const email = $("#loginEmail").val().trim();
+    if (email === "") {
+      showAlertDialog(
+        "Please enter your email address.",
+        "Change Password",
+        function () {},
+      );
+      return;
+    }
+    var emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+
+    if (!emailRegex.test(email)) {
+      showAlertDialog(
+        "Please enter a valid email address.",
+        "Change Password",
+        function () {},
+      );
+      return;
+    }
+    appState.route = 'change';
+    render();
+  });
+
+
+  $(document).on("click", "#sendCodeBtn", function () {
+    const email = $("#forgotEmail").val().trim();
+    appState.forgotEmail = email;
+    if (email === "") {
+      showAlertDialog(
+        "Please enter your email address.",
+        "Email Verification",
+        function () {},
+      );
+      return;
+    }
+     var emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+
+    if (!emailRegex.test(email)) {
+      showAlertDialog(
+        "Please enter a valid email address.",
+        "Email Verification",
+        function () {},
+      );
+      return;
+    }
+    const tempPw = getTempassword();
+    updateCurrentUserWithTempPassword(email, tempPw, false, false);
+  });
+
+  $(document).on("click", "#verifyCodeBtn", function () {
+    const verificationCode = $("#verificationCode").val().trim();
+    if (verificationCode === "") {
+      showAlertDialog(
+        "Please enter the verification code.",
+        "Email Verification",
+        function () {},
+      );
+      return;
+    }
+    if (appState.tempPassword === verificationCode) {
+      appState.route = "reset";
+      updateRender();
+    } else {
+      showAlertDialog(
+        "Invalid verification code. Please try again.",
+        "Email Verification",
+        function () {},
+      );
     }
   });
 
-  function sendPasswordToEmail(email, tempPw, isResendTempPw) {
-    var settings = {
-      url: "/api/sendEmail",
-      method: "POST",
-      timeout: 0,
-      headers: {
-        "Content-Type": "application/json",
-      },
-      data: JSON.stringify({
-        name: "Test",
+  function callLogin() {
+    const email = $("#loginEmail").val().trim();
+    const password = $("#loginPassword").val().trim();
+    if (email === "" || password === "") {
+      showAlertDialog(
+        "Please enter both email and password.",
+        "Login Error",
+        function () {},
+      );
+      return;
+    }
+    var emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    if (!emailRegex.test(email)) {
+      showAlertDialog(
+        "Please enter a valid email address.",
+        "Login Error",
+        function () {},
+      );
+      return;
+    }
+    showLoader();
+    localStorage.removeItem("user");
+    const selectedEnv = $("#simproEnvSelect").val() || "PROD";
+    localStorage.setItem("SIMPRO_ENV", selectedEnv);
 
-        email: email,
-
-        password: tempPw,
-      }),
+    var data = {
+      email: email,
+      password: password,
     };
-    $.ajax(settings)
-      .done(function (response) {
+    $.ajax({
+      url: "/api/login",
+      method: "POST",
+      contentType: "application/json",
+      data: JSON.stringify(data),
+      success: function (result) {
         hideLoader();
-        showAlertDialog(response.message, "Email Verification", function () {
-          if (!isResendTempPw) {
-            window.location.href =
-          "/forgotPassword?email=" + encodeURIComponent(email) +"&isTemp=true";
-          } else {
-            $('#oldPassword').attr('placeholder', 'Temp Password').prop('readonly', true).val(tempPw);
-          }
-      });
-      })
-      .fail(function (err) {
+        console.log("Login successful:", result.user);
+        localStorage.setItem("user", JSON.stringify(result.user));
+        $("#loginBtn").removeClass("button--loading");
+        window.location.href = "/lead-form";
+      },
+      error: function (xhr) {
         hideLoader();
-        showAlertDialog("Failed to send email", "Email Verification", function () {});
-      });
+        localStorage.removeItem("user");
+        $("#loginBtn").removeClass("button--loading");
+        var msg =
+          xhr.responseJSON && xhr.responseJSON.error
+            ? xhr.responseJSON.error
+            : "Login failed";
+        $("#errorMsg").text(msg);
+        $("#errorMsg").removeClass("d-none");
+      },
+    });
   }
 
-  function updateCurrentUserWithTempPassword(email, tempPw, isAccountActive, isResendTempPw) {
+  function callActivate(isResendTempPw = false) {
+    var email;
+    if (isResendTempPw) {
+      email = appState.verificationEmail;
+    } else {
+      email = $("#loginEmail").val().trim();
+    }
+    const tempPw = getTempassword();
+    updateCurrentUserWithTempPassword(email, tempPw, false, isResendTempPw);
+  }
+
+  function updateCurrentUserWithTempPassword(
+    email,
+    tempPw,
+    isAccountActive,
+    isResendTempPw,
+  ) {
+    showLoader();
     var settings = {
       url: "/api/users",
       method: "PUT",
@@ -186,31 +307,133 @@ $(function () {
     };
 
     $.ajax(settings)
-    .done(function (response) {
-       sendPasswordToEmail(email, tempPw, isResendTempPw);
-    
-    })
-    .fail(function (err) {
-      hideLoader();
-      console.log(err);
-          showAlertDialog(err.responseJSON.error, "Email Verification", function () {});
+      .done(function (response) {
+        console.log("User updated successfully:", response);
+        sendPasswordToEmail(email, tempPw, isResendTempPw);
+      })
+      .fail(function (err) {
+        hideLoader();
+        console.log(err);
+        showAlertDialog(
+          err.responseJSON.error,
+          "Email Verification",
+          function () {},
+        );
+      });
+  }
+
+  function sendPasswordToEmail(email, tempPw, isResendTempPw) {
+    var settings = {
+      url: "/api/sendEmail",
+      method: "POST",
+      timeout: 0,
+      headers: {
+        "Content-Type": "application/json",
+      },
+      data: JSON.stringify({
+        name: appState.userName || "HI",
+        email: email,
+        password: tempPw,
+      }),
+    };
+    $.ajax(settings)
+      .done(function (response) {
+        hideLoader();
+        appState.verificationEmail = email;
+        appState.tempPassword = tempPw;
+        showAlertDialog(response.message, "Email Verification", function () {
+          if (!isResendTempPw) {
+            appState.route = "verification";
+            updateRender();
+          } else {
+            appState.route = "verification";
+            updateRender();
+          }
+        });
+      })
+      .fail(function (err) {
+        hideLoader();
+        showAlertDialog(
+          "Failed to send email",
+          "Email Verification",
+          function () {},
+        );
       });
   }
   function getTempassword() {
     return Math.random().toString(36).substring(2, 8);
   }
 
-  $("#forgotPasswordLink").on("click", function() {
+  function updatePassword(isTempFlow = false) {
+    var newPassword = "";
+    var confirmPassword ="";
+    var oldPassword = "";
+    if (!isTempFlow) {
+      newPassword = $("#newPassword").val().trim();
+      confirmPassword = $("#confirmPassword").val().trim();
+      oldPassword = $("#currentPassword").val().trim();
+      if (oldPassword === "") {
+        showAlertDialog(
+          "Please enter your current password.",
+          "Change Password",
+          function () {},
+        );
+        return;
+      }
+    } else {
+      newPassword = $("#resetPassword").val().trim();
+      confirmPassword = $("#resetConfirm").val().trim();
+      oldPassword = appState.tempPassword;
+    }
+    if (newPassword === "" || confirmPassword === "") {
+      showAlertDialog(
+        "Please fill in both password fields.",
+        "Reset Password",
+        function () {},
+      );
+      return;
+    } else if (newPassword !== confirmPassword) {
+      showAlertDialog(
+        "Passwords do not match. Please try again.",
+        "Reset Password",
+        function () {},
+      );
+      return;
+    }
+
     showLoader();
-        const tempPw = getTempassword();
-        var email = $("#email").val().trim();
-      updateCurrentUserWithTempPassword(email, tempPw, true, false);
+
+    var data = {
+      email: appState.verificationEmail,
+      oldPassword: oldPassword,
+      newPassword: newPassword,
+      isTemp: isTempFlow,
+    };
+    $.ajax({
+      url: "/api/changePassword",
+      method: "POST",
+      contentType: "application/json",
+      data: JSON.stringify(data),
+      success: function (result) {
+        hideLoader();
+        showAlertDialog(
+          "Password has been successfully updated. Please log in with your new password.",
+          "Reset Password",
+          function () {
+            appState.route = "login";
+            appState.accountStatus = "ACTIVE";
+            updateRender();
+          },
+        );
+      },
+      error: function (xhr) {
+        hideLoader();
+        var msg =
+          xhr.responseJSON && xhr.responseJSON.error
+            ? xhr.responseJSON.error
+            : "Login failed";
+        showAlertDialog(msg, "Reset Password", function () {});
+      },
     });
-  
-     $("#resendPassword").on("click", function() {
-    showLoader();
-        const tempPw = getTempassword();
-        var email = $("#email").val().trim();
-      updateCurrentUserWithTempPassword(email, tempPw, true, true);
-    });
+  }
 });

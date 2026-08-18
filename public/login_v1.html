@@ -1,0 +1,155 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Login</title>
+    <!-- Bootstrap 5 -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+    <!-- Font Awesome -->
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600&display=swap" rel="stylesheet">
+    <link href="css/style.css" rel="stylesheet">
+    <link href="css/lead-style.css" rel="stylesheet">
+
+</head>
+
+<body>
+
+    <!-- Loader -->
+    <div id="containerLoader" class="d-none position-absolute top-0 start-0 w-100 h-100
+                d-flex justify-content-center align-items-center"
+        style="background: rgba(255,255,255,.7); z-index:999;">
+
+        <div class="spinner-border text-primary" role="status">
+            <span class="visually-hidden">Loading...</span>
+        </div>
+
+    </div>
+
+    <div class="pre-login container">
+        <!-- Loader -->
+        <div id="loader" class="position-absolute top-0 start-0 w-100 h-100 d-none
+                justify-content-center align-items-center" style="background: rgba(255,255,255,0.8); z-index:1000;">
+
+            <div class="text-center">
+                <div class="spinner-border text-primary" role="status"></div>
+                <div class="mt-2">Please wait...</div>
+            </div>
+
+        </div>
+        <div style="width:20%;justify-content: space-between;position: relative;margin: 8px auto; display: none;">
+            <select id="simproEnvSelect"
+                style="width:100%; padding:10px 12px; border:1px solid #ccc; border-radius:8px; background:#fff; color:#333; appearance:none;">
+                <option value="PROD">Production</option>
+                <option value="UAT">UAT</option>
+            </select>
+        </div>
+        
+        <!-- Logo -->
+        <div class="login-logo-container">
+            <img class="login-logo-img" src="images/excel_log.png" alt="logo">
+        </div>
+
+        <!-- Welcome Message -->
+        <div class="login-welcome">
+            <h1 class="login-title">Welcome Back</h1>
+            <p class="login-subtitle">Please login to continue</p>
+        </div>
+
+        <!-- Form -->
+        <form id="loginForm" class="login-form">
+
+            <!-- Email Input -->
+            <div class="form-group">
+                <label class="form-label">Email</label>
+                <div class="input-wrapper">
+                    <i class="fa-regular fa-envelope input-icon"></i>
+                    <input type="email" id="email" class="form-input" placeholder="Enter your email" required>
+                </div>
+            </div>
+
+            <!-- Password Input -->
+            <div class="form-group">
+                <label class="form-label">Password</label>
+                <div id="passwordWrapper" class="input-wrapper">
+                    <i class="fa-solid fa-lock input-icon"></i>
+                    <input type="password" id="password" class="form-input" placeholder="Enter your password" required>
+                    <span class="password-toggle" onclick="togglePassword()">
+                        <i id="password_eye_icon" class="fa-solid fa-eye"></i>
+                    </span>
+                </div>
+            </div>
+
+            <!-- Login Button -->
+            <button id="loginBtn" type="button" class="login-button">
+                <span class="button__text">Log In</span>
+            </button>
+
+            <!-- Error Message -->
+            <div class="error-message d-none" id="errorMsg">
+                Passwords do not match.
+            </div>
+
+            <div class="login-divider">or</div>
+            <!-- Links -->
+            <div id="forgotPassword" class="login-links d-none">
+                <a id="changePasswordLink" href="/forgotPassword" class="link-text">Change Password</a>
+                <a id="forgotPasswordLink" href="#" class="link-text">Forgot Password?</a>
+            </div>
+
+        </form>
+
+       
+        <div id="createNewConfirmModal"
+            style="display:none; position:fixed; inset:0; background:rgba(0,0,0,0.4); align-items:center; justify-content:center; z-index:99999;">
+            <div
+                style="background:#fff; border-radius:10px; width:min(92vw, 420px); box-shadow:0 10px 30px rgba(0,0,0,0.2); padding:20px;">
+                <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:12px;">
+                    <h5 id="createNewConfirmModalTitle" style="margin:0; color:#222;">Create New Lead?</h5>
+                    <button type="button" class="confirm-close" aria-label="Close"
+                        style="border:none; background:transparent; font-size:24px; line-height:1; color:#666; cursor:pointer; padding:0; display: none;">×</button>
+                </div>
+                <p id="createNewConfirmModalMessage" style="margin:0 0 16px; color:#555;">Do you want to keep the
+                    customer details and start a new lead with the rest cleared?</p>
+                <div style="display:flex; justify-content:flex-end; gap:10px;">
+                    <button type="button" class="btn btn2 btn-border btn-outline-secondary confirm-no"
+                        style="display:none;">No</button>
+                    <button type="button" class="btn btn2 btn-primary confirm-yes">OK</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script src="script/common.js"></script>
+
+    <script src="script/login.js"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600&display=swap" rel="stylesheet">
+    <!-- Font Awesome for icon fonts -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"
+        crossorigin="anonymous" referrerpolicy="no-referrer" />
+    <script>
+
+        // Show/Hide Password
+        function togglePassword() {
+            const pwd = document.getElementById("password");
+            const icon = document.getElementById("password_eye_icon");
+            
+            if (pwd.type === "password") {
+                pwd.type = "text";
+                icon.classList.remove("fa-eye");
+                icon.classList.add("fa-eye-slash");
+            } else {
+                pwd.type = "password";
+                icon.classList.remove("fa-eye-slash");
+                icon.classList.add("fa-eye");
+            }
+        }
+    </script>
+
+</body>
+
+</html>
