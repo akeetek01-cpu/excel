@@ -383,7 +383,7 @@ exports.sendEmail = async (req, res) => {
 
                 <p>
                     <a class="btn"
-                       href="http://localhost:3000/forgotPassword?email=${encodeURIComponent(email)}&tempPw=${encodeURIComponent(password)}&isTemp=true">
+                       href="https://excel--excel-292de.us-east4.hosted.app/login?email=${encodeURIComponent(email)}&tempPw=${encodeURIComponent(password)}&isTemp=true">
                        Change Password
                     </a>
                 </p>
