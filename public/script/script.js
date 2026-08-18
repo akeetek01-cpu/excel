@@ -1,4 +1,24 @@
 $(function () {
+  // Check if user is logged in; redirect to login if not
+  const user = localStorage.getItem("user");
+  if (!user) {
+    window.location.href = "/";
+    return;
+  }
+
+  // Parse and populate user details
+  try {
+    const userData = JSON.parse(user);
+    if (userData.Name) {
+      $("#yourName").val(userData.Name);
+    }
+    if (userData.TeamName) {
+      $("#yourManagerName").val(userData.TeamName);
+    }
+  } catch (e) {
+    console.warn("Unable to parse user data:", e);
+  }
+
   // Data model
   const jobData = {
     customer: {
