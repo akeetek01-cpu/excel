@@ -161,7 +161,7 @@ exports.changePassword = async (req, res) => {
 
         snapshot.forEach((childSnap) => {
             const user = childSnap.val();
-            if (isTemp === "true") {
+            if (isTemp === true || isTemp === "true") {
                 if (
                     user.Email === email &&
                     user.tempPassword === oldPassword
