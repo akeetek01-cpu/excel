@@ -14,7 +14,7 @@
   </head>
   <body>
      <!-- Loader -->
-    <div id="containerLoader" class="d-none position-absolute top-0 start-0 w-100 h-100
+    <div id="containerLoader" class="d-none position-fixed top-0 bottom-0 start-0 w-100 h-100
                 d-flex justify-content-center align-items-center"
         style="background: rgba(255,255,255,.7); z-index:999;">
 
@@ -190,6 +190,8 @@
 
       function getResetScreen() {
         return `
+                          <div class="icon-box" aria-label="Logo"><img class="logo" src="images/excel_log.png" alt="Excel Logo"></div>
+
           <div class="subtitle">
             <h2>Create a new password</h2>
           </div>
@@ -201,7 +203,6 @@
               <input id="resetPassword" type="${appState.passwordVisible.reset ? 'text' : 'password'}" value="${appState.resetPassword}" placeholder="Enter new password" />
               <button class="toggle-visibility" type="button" aria-label="Toggle password visibility" data-field="reset">${appState.passwordVisible.reset ? icon('eyeOff') : icon('eye')}</button>
             </div>
-            <div class="helper-text">Password must be at least 8 characters.</div>
           </div>
 
           <div class="field">
@@ -243,7 +244,6 @@
             </div>
           </div>
 
-          <div class="helper-text">Password must be at least 8 characters.</div>
 
           <div class="field" style="margin-top:18px;">
             <label for="confirmPassword">Confirm New Password</label>

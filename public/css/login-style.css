@@ -41,7 +41,6 @@ input:-webkit-autofill:focus {
       .app {
       width: 100%;
 max-width: 520px;
-padding: 25px;
         display: flex;
         justify-content: center;
       }
@@ -50,8 +49,7 @@ padding: 25px;
         background: linear-gradient(180deg, #0b3453 0%, #0a2d4a 100%);
         border: 1px solid var(--border);
         border-radius: 18px;
-        min-height: 700px;
-        padding-bottom: 18px;
+        min-height: 600px;
       }
       .status-bar {
         display: none !important;
@@ -124,9 +122,9 @@ padding: 25px;
       }
       .field label {
         display: block;
-        font-size: 15px;
-        font-weight: 600;
-        margin-bottom: 8px;
+    font-size: 14px;
+    font-weight: 500;
+            margin-bottom: 4px;
       }
       .input-wrap {
         display: flex;

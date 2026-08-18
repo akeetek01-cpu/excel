@@ -126,6 +126,20 @@ $(function () {
     }
   }
 
+  function navigateTo(route) {
+    if (!route) return;
+
+    if (route !== "verification") {
+      appState.verificationCode = "";
+      if (route === "login") {
+        appState.forgotEmail = "";
+      }
+    }
+
+    appState.route = route;
+    updateRender();
+  }
+
   $(document).on("click", "#loginBtn", function () {
     callLogin();
   });
@@ -135,8 +149,8 @@ $(function () {
   });
 
   $(document).on("click", "#resendCodeBtn", function () {
+    appState.verificationCode = "";
     $("#verificationCode").val("");
-    appState.tempPassword = "";
     callActivate((isResendTempPw = true));
   });
 
@@ -167,8 +181,7 @@ $(function () {
       );
       return;
     }
-    appState.route = 'change';
-    render();
+    navigateTo('change');
   });
 
 
@@ -194,7 +207,7 @@ $(function () {
       return;
     }
     const tempPw = getTempassword();
-    updateCurrentUserWithTempPassword(email, tempPw, false, false);
+    updateCurrentUserWithTempPassword(email, tempPw, true, false);
   });
 
   $(document).on("click", "#verifyCodeBtn", function () {
@@ -208,8 +221,7 @@ $(function () {
       return;
     }
     if (appState.tempPassword === verificationCode) {
-      appState.route = "reset";
-      updateRender();
+      navigateTo("reset");
     } else {
       showAlertDialog(
         "Invalid verification code. Please try again.",
@@ -268,21 +280,21 @@ $(function () {
           xhr.responseJSON && xhr.responseJSON.error
             ? xhr.responseJSON.error
             : "Login failed";
-        $("#errorMsg").text(msg);
-        $("#errorMsg").removeClass("d-none");
+        showAlertDialog(msg, "Login Error", function () {});
       },
     });
   }
 
   function callActivate(isResendTempPw = false) {
     var email;
+    var isAccountActive = (appState.forgotEmail.length > 0) ? true : false;
     if (isResendTempPw) {
       email = appState.verificationEmail;
     } else {
       email = $("#loginEmail").val().trim();
     }
     const tempPw = getTempassword();
-    updateCurrentUserWithTempPassword(email, tempPw, false, isResendTempPw);
+    updateCurrentUserWithTempPassword(email, tempPw, isAccountActive, isResendTempPw);
   }
 
   function updateCurrentUserWithTempPassword(
@@ -343,11 +355,9 @@ $(function () {
         appState.tempPassword = tempPw;
         showAlertDialog(response.message, "Email Verification", function () {
           if (!isResendTempPw) {
-            appState.route = "verification";
-            updateRender();
+            navigateTo("verification");
           } else {
-            appState.route = "verification";
-            updateRender();
+            navigateTo("verification");
           }
         });
       })
@@ -416,13 +426,18 @@ $(function () {
       data: JSON.stringify(data),
       success: function (result) {
         hideLoader();
+        appState.resetPassword = "";
+        appState.resetConfirm = "";
+        if (typeof $ !== "undefined") {
+          $("#resetPassword").val("");
+          $("#resetConfirm").val("");
+        }
         showAlertDialog(
           "Password has been successfully updated. Please log in with your new password.",
           "Reset Password",
           function () {
-            appState.route = "login";
             appState.accountStatus = "ACTIVE";
-            updateRender();
+            navigateTo("login");
           },
         );
       },
