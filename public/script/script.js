@@ -918,6 +918,12 @@ $(function () {
         }
         showError("#jobNumber", "#jobNumberError", "Job Number is required.");
       } else if (!$("#autoJob").is(":checked") && !/^\d{6}$/.test(value)) {
+        if (window.clearJobNumberDependentFields) {
+          window.clearJobNumberDependentFields();
+        } else {
+          $("#autoJobBtn").val("");
+          $("#customerTenancy").val("").trigger("change");
+        }
         showError(
           "#jobNumber",
           "#jobNumberError",

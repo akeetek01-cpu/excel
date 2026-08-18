@@ -33,6 +33,21 @@ $(function () {
     $("#simproEnvSelect").closest("div").show();
   }
 
+
+  const queryString = window.location.search;
+        const urlParams = new URLSearchParams(queryString);
+        const emailValue = urlParams.get('email');
+        const temp = urlParams.get('tempPw');
+        const isTemp = urlParams.get('isTemp'); 
+        if (isTemp === 'true') {
+          appState.verificationEmail = emailValue;
+          appState.tempPassword = temp;
+          appState.forgotEmail = emailValue;
+          updateRender();
+            navigateTo("verification");
+        } 
+
+
   $(document).on("input", "#loginEmail", function () {
     // Fires while user is typing, pasting, deleting, etc.
     console.log("Typing/Input:", this.value);

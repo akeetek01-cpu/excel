@@ -43,7 +43,15 @@ $(function () {
 
     $("#autoJobBtn").val("");
     $("#customerAssetIdSelectWrapper").removeClass("col-3-5")
-    $("#customerName").val("").removeClass("is-invalid");
+    
+    // Clear customer contact/name dropdown and reset related fields
+    const $customerName = $("#customerName");
+    $customerName.find("option").not(':first').remove();
+    $customerName.empty().append(new Option("Select Contact", "", true, true));
+    $customerName.find("option[value='']").prop("disabled", true).prop("hidden", true);
+    $customerName.append(new Option("Other", "other"));
+    $customerName.val("").removeClass("is-invalid");
+    
     $("#customerNameInput").val("").removeClass("is-invalid");
     $("#customerNameInputWrapper")
       .addClass("d-none")
