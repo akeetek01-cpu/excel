@@ -3357,7 +3357,8 @@ $(function () {
         ProjectManager: lead.ProjectManager || 0,
         // Technicians: lead.Salesperson || 0,
         // Technician: lead.Salesperson || 0,
-        LinkedJobID: Number(jobData.customer.jobNumber) || 0,
+        IsVariation: false,
+        //LinkedJobID: Number(jobData.customer.jobNumber) || 0,
         AutoAdjustStatus: !!lead.AutoAdjustStatus,
         Name:
           (Array.isArray(jobData.faults)

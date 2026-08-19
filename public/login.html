@@ -89,7 +89,6 @@
         return `
           <div class="icon-box" aria-label="Logo"><img class="logo" src="images/excel_log.png" alt="Excel Logo"></div>
           <div class="subtitle">
-            <h2>Welcome Back</h2>
             <p>Please login to continue</p>
           </div>
 
@@ -136,9 +135,7 @@
         return `
           <div class="icon-box"><img class="logo" src="images/excel_log.png" alt="Excel Logo"></div>
           <div class="subtitle" style="margin-top:-4px;">
-            <p>Enter your registered email address.</p>
-            <p>We will send you a verification code</p>
-            <p>to reset your password.</p>
+            
           </div>
 
           <div class="field">
@@ -169,8 +166,7 @@
         return `
                   <div class="icon-box" aria-label="Logo"><img class="logo" src="images/excel_log.png" alt="Excel Logo"></div>
           <div class="subtitle">
-            <h2>Enter the 6-digit code</h2>
-            <p>We sent a verification code to ${appState.verificationEmail}.</p>
+            <p>Enter the verification code sent to ${appState.verificationEmail}.</p>
           </div>
 
           <div class="field">
@@ -267,23 +263,23 @@
         const backBtn = document.getElementById('backBtn');
 
         if (appState.route === 'login') {
-          pageTitle.textContent = 'Welcome Back';
+          pageTitle.textContent = '';
           screenRoot.innerHTML = getLoginScreen();
           backBtn.classList.add('hidden');
         } else if (appState.route === 'forgot') {
-          pageTitle.textContent = 'Forgot Password';
+          pageTitle.textContent = '';
           screenRoot.innerHTML = getForgotScreen();
           backBtn.classList.remove('hidden');
         } else if (appState.route === 'verification') {
-          pageTitle.textContent = 'Verification';
+          pageTitle.textContent = '';
           screenRoot.innerHTML = getVerificationScreen();
           backBtn.classList.remove('hidden');
         } else if (appState.route === 'reset') {
-          pageTitle.textContent = 'Reset Password';
+          pageTitle.textContent = '';
           screenRoot.innerHTML = getResetScreen();
           backBtn.classList.remove('hidden');
         } else if (appState.route === 'change') {
-          pageTitle.textContent = 'Change Password';
+          pageTitle.textContent = '';
           screenRoot.innerHTML = getChangeScreen();
           backBtn.classList.remove('hidden');
         }
@@ -371,7 +367,7 @@
 
       document.getElementById('backBtn').addEventListener('click', () => {
         if (appState.route === 'forgot') appState.route = 'login';
-        else if (appState.route === 'verification') appState.route = 'forgot';
+        else if (appState.route === 'verification') appState.route = 'login';
         else if (appState.route === 'reset') appState.route = 'verification';
         else if (appState.route === 'change') appState.route = 'login';
         render();

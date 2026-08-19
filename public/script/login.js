@@ -91,8 +91,10 @@ $(function () {
   function handleInput($input, eventType) {
     const value = $.trim($input.val());
     var emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    var allowedDomains = ["excel.co.nz", "akeetek.com"];
+    var emailDomain = value.split("@").pop().toLowerCase();
     appState.verificationEmail = value;
-    if (emailRegex.test(value)) {
+    if (emailRegex.test(value) && allowedDomains.includes(emailDomain)) {
       validateEmailFromApi(value);
     }
     console.log({
@@ -410,9 +412,16 @@ $(function () {
       confirmPassword = $("#resetConfirm").val().trim();
       oldPassword = appState.tempPassword;
     }
-    if (newPassword === "" || confirmPassword === "") {
+    if (newPassword === "") {
       showAlertDialog(
-        "Please fill in both password fields.",
+        "Please enter new password.",
+        "Reset Password",
+        function () {},
+      );
+      return;
+    } if (confirmPassword === "") {
+      showAlertDialog(
+        "Please confirm new password.",
         "Reset Password",
         function () {},
       );

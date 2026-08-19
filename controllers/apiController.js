@@ -180,7 +180,7 @@ exports.changePassword = async (req, res) => {
 
         if (!userKey) {
             return res.status(401).json({
-                error: "Invalid email or old/temp password"
+                error: "Pasword mismatch"
             });
         }
 
@@ -414,7 +414,7 @@ exports.sendEmail = async (req, res) => {
 
         res.json({
             success: true,
-            message: `Temporary password sent to the user's ${email} successfully. Please reset your password using the temporary password.`
+            message: `Verification code sent to ${email}. Please check your inbox.`
         });
 
     } catch (err) {
