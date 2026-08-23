@@ -17,6 +17,8 @@ router.post("/changePassword", controller.changePassword);
 
 router.get("/InsertScript", controller.insertScript);
 router.post("/sendEmail", controller.sendEmail);
+router.get("/simpro/employees", controller.getSimproEmployees);
+router.get("/simpro/teams", controller.getSimproTeams);
 
 
 

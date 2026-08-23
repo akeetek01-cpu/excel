@@ -43,6 +43,61 @@ exports.dashboard = (req, res) => {
     res.json({ message: "Excel Protected API" });
 };
 
+exports.getSimproEmployees = async (req, res) => {
+  const { baseUrl, authToken, companyId } = getSimproConfig(req.query.env);
+  if (!authToken) {
+    return res.status(503).json({ error: "Simpro access token is not configured on the server" });
+  }
+
+  try {
+    const response = await axios.get(`${baseUrl}/companies/${companyId}/employees/`, {
+      params: {
+        search: "all",
+        columns: "ID,Name,Position,PrimaryContact",
+        pageSize: 250,
+        page: 1,
+        limit: 100
+      },
+      headers: {
+        Accept: "application/json",
+        Authorization: `Bearer ${authToken}`
+      },
+      timeout: 15000
+    });
+    return res.json(response.data);
+  } catch (error) {
+    console.error("Simpro employee request failed:", error.response?.status || error.message);
+    return res.status(error.response?.status || 502).json({ error: "Unable to retrieve employees from Simpro" });
+  }
+};
+
+exports.getSimproTeams = async (req, res) => {
+  const { baseUrl, authToken, companyId } = getSimproConfig(req.query.env);
+  if (!authToken) {
+    return res.status(503).json({ error: "Simpro access token is not configured on the server" });
+  }
+
+  try {
+    const response = await axios.get(`${baseUrl}/companies/${companyId}/setup/teams/`, {
+      params: {
+        search: "any",
+        pageSize: 250,
+        page: 1,
+        limit: 100
+      },
+      headers: {
+        Accept: "application/json",
+        Authorization: `Bearer ${authToken}`
+      },
+      timeout: 15000
+    });
+    return res.json(response.data);
+  } catch (error) {
+    console.error("Simpro team request failed:", error.response?.status || error.message);
+    return res.status(error.response?.status || 502).json({ error: "Unable to retrieve teams from Simpro" });
+  }
+};
+
 const db = require("../firebase");
 const { ref, set, get, child, update } = require("firebase/database");
 
