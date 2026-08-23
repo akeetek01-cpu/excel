@@ -1,10 +1,26 @@
-$(function () {
-  // Check if user is logged in; redirect to login if not
+function enforceLeadFormAccess() {
   const user = localStorage.getItem("user");
   if (!user) {
-    window.location.href = "/";
-    return;
+    window.location.replace("/");
+    return false;
   }
+  return true;
+}
+
+window.addEventListener("pageshow", enforceLeadFormAccess);
+
+$(function () {
+  if (!enforceLeadFormAccess()) return;
+
+  const user = localStorage.getItem("user");
+
+  $("#leadLogoutButton").on("click", function () {
+    showCustomDialogConfirm("Are you sure you want to logout?", "Logout Confirmation", function () {
+      window.localStorage.clear();
+      window.sessionStorage.clear();
+      window.location.replace("/");
+    });
+  });
 
   // Parse and populate user details
   try {
@@ -3199,7 +3215,7 @@ $(function () {
       { CustomField: 7, Value: "QUOTE Request - LEAD Form" },
       { CustomField: 4, Value: user.Name || "" },
       { CustomField: 6, Value: normalizeLeadTeamName(user.TeamName) || "" },
-      { CustomField: 5, Value: normalizeSalerPersonPosition(user.col3) || "" },
+      { CustomField: 5, Value: normalizeSalerPersonPosition(user.position) || "" },
     ].filter((field) => String(field.Value || "").trim() !== "");
 
     return {
@@ -3258,7 +3274,7 @@ $(function () {
       { CustomField: 7, Value: "QUOTE Request - LEAD Form" },
       { CustomField: 4, Value: user.Name || "" },
       { CustomField: 6, Value: normalizeLeadTeamName(user.TeamName) || ""  },
-      { CustomField: 5, Value: normalizeSalerPersonPosition(user.col3) || "" },
+      { CustomField: 5, Value: normalizeSalerPersonPosition(user.position) || "" },
     ].filter((field) => String(field.Value || "").trim() !== "");
 
     const attachments = [];

@@ -31,7 +31,7 @@
       const customFields = [
         { id: 7, value: "QUOTE Request - LEAD Form" },
         { id: 4, value: user.Name || "" },
-        { id: 6, value: user.col3 || "" },
+        { id: 6, value: user.position || "" },
         { id: 5, value: user.TeamName || "" },
       ];
 

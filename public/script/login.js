@@ -23,7 +23,7 @@ window.appState = window.appState || {
 };
 
 $(function () {
-  const PROD_UAT_ENABLE = "NO"; // Set to "YES" to enable the environment select dropdown, "NO" to hide it.
+  const PROD_UAT_ENABLE = "YES"; // Set to "YES" to enable the environment select dropdown, "NO" to hide it.
   if (PROD_UAT_ENABLE !== "YES") {
     $("#simproEnvSelect").closest("div").hide();
     localStorage.setItem("SIMPRO_ENV", "PROD");
@@ -91,7 +91,7 @@ $(function () {
   function handleInput($input, eventType) {
     const value = $.trim($input.val());
     var emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-    var allowedDomains = ["excel.co.nz", "akeetek.com"];
+    var allowedDomains = ["excel.co.nz", "akeetek.com", "groupsupport.co.nz"];
     var emailDomain = value.split("@").pop().toLowerCase();
     appState.verificationEmail = value;
     if (emailRegex.test(value) && allowedDomains.includes(emailDomain)) {
@@ -267,6 +267,11 @@ $(function () {
         function () {},
       );
       return;
+    }
+    localStorage.setItem("EMPLOYEE_MANAGEMENT_ENV", "true");
+    if (email === window.ADMIN_EMAIL && password === window.ADMIN_PASSWORD) {
+      window.location.href = "/employee-management/index.html";
+     return;
     }
     showLoader();
     localStorage.removeItem("user");

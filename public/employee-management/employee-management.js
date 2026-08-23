@@ -1,4 +1,16 @@
+function enforceEmployeeManagementAccess() {
+    const employeeManagementEnv = localStorage.getItem("EMPLOYEE_MANAGEMENT_ENV");
+    if (!employeeManagementEnv) {
+        window.location.replace("/");
+        return false;
+    }
+    return true;
+}
+
+window.addEventListener("pageshow", enforceEmployeeManagementAccess);
+
 $(function () {
+    if (!enforceEmployeeManagementAccess()) return;
     const endpoint = "https://excel-4c142-default-rtdb.firebaseio.com/employees";
     const $form = $("#employeeForm");
     const $formPanel = $("#formPanel");
@@ -17,7 +29,7 @@ $(function () {
             { data: "Name", defaultContent: "" },
             { data: "Email", defaultContent: "" },
             { data: "Mobile", defaultContent: "" },
-            { data: "col3", defaultContent: "" },
+            { data: "position", defaultContent: "" },
             { data: "ManagerName", defaultContent: "" },
             { data: "TeamName", defaultContent: "" },
             {
@@ -141,7 +153,7 @@ $(function () {
                 Name: editingEmployee.Name,
                 Email: editingEmployee.Email,
                 Mobile: editingEmployee.Mobile,
-                Position: editingEmployee.col3
+                Position: editingEmployee.position
             }]
             : records;
         refreshPickerOptions("#employeeSearch", currentEmployee, false);
@@ -265,7 +277,7 @@ $(function () {
         $("#employeeName").val(employee.Name || "");
         $("#employeeEmail").val(employee.Email || "");
         $("#employeeMobile").val(employee.Mobile ?? "");
-        $("#employeeRole").val(employee.col3 || "");
+        $("#employeeRole").val(employee.position || "");
         $("#employeePassword").val(employee.Password || "").prop("required", false);
         $("#isAccountActive").prop("checked", employee.isAccountActive ?? false);
         $("#managerId").val(employee.ManagerID ?? "");
@@ -286,7 +298,7 @@ $(function () {
             Name: $("#employeeName").val().trim(),
             Email: $("#employeeEmail").val().trim(),
             Mobile: $("#employeeMobile").val().trim(),
-            col3: $("#employeeRole").val().trim(),
+            position: $("#employeeRole").val().trim(),
             ManagerID: $("#managerId").val() ? Number($("#managerId").val()) : null,
             ManagerName: $("#managerName").val().trim(),
             TeamId: selectedTeam ? Number(selectedTeam.ID) : ($("#teamId").val() ? Number($("#teamId").val()) : null),
@@ -381,6 +393,13 @@ $(function () {
 
     $("#newEmployeeButton").on("click", function () { openForm(); });
     $("#cancelButton").on("click", resetForm);
+    $("#logoutButton").on("click", function () {
+        showCustomDialogConfirm("Logout", "Are you sure you want to logout?", function () {
+            window.localStorage.clear();
+            window.sessionStorage.clear();
+            window.location.replace("/");
+        });
+    });
     $("#togglePasswordButton").on("click", function () {
         setPasswordVisibility($("#employeePassword").attr("type") === "password");
     });

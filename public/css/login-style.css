@@ -270,6 +270,5 @@ max-width: 520px;
       .message-line { line-height: 1.5; }
       @media (max-width: 430px) {
         body { padding: 12px; }
-        .phone { min-height: 660px; }
         .content { padding-left: 18px; padding-right: 18px; }
       }

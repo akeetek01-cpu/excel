@@ -31,6 +31,29 @@
 #loginBtn {
   display: block;
 }
+.lead-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+}
+.lead-logout-button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 40px;
+  height: 40px;
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  color: #b42318;
+  background: #fff;
+  cursor: pointer;
+  font-size: 17px;
+}
+.lead-logout-button:hover {
+  color: #fff;
+  background: #b42318;
+}
 /* Override browser autofill background/color for login inputs */
 #loginForm input:-webkit-autofill,
 #loginForm input:-webkit-autofill:hover,

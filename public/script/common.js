@@ -135,6 +135,10 @@ function showCustomDialogConfirm(title, message, onConfirm, onCancel) {
   });
 }
 
+ $(".confirm-close").on("click", function () {
+    dismissCustomDialog();
+  });
+
 function dismissCustomDialog() {
   $("#createNewConfirmModal").hide();
 }

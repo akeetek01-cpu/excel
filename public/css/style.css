@@ -75,9 +75,11 @@ h2 {
 }
 
 .lead-capture .logo label {
-  float: right;
   font-size: 14px;
   font-weight: 600;
+}
+.lead-right-details{
+  float: right;
 }
 .create-lead-label {
   color: var(--teal);

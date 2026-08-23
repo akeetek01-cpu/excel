@@ -23,9 +23,13 @@
     <div class="lead-capture container">
         <div class="logo">
             <img src="images/excel_log.png" alt="Excel Logo">
-            <label id="createLeadLabel" class="create-lead-label" style="min-width:100px">
-
-            </label>
+            <div class="lead-right-details"">
+                <label id="createLeadLabel" class="create-lead-label" style="min-width:100px"></label>
+                <button id="leadLogoutButton" class="lead-logout-button" type="button" aria-label="Logout"
+                    title="Logout">
+                    <i class="fa-solid fa-right-from-bracket" aria-hidden="true"></i>
+                </button>
+            </div>
         </div>
         <div class="mx-auto">
 
@@ -446,7 +450,7 @@
                                 </select>
                                 <div id="tagsError" class="invalid-feedback"></div>
                             </div>
-                            
+
                         </div>
 
                     </div>

@@ -7,6 +7,7 @@
     <title>Employee Management</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+
     <link
         href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Space+Grotesk:wght@500;600;700&display=swap"
         rel="stylesheet">
@@ -19,11 +20,12 @@
     <main class="page-shell">
         <header class="page-header">
             <div>
-                <p class="eyebrow">Operations directory</p>
                 <h1>Employee Management</h1>
-                <p class="intro">Keep employee records current and available to the team.</p>
             </div>
-            <button id="newEmployeeButton" class="button button-primary" type="button">Add employee</button>
+            <div class="header-actions">
+                <button id="newEmployeeButton" class="button button-primary" type="button">Add employee</button>
+                <button id="logoutButton" class="button button-danger" type="button">Logout</button>
+            </div>
         </header>
 
         <section id="formPanel" class="form-panel" aria-labelledby="formTitle">
@@ -46,7 +48,7 @@
                     <label>Full name<input id="employeeName" name="Name" type="text" required readonly></label>
                     <label>Email<input id="employeeEmail" name="Email" type="email" required readonly></label>
                     <label>Mobile<input id="employeeMobile" name="Mobile" type="text"></label>
-                    <label>Position<input id="employeeRole" name="col3" type="text" readonly></label>
+                    <label>Position<input id="employeeRole" name="position" type="text" readonly></label>
                         <label>Password<div class="password-control"><input id="employeePassword" name="Password"
                             type="password" autocomplete="new-password" required><button id="togglePasswordButton"
                             class="password-toggle" type="button" aria-label="Show password" aria-pressed="false">Show</button></div></label>
@@ -101,10 +103,30 @@
         </section>
     </main>
 
+    <div id="createNewConfirmModal"
+        style="display:none; position:fixed; inset:0; background:rgba(0,0,0,0.4); align-items:center; justify-content:center; z-index:99999;">
+        <div
+            style="background:#fff; border-radius:10px; width:min(92vw, 420px); box-shadow:0 10px 30px rgba(0,0,0,0.2); padding:20px;">
+            <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:12px;">
+                <h5 id="createNewConfirmModalTitle" style="margin:0; color:#222;">Create New Lead?</h5>
+                <button type="button" class="confirm-close" aria-label="Close"
+                    style="border:none; background:transparent; font-size:24px; line-height:1; color:#666; cursor:pointer; padding:0;">×</button>
+            </div>
+            <p id="createNewConfirmModalMessage" style="margin:0 0 16px; color:#555;">Do you want to keep the customer
+                details and start a new lead with the rest cleared?</p>
+            <div style="display:flex; justify-content:flex-end; gap:10px;">
+                <button type="button" class="button button-secondary confirm-no"
+                    style="display:none;">No</button>
+                <button type="button" class="button button-primary confirm-yes">OK</button>
+            </div>
+        </div>
+    </div>
+
     <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
     <script src="https://cdn.datatables.net/2.0.8/js/dataTables.min.js"></script>
     <script src="https://unpkg.com/hcg-searchable-select@1/hcg-select.js"></script>
     <script src="employee-management.js"></script>
+    <script src="../script/common.js"></script>
 </body>
 
 </html>
