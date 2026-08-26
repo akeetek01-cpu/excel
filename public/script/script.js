@@ -3368,7 +3368,7 @@ $(function () {
         Type: "Service",
         Notes: lead.Description || "",
         Description: quoteWorkDescription || "",
-        Tags: lead.Tags || [],
+        Tags: tags || [],
         Salesperson: lead.Salesperson || 0,
         ProjectManager: lead.ProjectManager || 0,
         // Technicians: lead.Salesperson || 0,
@@ -3529,6 +3529,43 @@ $(function () {
     return payloads.length ? payloads : null;
   }
 
+  function sendLeadCreationEmail(response, jobData) {
+    const leadId = response?.ID || response?.Id || response?.id || response?.LeadId || response?.leadId;
+    const pdfAttachment = Array.isArray(jobData.attachments)
+      ? jobData.attachments.find(attachment => String(attachment.contentType || "").toLowerCase() === "application/pdf")
+      : null;
+    let loggedInUser = {};
+    try {
+      loggedInUser = JSON.parse(localStorage.getItem("user") || "{}");
+    } catch (error) {
+      console.warn("Unable to read logged-in user for lead email:", error);
+    }
+
+    if (!leadId || !loggedInUser.Email) {
+      console.warn("Lead notification email skipped: lead ID or recipient email is unavailable.");
+      return;
+    }
+
+    return $.ajax({
+      url: "/api/sendEmailLeadForm",
+      method: "POST",
+      contentType: "application/json",
+      data: JSON.stringify({
+        name: loggedInUser.Name || loggedInUser.name || "User",
+        email: jobData.customer?.email || loggedInUser.Email || loggedInUser.email || "",
+        leadId,
+        customerName: String($("#autoJobBtn").val() || "").trim(),
+        site: String($("#customerTenancy option:selected").text() || "").trim(),
+        fileName: `Lead_${leadId}.pdf`,
+        base64: pdfAttachment?.base64 || ""
+      })
+    }).done(function (emailResponse) {
+      console.log("Lead notification email sent successfully.", emailResponse);
+    }).fail(function (xhr) {
+      console.warn("Lead created, but notification email failed:", xhr.responseJSON || xhr.statusText);
+    });
+  }
+
   async function submitJob(options = {}) {
     const { onSuccess, onError } = options || {};
 
@@ -3550,6 +3587,7 @@ $(function () {
         showSuccessAlert: false,
         onSuccess: async function (response) {
           console.log(response);
+          sendLeadCreationEmail(response, jobData);
 
           // --- Create Quote automatically using same data ---
           let quoteResponse = null;

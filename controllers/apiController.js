@@ -32,15 +32,15 @@ function getSimproConfig(env) {
 }
 
 const transporter = nodemailer.createTransport({
-    service: "gmail",
-    auth: {
-        user: "akeetek01@gmail.com",
-        pass: "ezdbjjeavwavxsai"
-    }
+  service: "gmail",
+  auth: {
+    user: "akeetek01@gmail.com",
+    pass: "ezdbjjeavwavxsai"
+  }
 });
 
 exports.dashboard = (req, res) => {
-    res.json({ message: "Excel Protected API" });
+  res.json({ message: "Excel Protected API" });
 };
 
 exports.getSimproEmployees = async (req, res) => {
@@ -102,234 +102,234 @@ const db = require("../firebase");
 const { ref, set, get, child, update } = require("firebase/database");
 
 exports.registerUser = async (req, res) => {
-     //res.json({ message: "Excel Protected API" });
-        console.log(`${req.method} ${req.url}`);
+  //res.json({ message: "Excel Protected API" });
+  console.log(`${req.method} ${req.url}`);
 
-    const { name, email, password, phone } = req.body;
-    console.log("Received registration data:", { name, email, password: password ? "****" : undefined, phone: phone ? "****" : undefined });
-    if (!name || !email || !password || !phone) {
-        return res.status(400).json({ error: "All fields are required" });
-    }
-    const userId = Date.now();
-    try {
-        await set(ref(db, `employees/${userId}`), { name, email, password, phone });
-        res.json({ message: "User registered successfully" });
-    } catch (err) {
-        res.status(500).json({ error: "Error registering user" });
-    }
+  const { name, email, password, phone } = req.body;
+  console.log("Received registration data:", { name, email, password: password ? "****" : undefined, phone: phone ? "****" : undefined });
+  if (!name || !email || !password || !phone) {
+    return res.status(400).json({ error: "All fields are required" });
+  }
+  const userId = Date.now();
+  try {
+    await set(ref(db, `employees/${userId}`), { name, email, password, phone });
+    res.json({ message: "User registered successfully" });
+  } catch (err) {
+    res.status(500).json({ error: "Error registering user" });
+  }
 };
 
 exports.getUsers = async (req, res) => {
-    const dbRef = ref(db);
-    try {
-        const snapshot = await get(child(dbRef, 'employees'));
-        if (snapshot.exists()) {
-            res.json(snapshot.val());
-        } else {
-            res.json({});
-        }
-    } catch (err) {
-        res.status(500).json({ error: "Error fetching employees" });
+  const dbRef = ref(db);
+  try {
+    const snapshot = await get(child(dbRef, 'employees'));
+    if (snapshot.exists()) {
+      res.json(snapshot.val());
+    } else {
+      res.json({});
     }
+  } catch (err) {
+    res.status(500).json({ error: "Error fetching employees" });
+  }
 };
 
 exports.getUsersByEmail = async (req, res) => {
-    const { email } = req.body;
-    if (!email) {
-        return res.status(400).json({ error: "Email is required" });
-    }
-    const dbRef = ref(db);
-    try {
-        const snapshot = await get(child(dbRef, 'employees'));
-        if (snapshot.exists()) {
-            let user = null;
-            snapshot.forEach(childSnap => {
-                const userData = childSnap.val();
-                if (userData.Email === email) {
-                    user = userData;
-                }
-            });
-            if (user) {
-                res.json(user);
-            } else {
-                res.status(404).json({ error: "User not found" });
-            }
-        } else {
-            res.status(404).json({ error: "Users not found" });
+  const { email } = req.body;
+  if (!email) {
+    return res.status(400).json({ error: "Email is required" });
+  }
+  const dbRef = ref(db);
+  try {
+    const snapshot = await get(child(dbRef, 'employees'));
+    if (snapshot.exists()) {
+      let user = null;
+      snapshot.forEach(childSnap => {
+        const userData = childSnap.val();
+        if (userData.Email === email) {
+          user = userData;
         }
-    } catch (err) {
-        res.status(500).json({ error: "Error fetching user" });
+      });
+      if (user) {
+        res.json(user);
+      } else {
+        res.status(404).json({ error: "User not found" });
+      }
+    } else {
+      res.status(404).json({ error: "Users not found" });
     }
+  } catch (err) {
+    res.status(500).json({ error: "Error fetching user" });
+  }
 };
 
 exports.loginUser = async (req, res) => {
-    const { email, password } = req.body;
-    if (!email || !password) {
-        return res.status(400).json({ error: "All fields are required" });
-    }
-    const dbRef = ref(db);
-    try {
-        const snapshot = await get(child(dbRef, 'employees'));
-        if (snapshot.exists()) {
-            let found = false;
-            let currentUser = null;
-            snapshot.forEach(childSnap => {
-                const user = childSnap.val();
-                if (user.Email === email && user.Password === password) {
-                    found = true;
-                    currentUser = user;
-                }
-            });
-            if (found) {
-                return res.json({ message: "Login successful", user: currentUser });
-            }
+  const { email, password } = req.body;
+  if (!email || !password) {
+    return res.status(400).json({ error: "All fields are required" });
+  }
+  const dbRef = ref(db);
+  try {
+    const snapshot = await get(child(dbRef, 'employees'));
+    if (snapshot.exists()) {
+      let found = false;
+      let currentUser = null;
+      snapshot.forEach(childSnap => {
+        const user = childSnap.val();
+        if (user.Email === email && user.Password === password) {
+          found = true;
+          currentUser = user;
         }
-        res.status(401).json({ error: "Invalid credentials" });
-    } catch (err) {
-        res.status(500).json({ error: "Error logging in" });
+      });
+      if (found) {
+        return res.json({ message: "Login successful", user: currentUser });
+      }
     }
+    res.status(401).json({ error: "Invalid credentials" });
+  } catch (err) {
+    res.status(500).json({ error: "Error logging in" });
+  }
 };
 
 
 exports.changePassword = async (req, res) => {
-    
-    const { email, oldPassword, newPassword, isTemp } = req.body;
-    console.log("Request Body:", req.body);
 
-    if (!email || !oldPassword || !newPassword) {
-        return res.status(400).json({
-            error: "Email, old/temp password and new password are required"
-        });
+  const { email, oldPassword, newPassword, isTemp } = req.body;
+  console.log("Request Body:", req.body);
+
+  if (!email || !oldPassword || !newPassword) {
+    return res.status(400).json({
+      error: "Email, old/temp password and new password are required"
+    });
+  }
+
+  try {
+    const dbRef = ref(db);
+    const snapshot = await get(child(dbRef, "employees"));
+
+    if (!snapshot.exists()) {
+      return res.status(404).json({
+        error: "Users not found"
+      });
     }
 
-    try {
-        const dbRef = ref(db);
-        const snapshot = await get(child(dbRef, "employees"));
+    let userKey = null;
 
-        if (!snapshot.exists()) {
-            return res.status(404).json({
-                error: "Users not found"
-            });
+    snapshot.forEach((childSnap) => {
+      const user = childSnap.val();
+      if (isTemp === true || isTemp === "true") {
+        if (
+          user.Email === email &&
+          user.tempPassword === oldPassword
+        ) {
+          userKey = childSnap.key;
         }
-
-        let userKey = null;
-
-        snapshot.forEach((childSnap) => {
-            const user = childSnap.val();
-            if (isTemp === true || isTemp === "true") {
-                if (
-                    user.Email === email &&
-                    user.tempPassword === oldPassword
-                ) {
-                    userKey = childSnap.key;
-                }
-            } else {
-                if (
-                    user.Email === email &&
-                    user.Password === oldPassword
-                ) {
-                    userKey = childSnap.key;
-                }
-            }
-        });
-
-        if (!userKey) {
-            return res.status(401).json({
-                error: "Pasword mismatch"
-            });
+      } else {
+        if (
+          user.Email === email &&
+          user.Password === oldPassword
+        ) {
+          userKey = childSnap.key;
         }
+      }
+    });
 
-        await update(ref(db, `employees/${userKey}`), {
-            Password: newPassword,
-            isAccountActive: true,
-            modifiedDate: new Date().toISOString(),
-            tempPassword: null
-        });
-
-        return res.status(200).json({
-            message: "Password updated successfully"
-        });
-
-    } catch (error) {
-        console.error(error);
-
-        return res.status(500).json({
-            error: "Failed to update password"
-        });
+    if (!userKey) {
+      return res.status(401).json({
+        error: "Pasword mismatch"
+      });
     }
+
+    await update(ref(db, `employees/${userKey}`), {
+      Password: newPassword,
+      isAccountActive: true,
+      modifiedDate: new Date().toISOString(),
+      tempPassword: null
+    });
+
+    return res.status(200).json({
+      message: "Password updated successfully"
+    });
+
+  } catch (error) {
+    console.error(error);
+
+    return res.status(500).json({
+      error: "Failed to update password"
+    });
+  }
 };
 
 exports.insertScript = async (req, res) => {
-    const dbRef = ref(db);
-    try {
-        const snapshot = await get(child(dbRef, 'InsertScript'));
-        if (snapshot.exists()) {
-            res.json(snapshot.val());
-        } else {
-            res.json({});
-        }
-    } catch (err) {
-        res.status(500).json({ error: "Error fetching InsertScript" });
+  const dbRef = ref(db);
+  try {
+    const snapshot = await get(child(dbRef, 'InsertScript'));
+    if (snapshot.exists()) {
+      res.json(snapshot.val());
+    } else {
+      res.json({});
     }
+  } catch (err) {
+    res.status(500).json({ error: "Error fetching InsertScript" });
+  }
 };
 
-exports.updateUser = async (req, res) => {  
-      const { email, isAccountActive, tempPassword } = req.body;
-      if (!email) {
-        return res.status(400).json({
-            error: "Email is required"
-        });
+exports.updateUser = async (req, res) => {
+  const { email, isAccountActive, tempPassword } = req.body;
+  if (!email) {
+    return res.status(400).json({
+      error: "Email is required"
+    });
+  }
+
+  try {
+
+    const dbRef = ref(db);
+    const snapshot = await get(child(dbRef, "employees"));
+
+    if (!snapshot.exists()) {
+      return res.status(404).json({
+        error: "Users not found"
+      });
     }
 
-    try {
+    let userKey = null;
 
-        const dbRef = ref(db);
-        const snapshot = await get(child(dbRef, "employees"));
+    snapshot.forEach((childSnap) => {
 
-        if (!snapshot.exists()) {
-            return res.status(404).json({
-                error: "Users not found"
-            });
-        }
+      const user = childSnap.val();
 
-        let userKey = null;
+      if (user.Email === email) {
+        userKey = childSnap.key;
+      }
 
-        snapshot.forEach((childSnap) => {
+    });
 
-            const user = childSnap.val();
-
-            if (user.Email === email) {
-                userKey = childSnap.key;
-            }
-
-        });
-
-        if (!userKey) {
-            return res.status(404).json({
-                error: "User not found"
-            });
-        }
-
-        await update(ref(db, `employees/${userKey}`), {
-            modifiedDate: new Date().toISOString(),
-            isAccountActive: isAccountActive,
-            tempPassword: tempPassword
-        });
-
-        return res.json({
-            success: true,
-            message: "User updated successfully."
-        });
-
-    } catch (err) {
-
-        console.error(err);
-
-        return res.status(500).json({
-            error: err.message
-        });
-
+    if (!userKey) {
+      return res.status(404).json({
+        error: "User not found"
+      });
     }
+
+    await update(ref(db, `employees/${userKey}`), {
+      modifiedDate: new Date().toISOString(),
+      isAccountActive: isAccountActive,
+      tempPassword: tempPassword
+    });
+
+    return res.json({
+      success: true,
+      message: "User updated successfully."
+    });
+
+  } catch (err) {
+
+    console.error(err);
+
+    return res.status(500).json({
+      error: err.message
+    });
+
+  }
 }
 
 
@@ -338,17 +338,17 @@ exports.updateUser = async (req, res) => {
 
 
 
-exports.sendEmail = async (req, res) => {
+exports.sendEmailTempPassword = async (req, res) => {
 
-    const { name, email, password } = req.body;
+  const { name, email, password } = req.body;
 
-    if (!name || !email || !password) {
-        return res.status(400).json({
-            error: "Name, Email and Password are required."
-        });
-    }
+  if (!name || !email || !password) {
+    return res.status(400).json({
+      error: "Name, Email and Password are required."
+    });
+  }
 
-    const html = `
+  const html = `
     <!DOCTYPE html>
     <html>
 
@@ -458,30 +458,281 @@ exports.sendEmail = async (req, res) => {
     </html>
     `;
 
-    try {
+  try {
 
-        await transporter.sendMail({
-            from: '"Support Team" <akeetek01@gmail.com>',
-            to: email,
-            subject: "Welcome to Excel",
-            html: html
-        });
+    await transporter.sendMail({
+      from: '"Support Team" <akeetek01@gmail.com>',
+      to: email,
+      subject: "Welcome to Excel",
+      html: html
+    });
 
-        res.json({
-            success: true,
-            message: `Verification code sent to ${email}. Please check your inbox.`
-        });
+    res.json({
+      success: true,
+      message: `Verification code sent to ${email}. Please check your inbox.`
+    });
 
-    } catch (err) {
+  } catch (err) {
 
-        console.error(err);
+    console.error(err);
 
-        res.status(500).json({
-            success: false,
-            error: err.message
-        });
+    res.status(500).json({
+      success: false,
+      error: err.message
+    });
 
-    }
+  }
+
+};
+
+exports.sendEmailLeadForm = async (req, res) => {
+
+  const { name, email, leadId, customerName, site, fileName, base64 } = req.body;
+
+  if (!name || !email || !leadId || !customerName || !site) {
+    return res.status(400).json({
+      error: "Name, Email, Lead ID, Customer Name, and Site are required."
+    });
+  }
+
+  const html = `
+  html
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>New Lead Created</title>
+</head>
+
+<body style="margin:0; padding:0; background-color:#f1f3f8; font-family:Arial, Helvetica, sans-serif;">
+
+  <table role="presentation"
+         width="100%"
+         cellspacing="0"
+         cellpadding="0"
+         border="0"
+         style="margin:0; padding:18px 0; background-color:#f1f3f8;">
+
+    <tr>
+      <td align="center">
+
+        <!-- Main Container -->
+        <table role="presentation"
+               width="840"
+               cellspacing="0"
+               cellpadding="0"
+               border="0"
+               style="width:840px; max-width:840px; background-color:#ffffff; border-radius:18px; overflow:hidden;">
+
+          <!-- Header -->
+          <tr>
+            <td style="
+              padding:48px 42px 42px 42px;
+              background:linear-gradient(90deg, #142d4a 0%, #125d7b 100%);
+              color:#ffffff;
+              font-size:38px;
+              line-height:1.2;
+              font-weight:700;
+            ">
+              New Lead Created
+            </td>
+          </tr>
+
+          <!-- Content -->
+          <tr>
+            <td style="padding:44px 42px 40px 42px;">
+
+              <!-- Greeting -->
+              <p style="
+                margin:0 0 12px 0;
+                color:#172b43;
+                font-size:28px;
+                line-height:1.35;
+                font-weight:700;
+              ">
+                Hi ${name},
+              </p>
+
+              <!-- Success Message -->
+              <p style="
+                margin:0 0 28px 0;
+                color:#667085;
+                font-size:22px;
+                line-height:1.5;
+                font-weight:400;
+              ">
+                Lead #${leadId} has been created successfully.
+              </p>
+
+              <!-- Lead Number Box -->
+              <table role="presentation"
+                     width="100%"
+                     cellspacing="0"
+                     cellpadding="0"
+                     border="0"
+                     style="
+                       margin:0 0 38px 0;
+                       background-color:#f5f8fc;
+                       border:1px solid #dbe3ec;
+                       border-radius:8px;
+                     ">
+                <tr>
+                  <td style="
+                    width:6px;
+                    background-color:#159447;
+                    border-radius:8px 0 0 8px;
+                  ">
+                    &nbsp;
+                  </td>
+
+                  <td style="padding:22px 24px;">
+
+                    <div style="
+                      margin:0 0 8px 0;
+                      color:#667085;
+                      font-size:14px;
+                      line-height:1.3;
+                      font-weight:700;
+                      letter-spacing:5px;
+                    ">
+                      LEAD NUMBER
+                    </div>
+
+                    <div style="
+                      margin:0;
+                      color:#142d4a;
+                      font-size:32px;
+                      line-height:1.2;
+                      font-weight:700;
+                    ">
+                      #${leadId}
+                    </div>
+
+                  </td>
+                </tr>
+              </table>
+
+              <!-- Customer -->
+              <table role="presentation"
+                     width="100%"
+                     cellspacing="0"
+                     cellpadding="0"
+                     border="0"
+                     style="border-collapse:collapse;">
+
+                <tr>
+                  <td style="
+                    padding:0 0 16px 0;
+                    border-bottom:1px solid #e4e7ec;
+                    color:#7a8494;
+                    font-size:21px;
+                    line-height:1.4;
+                    font-weight:400;
+                  ">
+                    Customer
+                  </td>
+
+                  <td align="right" style="
+                    padding:0 0 16px 20px;
+                    border-bottom:1px solid #e4e7ec;
+                    color:#172b43;
+                    font-size:20px;
+                    line-height:1.4;
+                    font-weight:700;
+                  ">
+                    ${customerName}
+                  </td>
+                </tr>
+
+                <!-- Site -->
+                <tr>
+                  <td style="
+                    padding:18px 0 16px 0;
+                    border-bottom:1px solid #e4e7ec;
+                    color:#7a8494;
+                    font-size:21px;
+                    line-height:1.4;
+                    font-weight:400;
+                  ">
+                    Site
+                  </td>
+
+                  <td align="right" style="
+                    padding:18px 0 16px 20px;
+                    border-bottom:1px solid #e4e7ec;
+                    color:#172b43;
+                    font-size:20px;
+                    line-height:1.4;
+                    font-weight:700;
+                  ">
+                    ${site}
+                  </td>
+                </tr>
+
+              </table>
+
+             
+
+            </td>
+          </tr>
+
+          <!-- Footer -->
+          <tr>
+            <td style="
+              padding:28px 42px;
+              background-color:#f5f8fc;
+              color:#8a94a6;
+              font-size:16px;
+              line-height:1.5;
+              font-style:normal;
+            ">
+              Note: This is a system generated email, please do not reply.
+            </td>
+          </tr>
+
+        </table>
+
+      </td>
+    </tr>
+
+  </table>
+
+</body>
+</html>
+    `;
+
+  try {
+
+    await transporter.sendMail({
+      from: '"Support Team" <akeetek01@gmail.com>',
+      to: email,
+      subject: `Lead #${leadId} Created Successfully`,
+      html: html,
+      attachments: String(base64 || "").trim()
+        ? [{
+            filename: fileName || `Lead_${leadId}.pdf`,
+            content: Buffer.from(String(base64).replace(/^data:application\/pdf;base64,/, ""), "base64"),
+            contentType: "application/pdf"
+          }]
+        : []
+    });
+
+    res.json({
+      success: true,
+      message: `Lead creation email sent to ${email}. Please check your inbox.`
+    });
+
+  } catch (err) {
+
+    console.error(err);
+
+    res.status(500).json({
+      success: false,
+      error: err.message
+    });
+
+  }
 
 };
 
