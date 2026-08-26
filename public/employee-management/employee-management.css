@@ -347,6 +347,14 @@ table.dataTable tbody td {
     cursor: pointer;
 }
 
+.dt-layout-cell {
+        display: flex;
+    overflow-x: auto;
+    overflow-y: hidden;
+}
+div.dt-container div.dt-layout-cell{
+        padding: 5px;
+}
 @media (max-width: 850px) {
     .page-shell {
         padding: 30px 16px 44px;
