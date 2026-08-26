@@ -1114,6 +1114,33 @@ exports.submitLeadToSimpro = async (req, res) => {
   }
 };
 
+exports.archiveLead = async (req, res) => {
+  const leadId = Number(req.body?.leadId || 0);
+  const simproConfig = getSimproConfig(req.body?.simproEnv);
+
+  if (!leadId) {
+    return res.status(400).json({ error: "leadId is required." });
+  }
+
+  try {
+    const response = await axios.patch(
+      `${simproConfig.baseUrl}/companies/${simproConfig.companyId}/leads/${leadId}`,
+      { ArchiveReason: 228 },
+      {
+        headers: {
+          Authorization: `Bearer ${simproConfig.authToken}`,
+          "Content-Type": "application/json",
+          Accept: "application/json",
+        },
+      },
+    );
+    return res.status(200).json(response.data);
+  } catch (error) {
+    console.error(`Failed to archive lead ${leadId}:`, error.response?.data || error.message);
+    return res.status(error.response?.status || 502).json({ error: "Unable to archive lead." });
+  }
+};
+
 exports.submitQuoteToSimpro = async (req, res) => {
   try {
     const quoteData = req.body?.quoteData;

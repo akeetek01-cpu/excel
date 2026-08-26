@@ -3368,7 +3368,7 @@ $(function () {
         Type: "Service",
         Notes: lead.Description || "",
         Description: quoteWorkDescription || "",
-        Tags: tags || [],
+        Tags: lead.Tags || [],
         Salesperson: lead.Salesperson || 0,
         ProjectManager: lead.ProjectManager || 0,
         // Technicians: lead.Salesperson || 0,
@@ -3566,6 +3566,26 @@ $(function () {
     });
   }
 
+  function archiveLeadAfterQuote(leadResponse, quoteResponse) {
+    const leadId = leadResponse?.ID || leadResponse?.Id || leadResponse?.id || leadResponse?.LeadId || leadResponse?.leadId;
+    const quoteId = quoteResponse?.ID || quoteResponse?.Id || quoteResponse?.id || quoteResponse?.QuoteId || quoteResponse?.quoteId;
+    if (!leadId || !quoteId) {
+      return;
+    }
+
+    const simproEnv = window.localStorage?.getItem("SIMPRO_ENV") || "PROD";
+    $.ajax({
+      url: "/api/lead/archive",
+      method: "PATCH",
+      contentType: "application/json",
+      data: JSON.stringify({ leadId, simproEnv })
+    }).done(function (archiveResponse) {
+      console.log(`Lead ${leadId} archived after quote ${quoteId} was created.`, archiveResponse);
+    }).fail(function (xhr) {
+      console.warn(`Quote ${quoteId} created, but lead ${leadId} could not be archived:`, xhr.responseJSON || xhr.statusText);
+    });
+  }
+
   async function submitJob(options = {}) {
     const { onSuccess, onError } = options || {};
 
@@ -3614,6 +3634,7 @@ $(function () {
                 quoteResponse = qerr && qerr.responseJSON ? qerr.responseJSON : null;
                 console.warn("Quote creation failed:", qerr);
               }
+              archiveLeadAfterQuote(response, quoteResponse);
             } else {
               console.warn("submitQuoteToSimpro is not available.");
             }

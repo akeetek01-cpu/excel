@@ -1,16 +1,16 @@
-function enforceEmployeeManagementAccess() {
-    const employeeManagementEnv = localStorage.getItem("EMPLOYEE_MANAGEMENT_ENV");
-    if (!employeeManagementEnv) {
-        window.location.replace("/");
-        return false;
-    }
-    return true;
+function enforceLeadFormAccess() {
+  const user = localStorage.getItem("user");
+  if (!user) {
+    window.location.replace("/");
+    return false;
+  }
+  return true;
 }
 
-window.addEventListener("pageshow", enforceEmployeeManagementAccess);
+window.addEventListener("pageshow", enforceLeadFormAccess);
 
 $(function () {
-    if (!enforceEmployeeManagementAccess()) return;
+    if (!enforceLeadFormAccess()) return;
     const endpoint = "https://excel-4c142-default-rtdb.firebaseio.com/employees";
     const $form = $("#employeeForm");
     const $formPanel = $("#formPanel");
