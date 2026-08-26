@@ -156,7 +156,7 @@ $(function () {
 
   function sendPasswordToEmail(email, tempPw, isResendTempPw) {
     var settings = {
-      url: "/api/sendEmail",
+      url: "/api/sendEmailForgotPassword",
       method: "POST",
       timeout: 0,
       headers: {

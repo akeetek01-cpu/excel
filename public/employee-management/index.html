@@ -11,8 +11,8 @@
     <link
         href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Space+Grotesk:wght@500;600;700&display=swap"
         rel="stylesheet">
-    <link rel="stylesheet" href="https://cdn.datatables.net/2.0.8/css/dataTables.dataTables.min.css">
-    <link rel="stylesheet" href="https://unpkg.com/hcg-searchable-select@1/hcg-select.css">
+    <link rel="stylesheet" href="../css/dataTables.dataTables.min.css">
+    <link rel="stylesheet" href="../css/hcg-select.css">
     <link rel="stylesheet" href="employee-management.css">
 </head>
 
@@ -66,6 +66,7 @@
                     <label>Team ID<input id="teamId" name="TeamId" type="number" readonly></label>
                     <label>Team name<input id="teamName" name="TeamName" type="text" readonly></label>
                     <label class="active-account"><input id="isAccountActive" name="isAccountActive" type="checkbox"> Active account</label>
+                    <label class="active-account"><input id="isAdmin" name="isAdmin" type="checkbox"> Administrator</label>
 
                 </div>
                 <div class="form-actions">
@@ -95,6 +96,8 @@
                             <th>Role</th>
                             <th>Manager</th>
                             <th>Team</th>
+                            <th>Account Active</th>
+                            <th>Admin Access</th>
                             <th>Actions</th>
                         </tr>
                     </thead>
@@ -122,9 +125,9 @@
         </div>
     </div>
 
-    <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
-    <script src="https://cdn.datatables.net/2.0.8/js/dataTables.min.js"></script>
-    <script src="https://unpkg.com/hcg-searchable-select@1/hcg-select.js"></script>
+    <script src="../script/jquery-3.7.1.min.js"></script>
+    <script src="../script/datatables.min.js"></script>
+    <script src="../script/hcg-select.js"></script>
     <script src="employee-management.js"></script>
     <script src="../script/common.js"></script>
 </body>

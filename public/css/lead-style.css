@@ -32,27 +32,35 @@
   display: block;
 }
 .lead-header {
+  position: relative;
   display: flex;
   align-items: center;
   justify-content: space-between;
-  gap: 16px;
+  min-height: 58px;
+  margin: 10px 16px 18px;
 }
-.lead-logout-button {
-  display: inline-flex;
+.lead-brand {
+  display: flex;
   align-items: center;
-  justify-content: center;
-  width: 40px;
-  height: 40px;
-  border: 1px solid var(--border);
-  border-radius: 8px;
-  color: #b42318;
-  background: #fff;
-  cursor: pointer;
-  font-size: 17px;
 }
-.lead-logout-button:hover {
-  color: #fff;
-  background: #b42318;
+.lead-brand img {
+  display: block;
+  width: 100px;
+}
+.lead-header .create-lead-label {
+  position: absolute;
+  left: 50%;
+  margin: 0;
+  transform: translateX(-50%);
+  white-space: nowrap;
+  text-align: center;
+}
+.lead-header .lead-logout-button {
+  margin-left: auto;
+}
+.btn:hover {
+    background: var(--purple);
+    color: #fff;
 }
 /* Override browser autofill background/color for login inputs */
 #loginForm input:-webkit-autofill,

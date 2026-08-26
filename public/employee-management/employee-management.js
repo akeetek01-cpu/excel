@@ -32,6 +32,8 @@ $(function () {
             { data: "position", defaultContent: "" },
             { data: "ManagerName", defaultContent: "" },
             { data: "TeamName", defaultContent: "" },
+            { data: "isAccountActive", defaultContent: "" },
+            { data: "isAdmin", defaultContent: "" },
             {
                 data: null,
                 orderable: false,
@@ -255,6 +257,7 @@ $(function () {
         $("#employeeSearch").prop("disabled", false);
         $("#employeePassword").prop("required", true);
         $("#isAccountActive").prop("checked", false);
+        $("#isAdmin").prop("checked", false);
         setPasswordVisibility(false);
         $("#employeeSearch, #managerSearch, #teamSearch").val("").trigger("change");
         refreshEmployeeOptions();
@@ -280,6 +283,7 @@ $(function () {
         $("#employeeRole").val(employee.position || "");
         $("#employeePassword").val(employee.Password || "").prop("required", false);
         $("#isAccountActive").prop("checked", employee.isAccountActive ?? false);
+        $("#isAdmin").prop("checked", employee.isAdmin ?? false);
         $("#managerId").val(employee.ManagerID ?? "");
         $("#managerName").val(employee.ManagerName || "");
         $("#managerSearch").val(employee.ManagerID ?? "");
@@ -303,7 +307,8 @@ $(function () {
             ManagerName: $("#managerName").val().trim(),
             TeamId: selectedTeam ? Number(selectedTeam.ID) : ($("#teamId").val() ? Number($("#teamId").val()) : null),
             TeamName: selectedTeam ? (selectedTeam.Name || "") : $("#teamName").val().trim(),
-            isAccountActive: $("#isAccountActive").prop("checked")
+            isAccountActive: $("#isAccountActive").prop("checked"),
+            isAdmin: $("#isAdmin").prop("checked")
         };
         const password = $("#employeePassword").val();
         if (password) employee.Password = password;

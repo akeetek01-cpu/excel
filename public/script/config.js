@@ -1,6 +1,4 @@
 (function (global) {
-  global.ADMIN_EMAIL = "pal@akeetek.com";
-  global.ADMIN_PASSWORD = "4gfDnkyEdKX9eRe5";
 
   global.SIMPRO_CONFIG_PROD = global.SIMPRO_CONFIG_PROD || {
     baseUrl: "https://excel.simprocloud.com/api/v1.0",

@@ -15,7 +15,7 @@ $(function () {
   const user = localStorage.getItem("user");
 
   $("#leadLogoutButton").on("click", function () {
-    showCustomDialogConfirm("Are you sure you want to logout?", "Logout Confirmation", function () {
+    showCustomDialogConfirm("Logout", "Are you sure you want to logout?", function () {
       window.localStorage.clear();
       window.sessionStorage.clear();
       window.location.replace("/");
