@@ -55,7 +55,7 @@ $(function() {
           mgrMap.set(String(u.ManagerID), u.ManagerName);
         }
         // also include users who are managers themselves (their role contains Manager)
-        if (u.col3 && /manager/i.test(u.col3) && u.ID && u.Name) {
+        if (u.position && /manager/i.test(u.position) && u.ID && u.Name) {
           mgrMap.set(String(u.ID), u.Name);
         }
       });

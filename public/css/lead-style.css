@@ -29,9 +29,38 @@
 
 }
 #loginBtn {
-  width: 120px;
   display: block;
-  margin: 0 auto;
+}
+.lead-header {
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  min-height: 58px;
+  margin: 10px 16px 18px;
+}
+.lead-brand {
+  display: flex;
+  align-items: center;
+}
+.lead-brand img {
+  display: block;
+  width: 100px;
+}
+.lead-header .create-lead-label {
+  position: absolute;
+  left: 50%;
+  margin: 0;
+  transform: translateX(-50%);
+  white-space: nowrap;
+  text-align: center;
+}
+.lead-header .lead-logout-button {
+  margin-left: auto;
+}
+.btn:hover {
+    background: var(--purple);
+    color: #fff;
 }
 /* Override browser autofill background/color for login inputs */
 #loginForm input:-webkit-autofill,
@@ -307,16 +336,7 @@ textarea {
   display: none;
   font-weight: 600;
 }
-.afterhrs-container {
-  margin-top: 40px;
-  /* padding-left: 20px; */
-  display: flex;
-  align-items: center;
-  justify-content: flex-start;
-  gap: 5px;
-  flex-wrap: nowrap;
-  min-height: 32px;
-}
+
 
 .after-hours-label {
    font-size: 12px;
@@ -326,6 +346,7 @@ textarea {
   margin-bottom: 0;
   white-space: nowrap;
   display: flex;
+  margin-left: 6px;
   align-items: center;
 }
 
@@ -432,7 +453,6 @@ textarea {
 #faultList .fault-card {
   border: 1px solid #cccccc;
   border-radius: 8px;
-  margin-bottom: 12px;
   transition: border-color 0.2s ease, box-shadow 0.2s ease;
 }
 
@@ -561,17 +581,25 @@ textarea {
     color: gray;
   /* margin-top: 5px; */
 }
-#backBtn, #createNewBtn{
+#backBtn, #createNewBtn, .btn-border{
         border: 1px solid #12c8c0;
-    background: transparent;
+        background: transparent;
+}
+
+.footer-nav-center{
+  justify-content: center !important;
+}
+
+.confirm-no{
+  color: black;
 }
 .modal-content {
     color: #000 !important;
 }
 .submit-btn {
-    padding-left: 20%;
-    margin: 0 4%;
-    padding-right: 20%;
+  padding-left: 10%;
+    /* margin: 0 9%; */
+    padding-right: 10%;
 }
 @media (min-width: 768px) {
   .wizard-card {
@@ -671,6 +699,34 @@ textarea {
   background: #ffffff;
 }
 
+select.form-select,
+select {
+  max-width: 100%;
+  overflow-x: auto;
+  overflow-y: hidden;
+  white-space: nowrap;
+  text-overflow: initial;
+  scrollbar-width: thin;
+  scrollbar-color: #12c8c0 #f1f3f5;
+}
+
+select.form-select::-webkit-scrollbar,
+select::-webkit-scrollbar {
+  height: 8px;
+}
+
+select.form-select::-webkit-scrollbar-thumb,
+select::-webkit-scrollbar-thumb {
+  background: #12c8c0;
+  border-radius: 999px;
+}
+
+select option {
+  white-space: normal;
+  word-break: break-word;
+  overflow-wrap: anywhere;
+}
+
 .d-flex .form-select.parts-select,
 .d-flex .form-select.equipment-select,
 .d-flex .form-select.consumables-select {
@@ -752,7 +808,7 @@ display: inline-flex !important;
 
 .fault-card .fault-body {
   background: linear-gradient(180deg, rgba(0,0,0,0.02), rgba(0,0,0,0.00));
-  padding: 12px;
+  padding: 2px 12px 12px 12px;
   border-radius: 8px;
 }
 

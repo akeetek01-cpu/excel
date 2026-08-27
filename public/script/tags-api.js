@@ -1,12 +1,12 @@
 $(function () {
   function loadTags() {
     const settings = {
-      url: "https://excel.simprocloud.com/api/v1.0/companies/6/setup/tags/customers/?search=any&pageSize=100&page=1&orderby=Name&limit=100",
+      url: `${window.SIMPRO_CONFIG.baseUrl}/companies/${window.SIMPRO_CONFIG.companyId}/setup/tags/projects/?search=any&pageSize=100&page=1&orderby=Name&limit=100`,
       method: "GET",
       timeout: 0,
       headers: {
         Accept: "application/json",
-        Authorization: "Bearer c9c47eab18f514ad102ae8c78ce2a444e3bc4dab"
+        Authorization: `Bearer ${window.SIMPRO_CONFIG.authToken}`
       }
     };
 
@@ -15,10 +15,19 @@ $(function () {
         const items = Array.isArray(response) ? response : response?.items || [];
         const $select = $("#tagsSelect");
         const currentValue = $select.val();
+        const environmentName = String(window.localStorage?.getItem("SIMPRO_ENV") || "").toUpperCase();
+        const shouldFilterPriority = environmentName !== "UAT";
 
         $select.find("option:not(:first)").remove();
 
-        const sortedItems = [...items].sort(function (a, b) {
+        const filteredItems = shouldFilterPriority
+          ? items.filter(function (item) {
+              const name = String(item?.Name || "").trim().toLowerCase();
+              return name.includes("priority");
+            })
+          : items;
+
+        const sortedItems = [...filteredItems].sort(function (a, b) {
           const nameA = (a && a.Name) || "";
           const nameB = (b && b.Name) || "";
           return nameA.localeCompare(nameB, undefined, { sensitivity: "base" });
@@ -42,6 +51,6 @@ $(function () {
       });
   }
 
-  //window.loadTags = loadTags;
-  //loadTags();
+  window.loadTags = loadTags;
+  loadTags();
 });

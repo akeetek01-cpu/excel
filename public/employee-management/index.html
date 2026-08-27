@@ -1,0 +1,135 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Employee Management</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+
+    <link
+        href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Space+Grotesk:wght@500;600;700&display=swap"
+        rel="stylesheet">
+    <link rel="stylesheet" href="../css/dataTables.dataTables.min.css">
+    <link rel="stylesheet" href="../css/hcg-select.css">
+    <link rel="stylesheet" href="employee-management.css">
+</head>
+
+<body>
+    <main class="page-shell">
+        <header class="page-header">
+            <div>
+                <h1>Employee Management</h1>
+            </div>
+            <div class="header-actions">
+                <button id="newEmployeeButton" class="button button-primary" type="button">Add employee</button>
+                <button id="logoutButton" class="button button-danger" type="button">Logout</button>
+            </div>
+        </header>
+
+        <section id="formPanel" class="form-panel" aria-labelledby="formTitle">
+            <div class="panel-heading">
+                <div>
+                    <p class="eyebrow">Employee record</p>
+                    <h2 id="formTitle">Add employee</h2>
+                </div>
+                <button id="cancelButton" class="button button-quiet" type="button">Cancel</button>
+            </div>
+            <form id="employeeForm">
+                <input id="originalId" type="hidden">
+                <div class="form-grid">
+                    <div><label class="wide-field"><span class="field-label">Find employee</span><select data-hcg-select
+                                data-placeholder="Search name, email, or ID" id="employeeSearch"
+                                aria-label="Find employee">
+                                <option value="">Search name, email, or ID</option>
+                            </select></label></div>
+                    <label>Employee ID<input id="employeeId" name="ID" type="number" required readonly></label>
+                    <label>Full name<input id="employeeName" name="Name" type="text" required readonly></label>
+                    <label>Email<input id="employeeEmail" name="Email" type="email" required readonly></label>
+                    <label>Mobile<input id="employeeMobile" name="Mobile" type="text"></label>
+                    <label>Position<input id="employeeRole" name="position" type="text" readonly></label>
+                        <label>Password<div class="password-control"><input id="employeePassword" name="Password"
+                            type="password" autocomplete="new-password" required><button id="togglePasswordButton"
+                            class="password-toggle" type="button" aria-label="Show password" aria-pressed="false">Show</button></div></label>
+                    <div><label class="wide-field"><span class="field-label">Find manager</span><select data-hcg-select
+                                data-placeholder="Search manager name, email, or ID" id="managerSearch"
+                                aria-label="Find manager">
+                                <option value="">Search manager name, email, or ID</option>
+                            </select></label></div>
+                    <label>Manager ID<input id="managerId" name="ManagerID" type="number" readonly></label>
+                    <label>Manager name<input id="managerName" name="ManagerName" type="text" readonly></label>
+                    <div><label class="wide-field"><span class="field-label">Find team</span><select data-hcg-select
+                                data-placeholder="Search team by name or ID" id="teamSearch" aria-label="Find team">
+                                <option value="">Search team by name or ID</option>
+                            </select></label></div>
+                    <label>Team ID<input id="teamId" name="TeamId" type="number" readonly></label>
+                    <label>Team name<input id="teamName" name="TeamName" type="text" readonly></label>
+                    <label class="active-account"><input id="isAccountActive" name="isAccountActive" type="checkbox"> Active account</label>
+                    <label class="active-account"><input id="isAdmin" name="isAdmin" type="checkbox"> Administrator</label>
+
+                </div>
+                <div class="form-actions">
+                    <button class="button button-primary" type="submit">Save employee</button>
+                    <span id="formMessage" class="form-message" role="status"></span>
+                </div>
+            </form>
+        </section>
+
+        <section class="table-panel" aria-labelledby="tableTitle">
+            <div class="panel-heading compact">
+                <div>
+                    <p class="eyebrow">Live records</p>
+                    <h2 id="tableTitle">All employees</h2>
+                </div>
+                <span id="recordCount" class="record-count">Loading...</span>
+            </div>
+            <div id="tableMessage" class="table-message" role="status"></div>
+            <div class="table-wrap">
+                <table id="employeesTable" class="display" style="width:100%">
+                    <thead>
+                        <tr>
+                            <th>ID</th>
+                            <th>Name</th>
+                            <th>Email</th>
+                            <th>Mobile</th>
+                            <th>Role</th>
+                            <th>Manager</th>
+                            <th>Team</th>
+                            <th>Account Active</th>
+                            <th>Admin Access</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                </table>
+            </div>
+        </section>
+    </main>
+
+    <div id="createNewConfirmModal"
+        style="display:none; position:fixed; inset:0; background:rgba(0,0,0,0.4); align-items:center; justify-content:center; z-index:99999;">
+        <div
+            style="background:#fff; border-radius:10px; width:min(92vw, 420px); box-shadow:0 10px 30px rgba(0,0,0,0.2); padding:20px;">
+            <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:12px;">
+                <h5 id="createNewConfirmModalTitle" style="margin:0; color:#222;">Create New Lead?</h5>
+                <button type="button" class="confirm-close" aria-label="Close"
+                    style="border:none; background:transparent; font-size:24px; line-height:1; color:#666; cursor:pointer; padding:0;">×</button>
+            </div>
+            <p id="createNewConfirmModalMessage" style="margin:0 0 16px; color:#555;">Do you want to keep the customer
+                details and start a new lead with the rest cleared?</p>
+            <div style="display:flex; justify-content:flex-end; gap:10px;">
+                <button type="button" class="button button-secondary confirm-no"
+                    style="display:none;">No</button>
+                <button type="button" class="button button-primary confirm-yes">OK</button>
+            </div>
+        </div>
+    </div>
+
+    <script src="../script/jquery-3.7.1.min.js"></script>
+    <script src="../script/dataTables.min.js"></script>
+    <script src="../script/hcg-select.js"></script>
+    <script src="employee-management.js"></script>
+    <script src="../script/common.js"></script>
+</body>
+
+</html>

@@ -1,23 +1,87 @@
+function enforceLeadFormAccess() {
+  const user = localStorage.getItem("user");
+  if (!user) {
+    window.location.replace("/");
+    return false;
+  }
+  return true;
+}
+
+window.addEventListener("pageshow", enforceLeadFormAccess);
+
 $(function () {
+  if (!enforceLeadFormAccess()) return;
+
+  const user = localStorage.getItem("user");
+
+  $("#leadLogoutButton").on("click", function () {
+    showCustomDialogConfirm("Logout", "Are you sure you want to logout?", function () {
+      window.localStorage.clear();
+      window.sessionStorage.clear();
+      window.location.replace("/");
+    });
+  });
+
+  // Parse and populate user details
+  try {
+    const userData = JSON.parse(user);
+    if (userData.Name) {
+      $("#yourName").val(userData.Name);
+    }
+    if (userData.TeamName) {
+      $("#yourManagerName").val(userData.TeamName);
+    }
+  } catch (e) {
+    console.warn("Unable to parse user data:", e);
+  }
+
   // Data model
   const jobData = {
-    customer: {},
-    asset: { description: "", location: "", customerAssetId: "" },
+    customer: {
+      customerId: "",
+      id: "",
+      jobNumber: "",
+      name: "",
+      phone: "",
+      email: "",
+      tenancy: "",
+      tenancyLabel: "",
+      notes: "",
+      siteContact: "",
+      siteContactLabel: "",
+      customerContact: "",
+      contactName: "",
+    },
+    asset: {
+      description: "",
+      descriptionLabel: "",
+      location: "",
+      locationLabel: "",
+      customerAssetId: "",
+      make: "",
+      model: "",
+      serialNumber: "",
+    },
     faults: [],
     estimates: {
       technicians: 0,
       hours: 0,
       totalHours: 0,
-      apprentice: false,
-      afterHours: false,
+      apprentice: 0,
+      otTechnicians: 0,
+      otApprentice: 0,
+      otHours: 0,
       costCenter: "",
+      costCenterLabel: "",
       tags: "",
+      tagsLabel: "",
     },
     photos: [],
   };
 
   let currentStep = 0;
   const MAX_PHOTOS = 10;
+  let customerAssetLookupTimer = null;
 
   function generateJobNumber() {
     return String(Math.floor(100000 + Math.random() * 900000));
@@ -102,68 +166,203 @@ $(function () {
     // buttons
     if (idx === 0) {
       $("#backBtn").hide().prop("disabled", true);
-      $("#nextButtonContainer").width("100%")
+      $(".footer-nav").addClass("footer-nav-center");
     } else if (idx === 1) {
-       $("#backBtn").show().prop("disabled", false);
-      $("#nextButtonContainer").width("auto")
+      $("#backBtn").show().prop("disabled", false);
+      $(".footer-nav").removeClass("footer-nav-center");
     } else {
       $("#backBtn").show().prop("disabled", false);
-      $("#nextButtonContainer").width("100%")
+      $(".footer-nav").removeClass("footer-nav-center");
     }
     if (idx === 1) {
-       $("#nextBtn").removeClass("submit-btn");
-      $("#nextBtn").html('Next <span><i class="fa-solid fa-angle-right"></i></span>&nbsp;&nbsp;Estimates');
-    }
-    else if (idx === 2) {
+      $("#nextBtn").removeClass("submit-btn");
+      $("#nextBtn").html(
+        'Next <span><i class="fa-solid fa-angle-right"></i></span>&nbsp;&nbsp;Estimates',
+      );
+    } else if (idx === 2) {
       $("#nextBtn").addClass("submit-btn");
       $("#nextBtn").html("Submit");
     } else {
-             $("#nextBtn").removeClass("submit-btn");
-// $("#nextBtn").html("Next <span><i class=\"fa-solid fa-angle-right\"></i> </span>   Asset & Fault");    }
-$("#nextBtn").html('Next <span><i class="fa-solid fa-angle-right"></i></span>&nbsp;&nbsp;Asset & Faults');}
+      $("#nextBtn").removeClass("submit-btn");
+      // $("#nextBtn").html("Next <span><i class=\"fa-solid fa-angle-right\"></i> </span>   Asset & Fault");    }
+      $("#nextBtn").html(
+        'Next <span><i class="fa-solid fa-angle-right"></i></span>&nbsp;&nbsp;Asset & Fault',
+      );
+    }
     $("#createNewBtn").toggle(idx === 2);
   }
 
-  function resetWizard() {
+  function syncLookupContextToJobData() {
+    const lookup = window.leadCaptureLookup || {};
+
+    if (lookup.customerId && !jobData.customer.customerId) {
+      jobData.customer.customerId = String(lookup.customerId);
+      jobData.customer.id = String(lookup.customerId);
+    }
+
+    if (lookup.customerName && !jobData.customer.name) {
+      jobData.customer.name = String(lookup.customerName);
+    }
+
+    if (lookup.siteContactName && !jobData.customer.siteContact) {
+      jobData.customer.siteContact = String(lookup.siteContactName);
+    }
+
+    if (lookup.defaultSiteId && !jobData.customer.tenancy) {
+      jobData.customer.tenancy = String(lookup.defaultSiteId);
+    }
+  }
+
+  function resetWizard(options = {}) {
+    const preserveCustomerDetails = !!(
+      options && options.preserveCustomerDetails
+    );
+    const preservedCustomer = preserveCustomerDetails
+      ? {
+          jobNumber: String(
+            jobData.customer.jobNumber || "#jobNumber" in window ? "" : "",
+          ).trim(),
+          name: String(jobData.customer.name || "").trim(),
+          phone: String(jobData.customer.phone || "").trim(),
+          email: String(jobData.customer.email || "").trim(),
+          tenancy: String(jobData.customer.tenancy || "").trim(),
+          tenancyLabel: String(jobData.customer.tenancyLabel || "").trim(),
+          notes: String(jobData.customer.notes || "").trim(),
+          autoJobBtnValue: String($("#autoJobBtn").val() || "").trim(),
+          customerNameValue: String($("#customerName").val() || "").trim(),
+          customerNameInputValue: String(
+            $("#customerNameInput").val() || "",
+          ).trim(),
+          customerPhoneValue: String($("#customerPhone").val() || "").trim(),
+          customerEmailValue: String($("#customerEmail").val() || "").trim(),
+          customerTenancyValue: String(
+            $("#customerTenancy").val() || "",
+          ).trim(),
+          customerNotesValue: String($("#customerNotes").val() || "").trim(),
+          jobNumberValue: String($("#jobNumber").val() || "").trim(),
+        }
+      : null;
+
     $("#form-customer")[0].reset();
     $("#faultList").empty();
-    $("#assetDescriptionSelect").val("");
+    $("#assetDescriptionInput").val("");
     $("#assetLocation").val("");
-    $("#assetDescriptionInput")
-      .val("")
-      .addClass("d-none")
-      .removeClass("is-invalid");
+    $("#assertMake").val("");
+    $("#assertModel").val("");
+    $("#assertSerialNumber").val("");
+    $("#customerAssetId").val("");
+    $("#customerAssetIdInput").val("");
+    $("#customerAssetIdInputWrapper").addClass("d-none");
+    $("#customerAssetIdSelectWrapper").removeClass("d-none");
+    $("#customerAssetId").prop("disabled", false);
+    $("#autoJobBtn").val("");
+
+    $("#assetDescriptionInput").removeClass("is-invalid");
     $("#assetLocationInput")
       .val("")
       .addClass("d-none")
       .removeClass("is-invalid");
     $(
-      "#assetDescriptionError, #assetDescriptionInputError, #assetLocationError, #assetLocationInputError",
+      "#assetDescriptionError, #assetDescriptionInputError, #assetLocationError, #assetLocationInputError, #customerAssetIdInputError",
     ).text("");
-    $("#customerAssetId").val("");
+    $("#customerNameInput").val("");
+    $("#customerNameInputWrapper").addClass("d-none");
+    $("#serviceManagerSelect").val("");
     $("#costCenterSelect").val("");
     $("#tagsSelect").val("");
     $("#technicians").val(1);
     $("#hours").val(0);
     $("#apprentice").val(0);
-    $("#afterHours").prop("checked", false);
-    jobData.customer = {};
-    jobData.asset = { description: "", location: "", customerAssetId: "" };
+    $("#otTechnicians").val(0);
+    $("#otApprentice").val(0);
+    $("#otHours").val(0);
+    jobData.customer = {
+      customerId: "",
+      id: "",
+      jobNumber:
+        preservedCustomer?.jobNumber || preservedCustomer?.jobNumberValue || "",
+      name: preservedCustomer?.name || "",
+      phone: preservedCustomer?.phone || "",
+      email: preservedCustomer?.email || "",
+      tenancy: preservedCustomer?.tenancy || "",
+      tenancyLabel: preservedCustomer?.tenancyLabel || "",
+      notes: preservedCustomer?.notes || "",
+      siteContact: "",
+      siteContactLabel: "",
+      customerContact: "",
+      contactName: "",
+    };
+    jobData.asset = {
+      description: "",
+      descriptionLabel: "",
+      location: "",
+      locationLabel: "",
+      customerAssetId: "",
+      make: "",
+      model: "",
+      serialNumber: "",
+    };
     jobData.faults = [];
     jobData.estimates = {
       technicians: 0,
       hours: 0,
       totalHours: 0,
-      apprentice: false,
-      afterHours: false,
+      apprentice: 0,
+      otTechnicians: 0,
+      otApprentice: 0,
+      otHours: 0,
       costCenter: "",
+      costCenterLabel: "",
       tags: "",
+      tagsLabel: "",
     };
     jobData.photos = [];
     photoFiles = [];
-    $("#previewGrid").empty();
+    $("#photoInput").val("");
+    renderPreviews();
+    $(".totalRecovery-select").val("");
+    $(".equipment-select").val("");
+    $(".parts-select").val("");
+    $(".equipment-qty, .parts-qty, .consumables-qty").val(0);
+    $(".equipment-list, .parts-list, .consumables-list").empty();
     $("#uploadStatus").hide().text("");
     $("#jsonOutput").text("");
+
+    if (preserveCustomerDetails) {
+      $("#jobNumber").val(
+        preservedCustomer?.jobNumberValue || preservedCustomer?.jobNumber || "",
+      );
+      $("#autoJobBtn").val(preservedCustomer?.autoJobBtnValue || "");
+      $("#customerName").val(preservedCustomer?.customerNameValue || "");
+      $("#customerNameInput").val(
+        preservedCustomer?.customerNameInputValue || "",
+      );
+      $("#customerPhone").val(preservedCustomer?.customerPhoneValue || "");
+      $("#customerEmail").val(preservedCustomer?.customerEmailValue || "");
+      $("#customerTenancy").val(preservedCustomer?.customerTenancyValue || "");
+      $("#customerNotes").val(preservedCustomer?.customerNotesValue || "");
+      $("#customerNameInputWrapper").toggleClass(
+        "d-none",
+        String(preservedCustomer?.customerNameValue || "") !== "other",
+      );
+      $("#customerNameInputError").text("");
+      $("#customerPhoneError").text("");
+      $("#customerEmailError").text("");
+    } else {
+      $("#jobNumber").val("");
+      $("#autoJobBtn").val("");
+      $("#customerName").val("");
+      $("#customerNameInput").val("");
+      $("#customerPhone").val("");
+      $("#customerEmail").val("");
+      $("#customerTenancy").val("");
+      $("#customerNotes").val("");
+      $("#customerNameInputWrapper").addClass("d-none");
+      $("#customerNameInputError").text("");
+      $("#customerPhoneError").text("");
+      $("#customerEmailError").text("");
+    }
+
     $("#modalJobNum, #modalCustomer, #modalTime").text("");
     $(
       "#revJob, #revCustomer, #revAsset, #revFaults, #revTech, #revHours, #revMan",
@@ -173,22 +372,347 @@ $("#nextBtn").html('Next <span><i class="fa-solid fa-angle-right"></i></span>&nb
     $(".fault-card").removeClass("fault-card-invalid");
     $(".fault-header").removeClass("fault-header-invalid");
     addFault();
+    // Ensure searchable select UI reflects cleared values
+    try {
+      [
+        '#serviceManagerSelect',
+        '#costCenterSelect',
+        '#tagsSelect',
+        '#customerTenancy',
+        '#customerName'
+      ].forEach(function(sel) {
+        try {
+          $(sel).trigger('change');
+          const api = typeof hcgSelect === 'function' ? hcgSelect(sel) : null;
+          if (api && typeof api.refresh === 'function') api.refresh();
+        } catch (_) {}
+      });
+      // refresh all form-select wrappers as a fallback
+      const allApi = typeof hcgSelect === 'function' ? hcgSelect('.form-select') : null;
+      if (allApi && typeof allApi.refresh === 'function') allApi.refresh();
+    } catch (e) {
+      // ignore if hcgSelect not present
+    }
+
     showStep(0);
     calculate();
+  }
+
+  function dismissCustomDialog() {
+    $("#createNewConfirmModal").hide();
+  }
+
+  function showCustomDialog(options = {}) {
+    const {
+      title = "Notice",
+      message = "",
+      confirmText = "OK",
+      cancelText = "",
+      showCancel = false,
+      onConfirm,
+      onCancel,
+    } = options || {};
+
+    $("#createNewConfirmModalTitle").text(title);
+    $("#createNewConfirmModalMessage").text(message);
+    $("#createNewConfirmModal .confirm-yes").text(confirmText);
+
+    const $cancelButton = $("#createNewConfirmModal .confirm-no");
+    if (showCancel && cancelText) {
+      $cancelButton.text(cancelText).show();
+    } else {
+      $cancelButton.hide();
+    }
+
+    $("#createNewConfirmModal .confirm-yes")
+      .off("click")
+      .on("click", function (e) {
+        e.preventDefault();
+        dismissCustomDialog();
+        if (typeof onConfirm === "function") {
+          onConfirm();
+        }
+      });
+
+    $cancelButton.off("click").on("click", function (e) {
+      e.preventDefault();
+      dismissCustomDialog();
+      if (typeof onCancel === "function") {
+        onCancel();
+      }
+    });
+
+    $("#createNewConfirmModal").css("display", "flex");
+  }
+
+  function showAlertDialog(message, title = "Notice") {
+    showCustomDialog({
+      title,
+      message,
+      confirmText: "OK",
+      showCancel: false,
+    });
+  }
+
+  function showAlertDialogSuccess(message, title = "Successful!") {
+    showCustomDialog({
+      title,
+      message,
+      confirmText: "OK",
+      showCancel: false,
+    });
+  }
+
+  window.showCustomDialog = showCustomDialog;
+  window.showAlertDialog = showAlertDialog;
+  window.showAlertDialogSuccess = showAlertDialogSuccess;
+  window.dismissCustomDialog = dismissCustomDialog;
+  window.showApiErrorDialog = showApiErrorDialog;
+
+  function completeCreateNewLeadChoice(preserveCustomerDetails) {
+    dismissCustomDialog();
+    if (preserveCustomerDetails) {
+      submitJob({
+        onSuccess: function () {
+          resetWizard({ preserveCustomerDetails: !!preserveCustomerDetails });
+        },
+        onError: function () {
+          showAlertDialog(
+            "Failed to create lead. Please try again. Staff not found.",
+          );
+          //resetWizard({ preserveCustomerDetails: !!preserveCustomerDetails });
+        },
+      });
+    }
+  }
+
+  function showCreateNewConfirm() {
+    showCustomDialog({
+      title: "Create New Lead?",
+      message: "Do you want to create another lead for the same Job Number?",
+      confirmText: "Yes",
+      cancelText: "No",
+      showCancel: true,
+      onConfirm: function () {
+        completeCreateNewLeadChoice(true);
+      },
+      onCancel: function () {
+        completeCreateNewLeadChoice(false);
+      },
+    });
   }
 
   function showError(field, errorId, message) {
     const $field = $(field);
     const $error = $(errorId);
     $field.addClass("is-invalid");
+    // If this is an hcg searchable select, also mark the visible wrapper as invalid
+    try {
+      if ($field.is('select')) {
+        let $wrapper = $field.next('.hcg-select');
+        if (!$wrapper.length) $wrapper = $field.closest('.hcg-select');
+        if (!$wrapper.length) $wrapper = $field.parent().find('.hcg-select').first();
+        if ($wrapper.length) $wrapper.addClass('is-invalid');
+      }
+    } catch (e) {
+      // silent
+    }
     $error.text(message);
+  }
+
+  function resetAssetFields({
+    keepAssetDescription = false,
+    keepCustomerAssetId = false,
+  } = {}) {
+    const clearValue = (selector) => {
+      const $field = $(selector);
+      if ($field.length) {
+        $field.val("").removeClass("is-invalid");
+      }
+    };
+
+    clearValue("#assertMake");
+    clearValue("#assertModel");
+    clearValue("#assertSerialNumber");
+
+    if (!keepAssetDescription) {
+      clearValue("#assetDescriptionSelect");
+      clearValue("#assetDescriptionInput");
+      //$("#assetDescriptionInput").addClass("d-none");
+      $("#assetDescriptionInputError").text("");
+    } else {
+      clearValue("#assetDescriptionInput");
+      //$("#assetDescriptionInput").removeClass("is-invalid");
+      $("#assetDescriptionInputError").text("");
+    }
+
+    clearValue("#assetLocation");
+    clearValue("#assetLocationInput");
+    $("#assetLocationInput").addClass("d-none");
+    $("#assetLocationInputError").text("");
+
+    if (!keepCustomerAssetId) {
+      // clearValue("#customerAssetId");
+    }
+
+    jobData.asset.description = "";
+    jobData.asset.descriptionLabel = "";
+    jobData.asset.location = "";
+    jobData.asset.locationLabel = "";
+    if (!keepCustomerAssetId) {
+      jobData.asset.customerAssetId = "";
+    }
   }
 
   function clearError(field, errorId) {
     const $field = $(field);
     const $error = $(errorId);
     $field.removeClass("is-invalid");
+    // also clear any hcg-select wrapper invalid state
+    try {
+      if ($field.is('select')) {
+        let $wrapper = $field.next('.hcg-select');
+        if (!$wrapper.length) $wrapper = $field.closest('.hcg-select');
+        if (!$wrapper.length) $wrapper = $field.parent().find('.hcg-select').first();
+        if ($wrapper.length) $wrapper.removeClass('is-invalid');
+      }
+    } catch (e) {
+      // silent
+    }
     if ($error.length) $error.text("");
+  }
+
+  function validateCustomerContactFields({ showErrors = true } = {}) {
+    let valid = true;
+    const customerNameValue = String($("#customerName").val() || "").trim();
+    const customerNameInput = String(
+      $("#customerNameInput").val() || "",
+    ).trim();
+    const customerPhoneValue = String($("#customerPhone").val() || "").trim();
+    const customerEmailValue = String($("#customerEmail").val() || "").trim();
+    const isOtherContact = customerNameValue === "other";
+
+    if (isOtherContact) {
+      if (customerNameInput === "") {
+        if (showErrors) {
+          showError(
+            "#customerNameInput",
+            "#customerNameInputError",
+            "Customer Contact Name is required.",
+          );
+        }
+        valid = false;
+      } else if (customerNameInput.length < 2) {
+        if (showErrors) {
+          showError(
+            "#customerNameInput",
+            "#customerNameInputError",
+            "Customer Name must contain a minimum of 2 characters.",
+          );
+        }
+        valid = false;
+      } else if (showErrors) {
+        clearError("#customerNameInput", "#customerNameInputError");
+      }
+
+      if (customerPhoneValue === "") {
+        if (showErrors) {
+          showError(
+            "#customerPhone",
+            "#customerPhoneError",
+            "Phone is required.",
+          );
+        }
+        valid = false;
+      } else if (!/^\d{8,12}$/.test(customerPhoneValue.replace(/\D/g, ""))) {
+        if (showErrors) {
+          showError(
+            "#customerPhone",
+            "#customerPhoneError",
+            "Please enter a valid phone number.",
+          );
+        }
+        valid = false;
+      } else if (showErrors) {
+        clearError("#customerPhone", "#customerPhoneError");
+      }
+
+      if (customerEmailValue === "") {
+        if (showErrors) {
+          showError(
+            "#customerEmail",
+            "#customerEmailError",
+            "Email is required.",
+          );
+        }
+        valid = false;
+      } else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(customerEmailValue)) {
+        if (showErrors) {
+          showError(
+            "#customerEmail",
+            "#customerEmailError",
+            "Please enter a valid email address.",
+          );
+        }
+        valid = false;
+      } else if (showErrors) {
+        clearError("#customerEmail", "#customerEmailError");
+      }
+
+      if (showErrors) {
+        clearError("#customerName", "#customerNameError");
+      }
+    } else if (customerNameValue === "") {
+      if (showErrors) {
+        showError(
+          "#customerName",
+          "#customerNameError",
+          "Customer Contact Name is required.",
+        );
+      }
+      valid = false;
+    } else {
+      if (showErrors) {
+        clearError("#customerName", "#customerNameError");
+        clearError("#customerNameInput", "#customerNameInputError");
+      }
+
+      if (customerPhoneValue !== "") {
+        if (!/^\d{8,12}$/.test(customerPhoneValue.replace(/\D/g, ""))) {
+          if (showErrors) {
+            showError(
+              "#customerPhone",
+              "#customerPhoneError",
+              "Please enter a valid phone number.",
+            );
+          }
+          valid = false;
+        } else if (showErrors) {
+          clearError("#customerPhone", "#customerPhoneError");
+        }
+      } else if (showErrors) {
+        clearError("#customerPhone", "#customerPhoneError");
+      }
+
+      if (customerEmailValue !== "") {
+        if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(customerEmailValue)) {
+          if (showErrors) {
+            showError(
+              "#customerEmail",
+              "#customerEmailError",
+              "Please enter a valid email address.",
+            );
+          }
+          valid = false;
+        } else if (showErrors) {
+          clearError("#customerEmail", "#customerEmailError");
+        }
+      } else if (showErrors) {
+        clearError("#customerEmail", "#customerEmailError");
+      }
+    }
+
+    return valid;
   }
 
   function markFaultCardInvalid($card) {
@@ -219,73 +743,8 @@ $("#nextBtn").html('Next <span><i class="fa-solid fa-angle-right"></i></span>&nb
     } else {
       clearError("#jobNumber", "#jobNumberError");
     }
-    let customerName = $("#customerName").val().trim();
 
-    if (customerName === "") {
-      showError(
-        "#customerName",
-        "#customerNameError",
-        "Customer Contact Name is required.",
-      );
-      valid = false;
-    } else if (customerName.length < 2) {
-      showError(
-        "#customerName",
-        "#customerNameError",
-        "Customer Name must contain a minimum of 2 characters.",
-      );
-      valid = false;
-    } else {
-      clearError("#customerName", "#customerNameError");
-    }
-
-    const phone = $("#customerPhone").val().trim();
-    if (phone === "") {
-      showError(
-        "#customerPhone",
-        "#customerPhoneError",
-        "Phone Number is required.",
-      );
-      valid = false;
-    } else if (!/^\d+$/.test(phone)) {
-      showError(
-        "#customerPhone",
-        "#customerPhoneError",
-        "Customer Phone must contain only numeric characters.",
-      );
-      valid = false;
-    } else if (phone.length < 9) {
-      showError(
-        "#customerPhone",
-        "#customerPhoneError",
-        "Customer Phone must contain a minimum of 9 digits.",
-      );
-      valid = false;
-    } else if (phone.length > 12) {
-      showError(
-        "#customerPhone",
-        "#customerPhoneError",
-        "Customer Phone cannot exceed 12 digits.",
-      );
-      valid = false;
-    } else {
-      clearError("#customerPhone", "#customerPhoneError");
-    }
-
-    const email = $("#customerEmail").val().trim();
-    if (email === "") {
-      showError("#customerEmail", "#customerEmailError", "Email is required.");
-      valid = false;
-    } else if (!/^\S+@\S+\.\S+$/.test(email)) {
-      showError(
-        "#customerEmail",
-        "#customerEmailError",
-        "Enter a valid email address.",
-      );
-      valid = false;
-    } else {
-      clearError("#customerEmail", "#customerEmailError");
-    }
+    valid = validateCustomerContactFields({ showErrors: true }) && valid;
 
     if ($("#customerTenancy").val().trim() === "") {
       showError(
@@ -303,6 +762,35 @@ $("#nextBtn").html('Next <span><i class="fa-solid fa-angle-right"></i></span>&nb
 
   function validateStep1() {
     let valid = true;
+
+    const selectedAssetValue = String($("#customerAssetId").val() || "").trim();
+    const manualAssetValue = String(
+      $("#customerAssetIdInput").val() || "",
+    ).trim();
+    const hasAssetSelection =
+      selectedAssetValue !== "" && selectedAssetValue !== "other";
+    const hasManualAssetEntry =
+      selectedAssetValue === "other" && manualAssetValue !== "";
+
+    if (!hasAssetSelection && !hasManualAssetEntry) {
+      if (selectedAssetValue === "other") {
+        showError(
+          "#customerAssetIdInput",
+          "#customerAssetIdInputError",
+          "Customer Asset ID or Excel Barcode is required.",
+        );
+      } else {
+        showError(
+          "#customerAssetId",
+          "#customerAssetIdError",
+          "Customer Asset ID or Excel Barcode is required.",
+        );
+      }
+      valid = false;
+    } else {
+      clearError("#customerAssetIdInput", "#customerAssetIdInputError");
+      clearError("#customerAssetId", "#customerAssetIdError");
+    }
 
     if ($("#assetDescriptionSelect").val() === "") {
       showError(
@@ -394,16 +882,51 @@ $("#nextBtn").html('Next <span><i class="fa-solid fa-angle-right"></i></span>&nb
           clearError($work, $workError);
         }
 
-        if (cardInvalid) {
-          markFaultCardInvalid($card);
-        } else {
-          clearFaultCardInvalid($card);
-        }
+        // if (cardInvalid) {
+        //   markFaultCardInvalid($card);
+        // } else {
+        //   clearFaultCardInvalid($card);
+        // }
       });
     }
 
     return valid;
   }
+
+  $("#customerPhone")
+    .on("input", function () {
+      const normalizedValue = String($(this).val() || "")
+        .replace(/\D/g, "")
+        .slice(0, 12);
+      $(this).val(normalizedValue);
+
+      if ($("#customerName").val() === "other") {
+        if (normalizedValue === "") {
+          showError(
+            "#customerPhone",
+            "#customerPhoneError",
+            "Phone is required.",
+          );
+        } else if (!/^\d{8,12}$/.test(normalizedValue)) {
+          showError(
+            "#customerPhone",
+            "#customerPhoneError",
+            "Please enter a valid phone number.",
+          );
+        } else {
+          clearError("#customerPhone", "#customerPhoneError");
+        }
+      } else {
+        clearError("#customerPhone", "#customerPhoneError");
+      }
+    })
+    .on("blur", function () {
+      validateCustomerContactFields({ showErrors: true });
+    });
+
+  $("#customerEmail").on("blur", function () {
+    validateCustomerContactFields({ showErrors: true });
+  });
 
   $("#jobNumber")
     .attr("maxlength", "6")
@@ -415,7 +938,7 @@ $("#nextBtn").html('Next <span><i class="fa-solid fa-angle-right"></i></span>&nb
         if (window.clearJobNumberDependentFields) {
           window.clearJobNumberDependentFields();
         } else {
-          $("#autoJobBtn").text("");
+          $("#autoJobBtn").val("");
           $("#customerTenancy").val("").trigger("change");
         }
       }
@@ -426,11 +949,17 @@ $("#nextBtn").html('Next <span><i class="fa-solid fa-angle-right"></i></span>&nb
         if (window.clearJobNumberDependentFields) {
           window.clearJobNumberDependentFields();
         } else {
-          $("#autoJobBtn").text("");
+          $("#autoJobBtn").val("");
           $("#customerTenancy").val("").trigger("change");
         }
         showError("#jobNumber", "#jobNumberError", "Job Number is required.");
       } else if (!$("#autoJob").is(":checked") && !/^\d{6}$/.test(value)) {
+        if (window.clearJobNumberDependentFields) {
+          window.clearJobNumberDependentFields();
+        } else {
+          $("#autoJobBtn").val("");
+          $("#customerTenancy").val("").trigger("change");
+        }
         showError(
           "#jobNumber",
           "#jobNumberError",
@@ -469,50 +998,83 @@ $("#nextBtn").html('Next <span><i class="fa-solid fa-angle-right"></i></span>&nb
   //   }
   // });
 
-  $("#customerName").on("blur", function () {
+  $("#customerName").on("change", function () {
     const value = $(this).val().trim();
+    const isOther = value === "other";
+
+    if (isOther) {
+      $("#customerNameInputWrapper").removeClass("d-none");
+      $("#customerNameInput").val("").removeClass("is-invalid");
+      $("#customerNameInputError").text("");
+    } else {
+      $("#customerNameInputWrapper").addClass("d-none");
+      $("#customerNameInput").val("").removeClass("is-invalid");
+      $("#customerNameInputError").text("");
+    }
+
+    $("#customerPhone").val("").removeClass("is-invalid");
+    $("#customerEmail").val("").removeClass("is-invalid");
+    $("#customerPhoneError").text("");
+    $("#customerEmailError").text("");
+
     if (value === "") {
       showError(
         "#customerName",
         "#customerNameError",
-        "Customer Contract Name is required.",
-      );
-    } else if (value.length < 2) {
-      showError(
-        "#customerName",
-        "#customerNameError",
-        "Customer Name must contain a minimum of 2 characters.",
+        "Customer Contact Name is required.",
       );
     } else {
       clearError("#customerName", "#customerNameError");
     }
   });
 
+  $("#customerName").on("blur", function () {
+    const value = $(this).val().trim();
+    if (value === "") {
+      showError(
+        "#customerName",
+        "#customerNameError",
+        "Customer Contact Name is required.",
+      );
+    } else if (value === "other") {
+      clearError("#customerName", "#customerNameError");
+    } else {
+      clearError("#customerName", "#customerNameError");
+    }
+  });
+
+  $("#customerNameInput").on("blur", function () {
+    const value = $(this).val().trim();
+    if ($("#customerName").val() === "other") {
+      if (value === "") {
+        showError(
+          "#customerNameInput",
+          "#customerNameInputError",
+          "Customer Contact Name is required.",
+        );
+      } else if (value.length < 2) {
+        showError(
+          "#customerNameInput",
+          "#customerNameInputError",
+          "Customer Name must contain a minimum of 2 characters.",
+        );
+      } else {
+        clearError("#customerNameInput", "#customerNameInputError");
+      }
+    }
+  });
+
   $("#customerPhone").on("blur", function () {
-    const phone = $(this).val().trim();
-    if (phone === "") {
+    const value = $(this).val().trim();
+    const isOther = $("#customerName").val() === "other";
+
+    if (isOther && value === "") {
+      showError("#customerPhone", "#customerPhoneError", "Phone is required.");
+    } else if (isOther && !/^\d{8,12}$/.test(value.replace(/\D/g, ""))) {
       showError(
         "#customerPhone",
         "#customerPhoneError",
-        "Phone Number is required.",
-      );
-    } else if (!/^\d+$/.test(phone)) {
-      showError(
-        "#customerPhone",
-        "#customerPhoneError",
-        "Customer Phone must contain only numeric characters.",
-      );
-    } else if (phone.length < 9) {
-      showError(
-        "#customerPhone",
-        "#customerPhoneError",
-        "Customer Phone must contain a minimum of 9 digits.",
-      );
-    } else if (phone.length > 12) {
-      showError(
-        "#customerPhone",
-        "#customerPhoneError",
-        "Customer Phone cannot exceed 12 digits.",
+        "Please enter a valid phone number.",
       );
     } else {
       clearError("#customerPhone", "#customerPhoneError");
@@ -521,13 +1083,15 @@ $("#nextBtn").html('Next <span><i class="fa-solid fa-angle-right"></i></span>&nb
 
   $("#customerEmail").on("blur", function () {
     const value = $(this).val().trim();
-    if (value === "") {
+    const isOther = $("#customerName").val() === "other";
+
+    if (isOther && value === "") {
       showError("#customerEmail", "#customerEmailError", "Email is required.");
-    } else if (!/^\S+@\S+\.\S+$/.test(value)) {
+    } else if (isOther && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(value)) {
       showError(
         "#customerEmail",
         "#customerEmailError",
-        "Enter a valid email address.",
+        "Please enter a valid email address.",
       );
     } else {
       clearError("#customerEmail", "#customerEmailError");
@@ -548,13 +1112,18 @@ $("#nextBtn").html('Next <span><i class="fa-solid fa-angle-right"></i></span>&nb
   });
 
   $("#assetDescriptionSelect").on("change", function () {
+    // Do not move focus automatically. Only toggle visibility of the free-text input when "Other" is selected.
     if ($(this).val() === "other") {
-      $("#assetDescriptionInput").removeClass("d-none");
+      resetAssetFields({ keepAssetDescription: true });
+      //$("#assetDescriptionInput").removeClass("d-none");
+      $("#assetDescriptionSelect").val("other");
     } else {
-      $("#assetDescriptionInput")
-        .addClass("d-none")
-        .removeClass("is-invalid")
-        .val("");
+      resetAssetFields({ keepAssetDescription: true });
+      $("#assetDescriptionSelect").val($(this).val() || "");
+      // $("#assetDescriptionInput")
+      //   .addClass("d-none")
+      //   .removeClass("is-invalid")
+      //   .val("");
       $("#assetDescriptionInputError").text("");
     }
   });
@@ -598,10 +1167,27 @@ $("#nextBtn").html('Next <span><i class="fa-solid fa-angle-right"></i></span>&nb
     }
   });
 
+  $("#serviceManagerSelect").on("change blur", function () {
+    const value = $(this).val().trim();
+    if (value === "") {
+      showError(
+        "#serviceManagerSelect",
+        "#serviceManagerError",
+        "Service Manager is required.",
+      );
+    } else {
+      clearError("#serviceManagerSelect", "#serviceManagerError");
+    }
+  });
+
   $("#costCenterSelect").on("change blur", function () {
     const value = $(this).val().trim();
     if (value === "") {
-      showError("#costCenterSelect", "#costCenterError", "Cost Center is required.");
+      showError(
+        "#costCenterSelect",
+        "#costCenterError",
+        "Cost Center is required.",
+      );
     } else {
       clearError("#costCenterSelect", "#costCenterError");
     }
@@ -616,41 +1202,45 @@ $("#nextBtn").html('Next <span><i class="fa-solid fa-angle-right"></i></span>&nb
     }
   });
 
-  $("#technicians").on("input", function () {
-    const value = Number($(this).val() || 0);
-    if (!Number.isNaN(value) && value > 0) {
-      $(this).val(Math.min(1000, Math.floor(value)));
-    }
-  }).on("blur", function () {
-    const tech = Number($(this).val() || 0);
-    if (!Number.isInteger(tech) || tech < 1) {
-      showError(
-        "#technicians",
-        "#techniciansError",
-        "No. of technicians must be a positive whole number.",
-      );
-    } else {
-      clearError("#technicians", "#techniciansError");
-    }
-  });
+  $("#technicians")
+    .on("input", function () {
+      const value = Number($(this).val() || 0);
+      if (!Number.isNaN(value) && value > 0) {
+        $(this).val(Math.min(1000, Math.floor(value)));
+      }
+    })
+    .on("blur", function () {
+      const tech = Number($(this).val() || 0);
+      if (!Number.isInteger(tech) || tech < 1) {
+        showError(
+          "#technicians",
+          "#techniciansError",
+          "No. of technicians must be a positive whole number.",
+        );
+      } else {
+        clearError("#technicians", "#techniciansError");
+      }
+    });
 
-  $("#apprentice").on("input", function () {
-    const value = Number($(this).val() || 0);
-    if (!Number.isNaN(value) && value >= 0) {
-      $(this).val(Math.min(1000, Math.floor(value)));
-    }
-  }).on("blur", function () {
-    const apprentice = Number($(this).val() || 0);
-    if (!Number.isInteger(apprentice) || apprentice < 0) {
-      showError(
-        "#apprentice",
-        "#apprenticeError",
-        "No. of apprentices must be a whole number greater than or equal to 0.",
-      );
-    } else {
-      clearError("#apprentice", "#apprenticeError");
-    }
-  });
+  $("#apprentice")
+    .on("input", function () {
+      const value = Number($(this).val() || 0);
+      if (!Number.isNaN(value) && value >= 0) {
+        $(this).val(Math.min(1000, Math.floor(value)));
+      }
+    })
+    .on("blur", function () {
+      const apprentice = Number($(this).val() || 0);
+      if (!Number.isInteger(apprentice) || apprentice < 0) {
+        showError(
+          "#apprentice",
+          "#apprenticeError",
+          "No. of apprentices must be a whole number greater than or equal to 0.",
+        );
+      } else {
+        clearError("#apprentice", "#apprenticeError");
+      }
+    });
 
   $("#hours").on("blur", function () {
     const hrs = Number($(this).val() || 0);
@@ -662,6 +1252,60 @@ $("#nextBtn").html('Next <span><i class="fa-solid fa-angle-right"></i></span>&nb
       );
     } else {
       clearError("#hours", "#hoursError");
+    }
+  });
+
+  // OT fields (after-hours) - mirror behavior of normal fields
+  $("#otTechnicians")
+    .on("input", function () {
+      const value = Number($(this).val() || 0);
+      if (!Number.isNaN(value) && value >= 0) {
+        $(this).val(Math.min(1000, Math.floor(value)));
+      }
+    })
+    .on("blur", function () {
+      const tech = Number($(this).val() || 0);
+      if (!Number.isInteger(tech) || tech < 0) {
+        showError(
+          "#otTechnicians",
+          "#otTechniciansError",
+          "No. of OT technicians must be a whole number greater than or equal to 0.",
+        );
+      } else {
+        clearError("#otTechnicians", "#otTechniciansError");
+      }
+    });
+
+  $("#otApprentice")
+    .on("input", function () {
+      const value = Number($(this).val() || 0);
+      if (!Number.isNaN(value) && value >= 0) {
+        $(this).val(Math.min(1000, Math.floor(value)));
+      }
+    })
+    .on("blur", function () {
+      const apprentice = Number($(this).val() || 0);
+      if (!Number.isInteger(apprentice) || apprentice < 0) {
+        showError(
+          "#otApprentice",
+          "#otApprenticeError",
+          "No. of OT apprentices must be a whole number greater than or equal to 0.",
+        );
+      } else {
+        clearError("#otApprentice", "#otApprenticeError");
+      }
+    });
+
+  $("#otHours").on("blur", function () {
+    const hrs = Number($(this).val() || 0);
+    if (isNaN(hrs) || hrs < 0.1 || hrs > 24) {
+      showError(
+        "#otHours",
+        "#otHoursError",
+        "OT Hours required must be between 0 and 24.",
+      );
+    } else {
+      clearError("#otHours", "#otHoursError");
     }
   });
 
@@ -733,6 +1377,17 @@ $("#nextBtn").html('Next <span><i class="fa-solid fa-angle-right"></i></span>&nb
     if ($field.hasClass("is-invalid")) {
       $field.removeClass("is-invalid");
     }
+    // if this is an hcg searchable select, also clear wrapper invalid state
+    try {
+      if ($field.is('select')) {
+        let $wrapper = $field.next('.hcg-select');
+        if (!$wrapper.length) $wrapper = $field.closest('.hcg-select');
+        if (!$wrapper.length) $wrapper = $field.parent().find('.hcg-select').first();
+        if ($wrapper.length) $wrapper.removeClass('is-invalid');
+      }
+    } catch (e) {
+      // silent
+    }
 
     if ($field.hasClass("fault-desc")) {
       $field.closest(".fault-card").find(".fault-desc-error").text("");
@@ -747,13 +1402,86 @@ $("#nextBtn").html('Next <span><i class="fa-solid fa-angle-right"></i></span>&nb
     }
   });
 
+  function syncSelectDisplayText($select) {
+    const $field = $select instanceof jQuery ? $select : $("#" + $select);
+    const selectedText = $field.find("option:selected").text().trim();
+    $field.attr("title", selectedText || "");
+  }
+
+  $(document).on("change", "select", function () {
+    syncSelectDisplayText($(this));
+  });
+
+  $("select").each(function () {
+    syncSelectDisplayText($(this));
+  });
+
   // Faults
   function updateAiLabelState($card) {
     const workVal = ($card.find(".work-req").val() || "").trim();
-    const partsVal = ($card.find(".parts").val() || $card.find('.parts-select').val() || "").trim();
-    const equipmentVal = ($card.find(".equipment").val() || $card.find('.equipment-select').val() || "").trim();
-    const hasAutoFilled = workVal !== "" || partsVal !== "" || equipmentVal !== "";
+    const partsVal = (
+      $card.find(".parts").val() ||
+      $card.find(".parts-select").val() ||
+      ""
+    ).trim();
+    const equipmentVal = (
+      $card.find(".equipment").val() ||
+      $card.find(".equipment-select").val() ||
+      ""
+    ).trim();
+    const hasAutoFilled =
+      workVal !== "" || partsVal !== "" || equipmentVal !== "";
     $card.find(".ai-pre-fill").toggleClass("is-filled", hasAutoFilled);
+  }
+
+  function refreshWorkRequiredOptions($card) {
+    if (window.populateWorkRequiredSelects) {
+      const items = Array.isArray(window.workRequiredItems)
+        ? window.workRequiredItems
+        : [];
+      window.populateWorkRequiredSelects(items);
+      if ($card && $card.length) {
+        const selectedValue = $card.find(".work-req").attr("title") || "";
+        if (selectedValue) {
+          $card.find(".work-req").val(selectedValue);
+        }
+      }
+      return true;
+    }
+
+    if (window.initWorkRequired) {
+      window.initWorkRequired().catch(() => {});
+      return true;
+    }
+
+    return false;
+  }
+
+  function refreshToolRecoveryOptions($card) {
+    const $selects =
+      $card && $card.length
+        ? $card.find("select.totalRecovery-select")
+        : $("select.totalRecovery-select");
+
+    if (!$selects.length) {
+      return false;
+    }
+
+    const optionsHtml =
+      typeof window.getTotalRecoveryOptionsHtml === "function"
+        ? window.getTotalRecoveryOptionsHtml(window.totalRecoveryItems)
+        : '<option value="">Select equipment</option>';
+
+    $selects.each(function () {
+      const $select = $(this);
+      const selectedValue = String($select.val() || "").trim();
+      $select.empty().append(optionsHtml);
+      if (selectedValue) {
+        $select.val(selectedValue);
+      }
+    });
+
+    return true;
   }
 
   function renderFaults() {
@@ -765,7 +1493,7 @@ $("#nextBtn").html('Next <span><i class="fa-solid fa-angle-right"></i></span>&nb
         <div class="fault-card ${expanded ? "expanded" : "collapsed"}" data-idx="${idx}">
           <div class="fault-header" role="button" tabindex="0" aria-expanded="${expanded}">
             <div>
-              <span class="badge fault-badge">${num}</span>
+              <span class="badge fault-badge d-none">${num}</span>
               Fault
             </div>
             <div class="d-flex align-items-center gap-2">
@@ -783,9 +1511,11 @@ $("#nextBtn").html('Next <span><i class="fa-solid fa-angle-right"></i></span>&nb
             <div class="row-1 g-2">
               <div class="mb-2">
                 <div class="d-flex justify-content-between align-items-center">
-                  <label class="form-label mb-0">Work Required</label>
+                  <label class="form-label mb-0">Work Required (Select script)</label>
                 </div>
-                <input maxlength="150" class="form-control work-req" placeholder="Describe in one line" value="${f.work || ""}">
+                <select data-hcg-select data-placeholder="Select Work Required" class="form-select work-req work-required-select" aria-label="Work Required" title="${f.work || ""}">
+                  <option value="">Select Work Required</option>
+                </select>
                 <div class="invalid-feedback work-req-error"></div>
               </div>
 
@@ -795,25 +1525,20 @@ $("#nextBtn").html('Next <span><i class="fa-solid fa-angle-right"></i></span>&nb
                     <div class="fault-material-block">
                       <label class="form-label">Tool Recovery (Special Equipments & Consumables)</label>
                       <div class="d-flex align-items-center gap-2">
-                        <select class="form-select equipment-select totalRecovery-select" aria-label="Select equipment">
-                          ${
-                            (window.totalRecoveryItems && window.totalRecoveryItems.length)
-                              ? window.totalRecoveryItems
-                                  .map((it) => {
-                                    const name = (it && it.Catalog && it.Catalog.Name) || it.Name || "";
-                                    const val = escapeHtml(name);
-                                    return `<option value="${val}">${val}</option>`;
-                                  })
-                                  .join("")
-                              : `<option value="">Select equipment</option>`
-                          }
+                        <select data-hcg-select data-placeholder="Select Equipment" class="form-select equipment-select totalRecovery-select" aria-label="Select equipment">
+                          <option value="">Select equipment</option>
                         </select>
-                        <input type="number" min="1" class="form-control equipment-qty" value="0" style="max-width:65px;">
+                        <input type="text" inputmode="numeric" maxlength="2" class="form-control equipment-qty" value="0" style="max-width:65px;">
                         <button type="button" class="btn btn-outline-primary add-equipment-btn">Add</button>
                       </div>
                       <div class="equipment-list mb-2">
-                        ${Array.isArray(f.equipmentItems) && f.equipmentItems.length ? f.equipmentItems.map(item => `
-                          <label class="list-group-item d-flex justify-content-between align-items-center added-item" data-name="${item.name}" data-qty="${item.qty}">
+                        ${
+                          Array.isArray(f.equipmentItems) &&
+                          f.equipmentItems.length
+                            ? f.equipmentItems
+                                .map(
+                                  (item) => `
+                          <div class="list-group-item d-flex justify-content-between align-items-center added-item" data-name="${item.name}" data-qty="${item.qty}" data-tool-id="${item.toolId || ""}">
                             <span class="d-flex align-items-center gap-1">
                             <small class="text-muted">${item.qty}</small>
                               <span class="item-label">${item.name}</span>
@@ -821,8 +1546,12 @@ $("#nextBtn").html('Next <span><i class="fa-solid fa-angle-right"></i></span>&nb
                             <button type="button" class="close remove-added-item" aria-label="Close" title="Remove item">
                               <i class="fa-solid fa-xmark" aria-hidden="true"></i>
                             </button>
-                          </label>
-                        `).join('') : ''}
+                          </div>
+                        `,
+                                )
+                                .join("")
+                            : ""
+                        }
                       </div>
                       <div class="invalid-feedback equipment-error"></div>
                     </div>
@@ -830,12 +1559,16 @@ $("#nextBtn").html('Next <span><i class="fa-solid fa-angle-right"></i></span>&nb
                       <label class="form-label">Parts & Material Required</label>
                       <div class="d-flex align-items-center gap-2">
                         <input id="partsMeterial" maxlength="150" class="form-control form-select parts-select" placeholder="Enter">
-                        <input type="number" min="1" class="form-control parts-qty" value="0" style="max-width:65px;">
+                        <input type="text" inputmode="numeric" maxlength="2" class="form-control parts-qty" value="0" style="max-width:65px;">
                         <button type="button" class="btn btn-outline-primary add-part-btn">Add</button>
                       </div>
                       <div class="parts-list mb-2" aria-live="polite">
-                        ${Array.isArray(f.partsItems) && f.partsItems.length ? f.partsItems.map(item => `
-                          <label class="list-group-item d-flex justify-content-between align-items-center added-item" data-name="${item.name}" data-qty="${item.qty}">
+                        ${
+                          Array.isArray(f.partsItems) && f.partsItems.length
+                            ? f.partsItems
+                                .map(
+                                  (item) => `
+                          <div class="list-group-item d-flex justify-content-between align-items-center added-item" data-name="${item.name}" data-qty="${item.qty}">
                             <span class="d-flex align-items-center gap-1">
                               <small class="text-muted">${item.qty}</small>
                               <span class="item-label">${item.name}</span>
@@ -843,8 +1576,12 @@ $("#nextBtn").html('Next <span><i class="fa-solid fa-angle-right"></i></span>&nb
                             <button type="button" class="close remove-added-item" aria-label="Close" title="Remove item">
                               <i class="fa-solid fa-xmark" aria-hidden="true"></i>
                             </button>
-                          </label>
-                        `).join('') : ''}
+                          </div>
+                        `,
+                                )
+                                .join("")
+                            : ""
+                        }
                       </div>
                       <div class="invalid-feedback parts-error"></div>
                     </div>
@@ -866,9 +1603,24 @@ $("#nextBtn").html('Next <span><i class="fa-solid fa-angle-right"></i></span>&nb
         </div>
       `);
       $list.append($card);
+      // if (f.work) {
+      //   $card.find('.work-req').val(f.work)
+      // }
+      refreshToolRecoveryOptions($card);
+      refreshWorkRequiredOptions($card);
       updateAiLabelState($card);
     });
     calculate();
+     const api = hcgSelect('.form-select.work-req', {
+      maxResults: 10
+     });
+      api.refresh();
+
+       const api1 = hcgSelect('.totalRecovery-select', {
+        maxResults: 10
+       });
+      api1.refresh();
+
   }
 
   function addFault(autos = false) {
@@ -876,6 +1628,7 @@ $("#nextBtn").html('Next <span><i class="fa-solid fa-angle-right"></i></span>&nb
     jobData.faults.push({
       description: "",
       work: "",
+      workDescription: "",
       parts: "",
       equipment: "",
       partsItems: [],
@@ -914,29 +1667,29 @@ $("#nextBtn").html('Next <span><i class="fa-solid fa-angle-right"></i></span>&nb
   $(document).on("input", ".fault-desc", function () {
     const text = $(this).val().trim().toLowerCase();
 
-    if (text === "leak") {
-      const idx = Number($(this).closest(".fault-card").data("idx"));
-      if (!isNaN(idx)) {
-        const autoDescription = "Leak from valve causing water ingress.";
-        const autoWork = "Replace valve and test system.";
-        const autoParts = "Valve assembly, sealant";
-        const autoEquipment = "Socket set, pressure tester";
+    // if (text === "leak") {
+    //   const idx = Number($(this).closest(".fault-card").data("idx"));
+    //   if (!isNaN(idx)) {
+    //     const autoDescription = "Leak from valve causing water ingress.";
+    //     const autoWork = "Replace valve and test system.";
+    //     const autoParts = "Valve assembly, sealant";
+    //     const autoEquipment = "Socket set, pressure tester";
 
-        jobData.faults[idx].description = autoDescription;
-        jobData.faults[idx].work = autoWork;
-        jobData.faults[idx].parts = autoParts;
-        jobData.faults[idx].equipment = autoEquipment;
+    //     jobData.faults[idx].description = autoDescription;
+    //     jobData.faults[idx].work = autoWork;
+    //     jobData.faults[idx].parts = autoParts;
+    //     jobData.faults[idx].equipment = autoEquipment;
 
-        const $card = $(this).closest(".fault-card");
-        $card.find(".fault-desc").val(autoDescription);
-        $card.find(".work-req").val(autoWork);
-        $card.find(".parts").val(autoParts);
-        $card.find(".equipment").val(autoEquipment);
+    //     const $card = $(this).closest(".fault-card");
+    //     $card.find(".fault-desc").val(autoDescription);
+    //     $card.find(".work-req").val(autoWork);
+    //     $card.find(".parts").val(autoParts);
+    //     $card.find(".equipment").val(autoEquipment);
 
-        updateAiLabelState($card);
-        $card.find(".fault-desc").trigger("input");
-      }
-    }
+    //     updateAiLabelState($card);
+    //     $card.find(".fault-desc").trigger("input");
+    //   }
+    // }
   });
 
   // $(document).on('click','.auto-fill',function(){
@@ -955,9 +1708,18 @@ $("#nextBtn").html('Next <span><i class="fa-solid fa-angle-right"></i></span>&nb
     const idx = Number($(this).closest(".fault-card").data("idx"));
     if (!isNaN(idx)) jobData.faults[idx].description = $(this).val();
   });
-  $(document).on("input", ".work-req", function () {
+  $(document).on("change", ".work-req", function () {
     const idx = Number($(this).closest(".fault-card").data("idx"));
-    if (!isNaN(idx)) jobData.faults[idx].work = $(this).val();
+    if (isNaN(idx)) return;
+
+    const $selected = $(this).find("option:selected");
+    const selectedValue = String($(this).val() || "").trim();
+    const selectedHtmlContent = String($selected.data("htmlContent") || "").trim();
+
+    jobData.faults[idx].work = selectedValue;
+    jobData.faults[idx].workDescription =
+      selectedHtmlContent || selectedValue;
+
     updateAiLabelState($(this).closest(".fault-card"));
   });
   $(document).on("input", ".parts", function () {
@@ -977,138 +1739,235 @@ $("#nextBtn").html('Next <span><i class="fa-solid fa-angle-right"></i></span>&nb
   }
 
   function clampQtyValue($qtyInput) {
-    const parsedValue = Number($qtyInput.val());
+    const rawValue = String($qtyInput.val() || "").replace(/\D/g, "");
+    if (!rawValue) {
+      $qtyInput.val(1);
+      return;
+    }
+
+    const parsedValue = Number(rawValue);
     if (!Number.isFinite(parsedValue) || parsedValue < 1) {
       $qtyInput.val(1);
+    } else {
+      $qtyInput.val(Math.min(99, parsedValue));
     }
   }
 
-  $(document).on('change', '.equipment-select', function () {
-    const $card = $(this).closest('.fault-card');
-    const $qtyInput = $card.find('.equipment-qty');
+  function limitQtyInput($qtyInput) {
+    const rawValue = String($qtyInput.val() || "").replace(/\D/g, "");
+    const trimmedValue = rawValue.slice(0, 2);
+    $qtyInput.val(trimmedValue);
+    if (trimmedValue) {
+      clampQtyValue($qtyInput);
+    }
+  }
+
+  $(document).on("change", ".equipment-select", function () {
+    const $card = $(this).closest(".fault-card");
+    const $qtyInput = $card.find(".equipment-qty");
     syncQtyOnSelection($(this), $qtyInput);
   });
 
-  $(document).on('input change', '.parts-select', function () {
-    const $card = $(this).closest('.fault-card');
-    const $qtyInput = $card.find('.parts-qty');
+  $(document).on("focus", ".equipment-select, .parts-select", function () {
+    const $field = $(this);
+    if ($field.is("select")) {
+      $field.val("");
+      $field.find('option[value=""]').prop("selected", true);
+    } else {
+      $field.val("");
+    }
+  });
+
+  $(document).on("input change", ".parts-select", function () {
+    const $card = $(this).closest(".fault-card");
+    const $qtyInput = $card.find(".parts-qty");
     syncQtyOnSelection($(this), $qtyInput);
   });
 
-  $(document).on('change', '.consumables-select', function () {
-    const $card = $(this).closest('.fault-card');
-    const $qtyInput = $card.find('.consumables-qty');
+  $(document).on("change", ".consumables-select", function () {
+    const $card = $(this).closest(".fault-card");
+    const $qtyInput = $card.find(".consumables-qty");
     syncQtyOnSelection($(this), $qtyInput);
   });
 
-  $(document).on('blur', '.equipment-qty, .parts-qty, .consumables-qty', function () {
-    clampQtyValue($(this));
-  });
+  $(document).on(
+    "input",
+    ".equipment-qty, .parts-qty, .consumables-qty",
+    function () {
+      limitQtyInput($(this));
+    },
+  );
+
+  $(document).on(
+    "blur",
+    ".equipment-qty, .parts-qty, .consumables-qty",
+    function () {
+      clampQtyValue($(this));
+    },
+  );
 
   // Add item handlers for parts, equipment, consumables
-  $(document).on('click', '.add-part-btn', function () {
-    const $card = $(this).closest('.fault-card');
-    const idx = Number($card.data('idx'));
+  $(document).on("click", ".add-part-btn", function () {
+    const $card = $(this).closest(".fault-card");
+    const idx = Number($card.data("idx"));
     if (isNaN(idx)) return;
-    const name = String($card.find('.parts-select').val() || '').trim();
-    const qty = Math.max(1, Number($card.find('.parts-qty').val() || 1));
+    const name = String($card.find(".parts-select").val() || "").trim();
+    const qty = Math.max(1, Number($card.find(".parts-qty").val() || 1));
     if (!name) return;
 
     jobData.faults[idx].partsItems = jobData.faults[idx].partsItems || [];
-    const existingItem = jobData.faults[idx].partsItems.find(item => String(item.name || '').trim().toLowerCase() === name.toLowerCase());
-    const $list = $card.find('.parts-list');
+    const existingItem = jobData.faults[idx].partsItems.find(
+      (item) =>
+        String(item.name || "")
+          .trim()
+          .toLowerCase() === name.toLowerCase(),
+    );
+    const $list = $card.find(".parts-list");
 
     if (existingItem) {
       existingItem.qty += qty;
-      const $existingLabel = $list.find(`.added-item[data-name="${$.escapeSelector(existingItem.name)}"]`);
+      const $existingLabel = $list.find(
+        `.added-item[data-name="${$.escapeSelector(existingItem.name)}"]`,
+      );
       if ($existingLabel.length) {
-        $existingLabel.attr('data-qty', existingItem.qty);
-        $existingLabel.find('.rounded-pill').text(existingItem.qty);
+        $existingLabel.attr("data-qty", existingItem.qty);
+        $existingLabel.find(".rounded-pill").text(existingItem.qty);
       }
     } else {
       jobData.faults[idx].partsItems.push({ name, qty });
-      $list.append(`<label class="list-group-item d-flex justify-content-between align-items-center added-item" data-name="${name}" data-qty="${qty}"><span class="d-flex align-items-center gap-1"><span class="rounded-pill">${qty}</span><span class="item-label">${name}</span></span><button type="button" class="btn-sm remove-added-item" aria-label="Remove item" title="Remove item" style="color: #dc3545;"><i class="fa-solid fa-xmark" aria-hidden="true"></i></button></label>`);
+      $list.append(
+        `<div class="list-group-item d-flex justify-content-between align-items-center added-item" data-name="${name}" data-qty="${qty}"><span class="d-flex align-items-center gap-1"><span class="rounded-pill">${qty}</span><span class="item-label">${name}</span></span><button type="button" class="btn-sm remove-added-item" aria-label="Remove item" title="Remove item" style="color: #dc3545;"><i class="fa-solid fa-xmark" aria-hidden="true"></i></button></div>`,
+      );
     }
 
-    $card.find('.parts-select').val('');
-    $card.find('.parts-select option[value=""]').prop('selected', true);
-    $card.find('.parts-qty').val(0);
+    $card.find(".parts-select").val("");
+    $card.find('.parts-select option[value=""]').prop("selected", true);
+    $card.find(".parts-qty").val(0);
   });
 
-  $(document).on('click', '.add-equipment-btn', function () {
-    const $card = $(this).closest('.fault-card');
-    const idx = Number($card.data('idx'));
+  $(document).on("click", ".add-equipment-btn", function () {
+    const $card = $(this).closest(".fault-card");
+    const idx = Number($card.data("idx"));
     if (isNaN(idx)) return;
-    const name = String($card.find('.equipment-select').val() || '').trim();
-    const qty = Math.max(1, Number($card.find('.equipment-qty').val() || 1));
+    const name = String($card.find(".equipment-select").val() || "").trim();
+    const $selectedOption = $card.find(".equipment-select option:selected");
+    const toolId = String($selectedOption.attr("data-tool-id") || "").trim();
+    const qty = Math.max(1, Number($card.find(".equipment-qty").val() || 1));
     if (!name) return;
 
-    jobData.faults[idx].equipmentItems = jobData.faults[idx].equipmentItems || [];
-    const existingItem = jobData.faults[idx].equipmentItems.find(item => String(item.name || '').trim().toLowerCase() === name.toLowerCase());
-    const $list = $card.find('.equipment-list');
+    jobData.faults[idx].equipmentItems =
+      jobData.faults[idx].equipmentItems || [];
+    const existingItem = jobData.faults[idx].equipmentItems.find(
+      (item) =>
+        String(item.name || "")
+          .trim()
+          .toLowerCase() === name.toLowerCase() &&
+        String(item.toolId || "").trim() === toolId,
+    );
+    const $list = $card.find(".equipment-list");
 
     if (existingItem) {
       existingItem.qty += qty;
-      const $existingLabel = $list.find(`.added-item[data-name="${$.escapeSelector(existingItem.name)}"]`);
+      const $existingLabel = $list.find(
+        `.added-item[data-name="${$.escapeSelector(existingItem.name)}"][data-tool-id="${$.escapeSelector(String(existingItem.toolId || ""))}"]`,
+      );
       if ($existingLabel.length) {
-        $existingLabel.attr('data-qty', existingItem.qty);
-        $existingLabel.find('.rounded-pill').text(existingItem.qty);
+        $existingLabel.attr("data-qty", existingItem.qty);
+        $existingLabel.find(".rounded-pill").text(existingItem.qty);
       }
     } else {
-      jobData.faults[idx].equipmentItems.push({ name, qty });
-      $list.append(`<label class="list-group-item d-flex justify-content-between align-items-center added-item" data-name="${name}" data-qty="${qty}"><span class="d-flex align-items-center gap-1"><span class="rounded-pill" >${qty}</span><span class="item-label">${name}</span></span><button type="button" class="btn-sm remove-added-item" aria-label="Remove item" title="Remove item" style="color: #dc3545;"><i class="fa-solid fa-xmark" aria-hidden="true"></i></button></label>`);
+      jobData.faults[idx].equipmentItems.push({ name, qty, toolId });
+      $list.append(
+        `<div class="list-group-item d-flex justify-content-between align-items-center added-item" data-name="${name}" data-qty="${qty}" data-tool-id="${toolId}"><span class="d-flex align-items-center gap-1"><span class="rounded-pill" >${qty}</span><span class="item-label">${name}</span></span><button type="button" class="btn-sm remove-added-item" aria-label="Remove item" title="Remove item" style="color: #dc3545;"><i class="fa-solid fa-xmark" aria-hidden="true"></i></button></div>`,
+      );
     }
 
-    $card.find('.equipment-select').val('');
-    $card.find('.equipment-select option[value=""]').prop('selected', true);
-    $card.find('.equipment-qty').val(0);
+    $card.find(".equipment-select").val("");
+    $card.find('.equipment-select option[value=""]').prop("selected", true);
+    $card.find(".equipment-qty").val(0);
+    // Refresh hcg searchable select UI so the visible wrapper shows placeholder (not previous value)
+    try {
+      const api = hcgSelect('.totalRecovery-select');
+      if (api && typeof api.refresh === 'function') api.refresh();
+    } catch (e) {
+      // ignore if hcgSelect not available
+    }
   });
 
-  $(document).on('click', '.add-consumable-btn', function () {
-    const $card = $(this).closest('.fault-card');
-    const idx = Number($card.data('idx'));
+  $(document).on("click", ".add-consumable-btn", function () {
+    const $card = $(this).closest(".fault-card");
+    const idx = Number($card.data("idx"));
     if (isNaN(idx)) return;
-    const name = String($card.find('.consumables-select').val() || '').trim();
-    const qty = Math.max(1, Number($card.find('.consumables-qty').val() || 1));
+    const name = String($card.find(".consumables-select").val() || "").trim();
+    const qty = Math.max(1, Number($card.find(".consumables-qty").val() || 1));
     if (!name) return;
 
-    jobData.faults[idx].consumablesItems = jobData.faults[idx].consumablesItems || [];
-    const existingItem = jobData.faults[idx].consumablesItems.find(item => String(item.name || '').trim().toLowerCase() === name.toLowerCase());
-    const $list = $card.find('.consumables-list');
+    jobData.faults[idx].consumablesItems =
+      jobData.faults[idx].consumablesItems || [];
+    const existingItem = jobData.faults[idx].consumablesItems.find(
+      (item) =>
+        String(item.name || "")
+          .trim()
+          .toLowerCase() === name.toLowerCase(),
+    );
+    const $list = $card.find(".consumables-list");
 
     if (existingItem) {
       existingItem.qty += qty;
-      const $existingLabel = $list.find(`.added-item[data-name="${$.escapeSelector(existingItem.name)}"]`);
+      const $existingLabel = $list.find(
+        `.added-item[data-name="${$.escapeSelector(existingItem.name)}"]`,
+      );
       if ($existingLabel.length) {
-        $existingLabel.attr('data-qty', existingItem.qty);
-        $existingLabel.find('.rounded-pill').text(existingItem.qty);
+        $existingLabel.attr("data-qty", existingItem.qty);
+        $existingLabel.find(".rounded-pill").text(existingItem.qty);
       }
     } else {
       jobData.faults[idx].consumablesItems.push({ name, qty });
-      $list.append(`<label class="list-group-item d-flex justify-content-between align-items-center added-item" data-name="${name}" data-qty="${qty}"><span class="d-flex align-items-center gap-1"><span class="rounded-pill" >${qty}</span><span class="item-label">${name}</span></span><button type="button" class="btn-sm remove-added-item" aria-label="Remove item" title="Remove item" style="color: #dc3545;"><i class="fa-solid fa-xmark" aria-hidden="true"></i></button></label>`);
+      $list.append(
+        `<div class="list-group-item d-flex justify-content-between align-items-center added-item" data-name="${name}" data-qty="${qty}"><span class="d-flex align-items-center gap-1"><span class="rounded-pill" >${qty}</span><span class="item-label">${name}</span></span><button type="button" class="btn-sm remove-added-item" aria-label="Remove item" title="Remove item" style="color: #dc3545;"><i class="fa-solid fa-xmark" aria-hidden="true"></i></button></div>`,
+      );
     }
 
-    $card.find('.consumables-select').val('');
-    $card.find('.consumables-select option[value=""]').prop('selected', true);
-    $card.find('.consumables-qty').val(0);
+    $card.find(".consumables-select").val("");
+    $card.find('.consumables-select option[value=""]').prop("selected", true);
+    $card.find(".consumables-qty").val(0);
   });
 
   // remove added item
-  $(document).on('click', '.remove-added-item', function () {
-    const $item = $(this).closest('.added-item');
-    const $card = $(this).closest('.fault-card');
-    const idx = Number($card.data('idx'));
+  $(document).on("click", ".remove-added-item", function (event) {
+    event.preventDefault();
+    event.stopPropagation();
+
+    const $button = $(this);
+    const $item = $button.closest(".added-item");
+    const $card = $button.closest(".fault-card");
+    const idx = Number($card.data("idx"));
     if (isNaN(idx)) return;
-    const name = $item.data('name');
-    const qty = Number($item.data('qty'));
-    // determine which list
-    if ($item.closest('.parts-list').length) {
-      jobData.faults[idx].partsItems = (jobData.faults[idx].partsItems || []).filter(i => !(i.name === name && Number(i.qty) === qty));
-    } else if ($item.closest('.equipment-list').length) {
-      jobData.faults[idx].equipmentItems = (jobData.faults[idx].equipmentItems || []).filter(i => !(i.name === name && Number(i.qty) === qty));
-    } else if ($item.closest('.consumables-list').length) {
-      jobData.faults[idx].consumablesItems = (jobData.faults[idx].consumablesItems || []).filter(i => !(i.name === name && Number(i.qty) === qty));
+    const name = $item.data("name");
+    const qty = Number($item.data("qty"));
+
+    if ($item.closest(".parts-list").length) {
+      jobData.faults[idx].partsItems = (
+        jobData.faults[idx].partsItems || []
+      ).filter((i) => !(i.name === name && Number(i.qty) === qty));
+    } else if ($item.closest(".equipment-list").length) {
+      const toolId = String($item.data("tool-id") || "").trim();
+      jobData.faults[idx].equipmentItems = (
+        jobData.faults[idx].equipmentItems || []
+      ).filter(
+        (i) =>
+          !(
+            i.name === name &&
+            Number(i.qty) === qty &&
+            String(i.toolId || "").trim() === toolId
+          ),
+      );
+    } else if ($item.closest(".consumables-list").length) {
+      jobData.faults[idx].consumablesItems = (
+        jobData.faults[idx].consumablesItems || []
+      ).filter((i) => !(i.name === name && Number(i.qty) === qty));
     }
+
     $item.remove();
   });
 
@@ -1133,68 +1992,139 @@ $("#nextBtn").html('Next <span><i class="fa-solid fa-angle-right"></i></span>&nb
   function calculate() {
     const technicians = Number($("#technicians").val() || 0);
     const apprentice = Number($("#apprentice").val() || 0);
-    const tech = technicians + apprentice;
+    const tech = technicians;
     const hrs = Number($("#hours").val() || 0);
-    const totalHours = tech * hrs;
+    const totalHours = (tech + apprentice) * hrs;
     const faults = jobData.faults.length || 0;
 
     $("#statFaults").text(faults || "-");
-    $("#statTech").text(tech || "-");
+    $("#statTech").text(tech + apprentice || "-");
     $("#statHours").text(totalHours || "-");
 
     jobData.estimates.technicians = tech;
     jobData.estimates.hours = hrs;
     jobData.estimates.totalHours = totalHours;
     jobData.estimates.apprentice = Number($("#apprentice").val() || 0);
-    jobData.estimates.afterHours = $("#afterHours").is(":checked");
+    jobData.estimates.otTechnicians = Number($("#otTechnicians").val() || 0);
+    jobData.estimates.otApprentice = Number($("#otApprentice").val() || 0);
+    jobData.estimates.otHours = Number($("#otHours").val() || 0);
   }
-  
+
   // Spinner button handlers
-  $("#techniciansMinus").on("click", function(e) {
+  $("#techniciansMinus").on("click", function (e) {
     e.preventDefault();
     const current = Number($("#technicians").val() || 1);
     if (current > 1) {
-      $("#technicians").val(current - 1).trigger("change");
-    }
-  });
-  
-  $("#techniciansPlus").on("click", function(e) {
-    e.preventDefault();
-    const current = Number($("#technicians").val() || 1);
-    $("#technicians").val(Math.min(1000, current + 1)).trigger("change");
-  });
-  
-  $("#apprenticeMinus").on("click", function(e) {
-    e.preventDefault();
-    const current = Number($("#apprentice").val() || 0);
-    if (current > 0) {
-      $("#apprentice").val(current - 1).trigger("change");
-    }
-  });
-  
-  $("#apprenticePlus").on("click", function(e) {
-    e.preventDefault();
-    const current = Number($("#apprentice").val() || 0);
-    $("#apprentice").val(Math.min(1000, current + 1)).trigger("change");
-  });
-  
-  $("#hoursMinus").on("click", function(e) {
-    e.preventDefault();
-    const current = Number($("#hours").val() || 0);
-    if (current > 0) {
-      $("#hours").val(Math.max(0, current - 1)).trigger("change");
-    }
-  });
-  
-  $("#hoursPlus").on("click", function(e) {
-    e.preventDefault();
-    const current = Number($("#hours").val() || 0);
-    if (current < 24) {
-      $("#hours").val(Math.min(24, current + 1)).trigger("change");
+      $("#technicians")
+        .val(current - 1)
+        .trigger("change");
     }
   });
 
-    $("#technicians,#hours,#apprentice,#afterHours").on(
+  $("#techniciansPlus").on("click", function (e) {
+    e.preventDefault();
+    const current = Number($("#technicians").val() || 1);
+    $("#technicians")
+      .val(Math.min(1000, current + 1))
+      .trigger("change");
+  });
+
+  $("#apprenticeMinus").on("click", function (e) {
+    e.preventDefault();
+    const current = Number($("#apprentice").val() || 0);
+    if (current > 0) {
+      $("#apprentice")
+        .val(current - 1)
+        .trigger("change");
+    }
+  });
+
+  $("#apprenticePlus").on("click", function (e) {
+    e.preventDefault();
+    const current = Number($("#apprentice").val() || 0);
+    $("#apprentice")
+      .val(Math.min(1000, current + 1))
+      .trigger("change");
+  });
+
+  $("#hoursMinus").on("click", function (e) {
+    e.preventDefault();
+    const current = Number($("#hours").val() || 0);
+    if (current > 0) {
+      $("#hours")
+        .val(Math.max(0, current - 1))
+        .trigger("change");
+    }
+  });
+
+  $("#hoursPlus").on("click", function (e) {
+    e.preventDefault();
+    const current = Number($("#hours").val() || 0);
+    if (current < 24) {
+      $("#hours")
+        .val(Math.min(24, current + 1))
+        .trigger("change");
+    }
+  });
+
+  // OT spinner handlers
+  $("#otTechniciansMinus").on("click", function (e) {
+    e.preventDefault();
+    const current = Number($("#otTechnicians").val() || 0);
+    if (current > 0) {
+      $("#otTechnicians")
+        .val(current - 1)
+        .trigger("change");
+    }
+  });
+
+  $("#otTechniciansPlus").on("click", function (e) {
+    e.preventDefault();
+    const current = Number($("#otTechnicians").val() || 0);
+    $("#otTechnicians")
+      .val(Math.min(1000, current + 1))
+      .trigger("change");
+  });
+
+  $("#otApprenticeMinus").on("click", function (e) {
+    e.preventDefault();
+    const current = Number($("#otApprentice").val() || 0);
+    if (current > 0) {
+      $("#otApprentice")
+        .val(current - 1)
+        .trigger("change");
+    }
+  });
+
+  $("#otApprenticePlus").on("click", function (e) {
+    e.preventDefault();
+    const current = Number($("#otApprentice").val() || 0);
+    $("#otApprentice")
+      .val(Math.min(1000, current + 1))
+      .trigger("change");
+  });
+
+  $("#otHoursMinus").on("click", function (e) {
+    e.preventDefault();
+    const current = Number($("#otHours").val() || 0);
+    if (current > 0) {
+      $("#otHours")
+        .val(Math.max(0, current - 1))
+        .trigger("change");
+    }
+  });
+
+  $("#otHoursPlus").on("click", function (e) {
+    e.preventDefault();
+    const current = Number($("#otHours").val() || 0);
+    if (current < 24) {
+      $("#otHours")
+        .val(Math.min(24, current + 1))
+        .trigger("change");
+    }
+  });
+
+  $("#technicians,#hours,#apprentice,#otTechnicians,#otApprentice,#otHours").on(
     "input change",
     calculate,
   );
@@ -1246,6 +2176,515 @@ $("#nextBtn").html('Next <span><i class="fa-solid fa-angle-right"></i></span>&nb
     $("#photoInput").trigger("click");
   });
 
+  let barcodeScannerInstance = null;
+  let barcodeScannerActive = false;
+
+  function setBarcodeStatus(message, isError = false) {
+    const $status = $("#barcodeStatus");
+    if ($status.length) {
+      $status.text("");
+    }
+  }
+
+  function ensureBarcodeScannerUI() {
+    if ($("#barcodeScannerOverlay").length) return;
+
+    $("body").append(`
+      <div id="barcodeScannerOverlay" style="display:none; position:fixed; inset:0; z-index:99999; background:rgba(0,0,0,0.86); padding:16px; display:flex; align-items:center; justify-content:center;">
+        <div style="width:min(100%, 520px); background:#fff; border-radius:14px; overflow:hidden; box-shadow:0 12px 32px rgba(0,0,0,0.25);">
+          <div style="display:flex; align-items:center; justify-content:space-between; padding:12px 16px; background:#f7f7f7;">
+            <strong>Scan Barcode</strong>
+            <button type="button" id="barcodeScannerCloseBtn" style="border:none; background:transparent; font-size:22px; line-height:1;">×</button>
+          </div>
+          <div id="barcodeScannerContainer" style="min-height:300px;"></div>
+          <div id="barcodeScannerMessage" style="padding:12px 16px; font-size:14px; color:#444;">Point your camera at the barcode.</div>
+        </div>
+      </div>
+    `);
+
+    $("#barcodeScannerCloseBtn").on("click", function (e) {
+      e.preventDefault();
+      stopBarcodeScanner();
+    });
+  }
+
+  function stopBarcodeScanner() {
+    barcodeScannerActive = false;
+
+    // Stop html5-qrcode instance if present
+    if (
+      barcodeScannerInstance &&
+      typeof barcodeScannerInstance.clear === "function"
+    ) {
+      Promise.resolve()
+        .then(() => barcodeScannerInstance.clear())
+        .catch(() => {})
+        .finally(() => {
+          barcodeScannerInstance = null;
+        });
+    }
+
+    // Stop Quagga if it's running
+    if (window.Quagga && window.Quagga.stop && window.Quagga.offDetected) {
+      try {
+        window.Quagga.offDetected();
+      } catch (_) {}
+      try {
+        window.Quagga.stop();
+      } catch (_) {}
+    }
+
+    $("#barcodeScannerOverlay").hide();
+  }
+
+  async function startBarcodeScanner() {
+    // prefer Html5Qrcode, but fall back to Quagga on iOS or when Html5Qrcode isn't available/working
+    const isIOS = /iP(ad|hone|od)/.test(navigator.userAgent || "");
+
+    if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) {
+      if (window.alert) {
+        showAlertDialog("Camera access is not available on this device.");
+      }
+      return;
+    }
+
+    ensureBarcodeScannerUI();
+    $("#barcodeScannerOverlay").show();
+    $("#barcodeScannerMessage").text("Opening camera…");
+    barcodeScannerActive = true;
+
+    // If on iOS or Html5Qrcode is not available, try Quagga first
+    if (isIOS || !window.Html5QrcodeScanner) {
+      if (window.Quagga) {
+        try {
+          // Configure Quagga for live stream
+          const constraints = {
+            width: { min: 320 },
+            height: { min: 240 },
+            facingMode: "environment",
+          };
+
+          window.Quagga.init(
+            {
+              inputStream: {
+                type: "LiveStream",
+                target: document.querySelector("#barcodeScannerContainer"),
+                constraints: constraints,
+                singleChannel: false,
+              },
+              decoder: {
+                readers: [
+                  "code_128_reader",
+                  "ean_reader",
+                  "ean_8_reader",
+                  "code_39_reader",
+                  "upc_reader",
+                  "upc_e_reader",
+                ],
+                multiple: false,
+              },
+              locate: true,
+              frequency: 10,
+            },
+            function (err) {
+              if (err) {
+                console.warn(
+                  "Quagga init failed, falling back to Html5Qrcode if available",
+                  err,
+                );
+                // fallback to Html5Qrcode if available
+                if (window.Html5QrcodeScanner) {
+                  startHtml5QrcodeScanner().catch(() => {
+                    if (window.alert)
+                      showAlertDialog(
+                        "Camera scanning is not available on this browser.",
+                      );
+                  });
+                } else {
+                  if (window.alert)
+                    showAlertDialog(
+                      "Camera scanning is not available on this browser.",
+                    );
+                }
+                return;
+              }
+
+              try {
+                window.Quagga.start();
+              } catch (e) {
+                console.warn("Quagga start failed", e);
+                if (window.Html5QrcodeScanner) {
+                  startHtml5QrcodeScanner().catch(() => {
+                    if (window.alert)
+                      showAlertDialog(
+                        "Camera scanning is not available on this browser.",
+                      );
+                  });
+                }
+                return;
+              }
+
+              window.Quagga.onDetected(function (result) {
+                try {
+                  const code =
+                    (result && result.codeResult && result.codeResult.code) ||
+                    null;
+                  if (code) {
+                    $("#customerAssetId").val(String(code).trim());
+                    if (window.lookupAssetByValue)
+                      window.lookupAssetByValue(code);
+                    if (window.alert)
+                      showAlertDialog("Barcode read successfully.");
+                    stopBarcodeScanner();
+                  }
+                } catch (e) {
+                  console.warn("Error handling Quagga detection", e);
+                }
+              });
+            },
+          );
+
+          return; // Quagga started (or initializing), exit function
+        } catch (e) {
+          console.warn("Quagga init threw", e);
+          // fall through to Html5Qrcode below
+        }
+      }
+    }
+
+    // Default path: use Html5Qrcode
+    if (window.Html5QrcodeScanner) {
+      return startHtml5QrcodeScanner();
+    }
+
+    if (window.alert)
+      showAlertDialog("Camera scanning is not available on this browser.");
+  }
+
+  // Extracted helper to start Html5Qrcode scanner so it can be called from fallback paths
+  async function startHtml5QrcodeScanner() {
+    if (barcodeScannerInstance) {
+      try {
+        await barcodeScannerInstance.clear();
+      } catch (_) {}
+    }
+
+    barcodeScannerInstance = new window.Html5QrcodeScanner(
+      "barcodeScannerContainer",
+      {
+        fps: 10,
+        qrbox: { width: 240, height: 240 },
+        aspectRatio: 1.0,
+        showTorchButtonIfSupported: true,
+        rememberLastUsedCamera: true,
+        videoConstraints: {
+          facingMode: { ideal: "environment" },
+        },
+      },
+      false,
+    );
+
+    await barcodeScannerInstance.render(
+      (decodedText) => {
+        const value = String(decodedText || "").trim();
+        if (value) {
+          $("#customerAssetId").val(value);
+          if (window.lookupAssetByValue) {
+            window.lookupAssetByValue(value);
+          }
+          if (window.alert) {
+            showAlertDialog("Barcode read successfully.");
+          }
+        } else if (window.alert) {
+          showAlertDialog(
+            "Barcode could not be read. Please enter the value manually.",
+          );
+        }
+        stopBarcodeScanner();
+      },
+      (error) => {
+        if (!barcodeScannerActive) return;
+        const message = String(error || "");
+        if (message && !message.toLowerCase().includes("no qr code")) {
+          $("#barcodeScannerMessage").text(
+            "Scanning… keep the barcode centered.",
+          );
+        }
+      },
+    );
+  }
+
+  function loadImageElement(src) {
+    return new Promise((resolve, reject) => {
+      const image = new Image();
+      image.onload = () => resolve(image);
+      image.onerror = () => reject(new Error("Unable to load image"));
+      image.src = src;
+    });
+  }
+
+  async function readBarcodeFromImageWithApi(file) {
+    if (!file) return "";
+
+    const formData = new FormData();
+    formData.append("file", file, file.name || "barcode-image");
+
+    try {
+      const response = await fetch(
+        "https://api.qrserver.com/v1/read-qr-code/",
+        {
+          method: "POST",
+          body: formData,
+          mode: "cors",
+        },
+      );
+
+      if (!response.ok) {
+        throw new Error(`Barcode API returned ${response.status}`);
+      }
+
+      const data = await response.json();
+      const firstSymbol = Array.isArray(data?.symbol) ? data.symbol[0] : null;
+      const value = String(
+        firstSymbol?.data || data?.decodedText || data?.data || "",
+      ).trim();
+      if (value) {
+        return value;
+      }
+    } catch (error) {
+      console.warn("Public barcode API failed:", error);
+    }
+
+    return "";
+  }
+
+  async function readBarcodeFromImage(file) {
+    if (!file) return "";
+
+    const fileName = (file.name || "").toLowerCase();
+    const isHeicOrHeif =
+      /(heic|heif)$/i.test(fileName) || /heic|heif/i.test(file.type || "");
+
+    const apiValue = await readBarcodeFromImageWithApi(file);
+    if (apiValue) {
+      return apiValue;
+    }
+
+    if (isHeicOrHeif) {
+      console.warn(
+        "HEIC/HEIF image detected; trying browser-based fallback decoding.",
+      );
+    }
+
+    if (window.Html5Qrcode) {
+      const readerId = "barcode-reader-hidden";
+      let container = document.getElementById(readerId);
+      if (!container) {
+        container = document.createElement("div");
+        container.id = readerId;
+        container.style.display = "none";
+        document.body.appendChild(container);
+      }
+
+      const html5QrCode = new window.Html5Qrcode(readerId);
+      try {
+        const decodedText = await html5QrCode.scanFile(file, true);
+        if (decodedText) {
+          return String(decodedText).trim();
+        }
+      } catch (error) {
+        console.warn("Html5Qrcode scan failed:", error);
+      } finally {
+        try {
+          await html5QrCode.clear();
+        } catch (_) {}
+      }
+    }
+
+    try {
+      if (window.createImageBitmap) {
+        const bitmap = await window.createImageBitmap(file);
+        try {
+          if (window.BarcodeDetector) {
+            try {
+              const detector = new window.BarcodeDetector({
+                formats: [
+                  "code_128",
+                  "qr_code",
+                  "ean_13",
+                  "ean_8",
+                  "code_39",
+                  "upc_a",
+                  "upc_e",
+                ],
+              });
+              const barcode = await detector.detect(bitmap);
+              const value = barcode?.[0]?.rawValue || "";
+              if (value) {
+                return String(value).trim();
+              }
+            } catch (error) {
+              console.warn("Built-in barcode detection failed:", error);
+            }
+          }
+        } finally {
+          bitmap.close && bitmap.close();
+        }
+      }
+    } catch (error) {
+      console.warn("ImageBitmap barcode detection failed:", error);
+    }
+
+    const imageUrl = URL.createObjectURL(file);
+    try {
+      const image = await loadImageElement(imageUrl);
+
+      if (window.BarcodeDetector) {
+        try {
+          const detector = new window.BarcodeDetector({
+            formats: [
+              "code_128",
+              "qr_code",
+              "ean_13",
+              "ean_8",
+              "code_39",
+              "upc_a",
+              "upc_e",
+            ],
+          });
+          const barcode = await detector.detect(image);
+          const value = barcode?.[0]?.rawValue || "";
+          if (value) {
+            return String(value).trim();
+          }
+        } catch (error) {
+          console.warn(
+            "Built-in barcode detection with image element failed:",
+            error,
+          );
+        }
+      }
+
+      if (window.ZXing && window.ZXing.BrowserMultiFormatReader) {
+        try {
+          const codeReader = new window.ZXing.BrowserMultiFormatReader();
+
+          if (typeof codeReader.decodeFromImageElement === "function") {
+            const result = await codeReader.decodeFromImageElement(image);
+            const value = result?.getText
+              ? result.getText()
+              : result?.text || "";
+            if (value) {
+              return String(value).trim();
+            }
+          }
+
+          if (typeof codeReader.decodeFromImageUrl === "function") {
+            const result = await codeReader.decodeFromImageUrl(imageUrl);
+            const value = result?.getText
+              ? result.getText()
+              : result?.text || "";
+            if (value) {
+              return String(value).trim();
+            }
+          }
+        } catch (error) {
+          console.warn("ZXing barcode detection failed:", error);
+        }
+      }
+    } finally {
+      URL.revokeObjectURL(imageUrl);
+    }
+
+    return "";
+  }
+
+  // $("#barcodeScanBtn").on("click", function (e) {
+  //   e.preventDefault();
+  //   const $fileInput = $("#barcodeFileInput");
+  //   $fileInput.attr("accept", "image/*");
+  //   $fileInput.attr("capture", "environment");
+  //   $fileInput.trigger("click");
+  // });
+
+  $("#barcodeFileInput").on("change", async function (event) {
+    const input = this;
+    const file =
+      event.target?.files?.[0] ||
+      event.originalEvent?.dataTransfer?.files?.[0] ||
+      null;
+
+    if (!file) {
+      return;
+    }
+
+    const fileName = (file.name || "").toLowerCase();
+    if (!fileName.match(/\.(png|jpg|jpeg|webp|bmp|gif)$/i)) {
+      if (window.alert) {
+        showAlertDialog("Please choose a valid image file.");
+      }
+      return;
+    }
+
+    try {
+      const value = await readBarcodeFromImage(file);
+      if (value) {
+        $("#customerAssetId").val(value);
+        if (window.lookupAssetByValue) {
+          window.lookupAssetByValue(value);
+        }
+        if (window.alert) {
+          console.log("Barcode read successfully.");
+        }
+      } else if (window.alert) {
+        showAlertDialog(
+          "Barcode could not be read from this image. Please enter the value manually.",
+        );
+      }
+    } catch (error) {
+      console.error("Barcode scan failed:", error);
+      if (window.alert) {
+        showAlertDialog(
+          "Barcode scan is not available in this browser. Please enter the value manually.",
+        );
+      }
+    } finally {
+      try {
+        input.value = "";
+      } catch (_) {
+        $(input).val("");
+      }
+    }
+  });
+
+  $("#customerAssetId").on("input change", function () {
+    // const value = $(this).val().trim();
+    // jobData.asset.customerAssetId = value;
+    // if (customerAssetLookupTimer) {
+    //   clearTimeout(customerAssetLookupTimer);
+    //   customerAssetLookupTimer = null;
+    // }
+    // if (!value) {
+    //   resetAssetFields({ keepCustomerAssetId: true });
+    //   jobData.asset.customerAssetId = "";
+    //   return;
+    // }
+    // if (value.length < 4) {
+    //   resetAssetFields({ keepCustomerAssetId: true });
+    //   jobData.asset.customerAssetId = value;
+    //   return;
+    // }
+    // customerAssetLookupTimer = setTimeout(() => {
+    //   const currentValue = String($("#customerAssetId").val() || "").trim();
+    //   if (currentValue !== value) {
+    //     return;
+    //   }
+    //   if (window.lookupAssetByValue) {
+    //     window.lookupAssetByValue(currentValue);
+    //   }
+    // }, 350);
+  });
+
   // stop clicks on the input bubbling up (defensive)
   $("#photoInput").on("click", function (e) {
     e.stopPropagation();
@@ -1268,13 +2707,17 @@ $("#nextBtn").html('Next <span><i class="fa-solid fa-angle-right"></i></span>&nb
 
     const spaceLeft = MAX_PHOTOS - photoFiles.length;
     if (spaceLeft <= 0) {
-      alert(`Only ${MAX_PHOTOS} images allowed`);
+      showAlertDialog(`Only ${MAX_PHOTOS} images allowed`);
       clearInput();
       return;
     }
 
     if (files.length > spaceLeft) {
-      alert(`Only ${spaceLeft} more image(s) can be added (max ${MAX_PHOTOS})`);
+      showAlertDialog(
+        `Only ${spaceLeft} more image(s) can be added (Max ${MAX_PHOTOS} images)`,
+      );
+      clearInput();
+      return;
     }
 
     const allowed = files.slice(0, spaceLeft);
@@ -1303,7 +2746,18 @@ $("#nextBtn").html('Next <span><i class="fa-solid fa-angle-right"></i></span>&nb
     const dt = e.originalEvent.dataTransfer;
     if (dt && dt.files) {
       const files = Array.from(dt.files);
-      const allowed = files.slice(0, MAX_PHOTOS - photoFiles.length);
+      const spaceLeft = MAX_PHOTOS - photoFiles.length;
+      if (spaceLeft <= 0) {
+        showAlertDialog(`Only ${MAX_PHOTOS} images allowed`);
+        return;
+      }
+      if (files.length > spaceLeft) {
+        showAlertDialog(
+          `Only ${spaceLeft} more image(s) can be added (max ${MAX_PHOTOS})`,
+        );
+        return;
+      }
+      const allowed = files.slice(0, spaceLeft);
       allowed.forEach((f) => photoFiles.push(f));
       jobData.photos = photoFiles.slice();
       renderPreviews();
@@ -1329,7 +2783,10 @@ $("#nextBtn").html('Next <span><i class="fa-solid fa-angle-right"></i></span>&nb
       saveStepData(currentStep);
       showStep(currentStep + 1);
     } else {
-      if (!validateStep(2)) return;
+      if (!validateStep(2)) {
+        e.preventDefault();
+        return false;
+      }
       saveStepData(2);
       submitJob();
     }
@@ -1341,8 +2798,29 @@ $("#nextBtn").html('Next <span><i class="fa-solid fa-angle-right"></i></span>&nb
     }
   });
 
-  $("#createNewBtn").on("click", function () {
-    resetWizard();
+  $("#createNewBtn").on("click", function (e) {
+    e.preventDefault();
+
+    saveStepData(0);
+    saveStepData(1);
+    saveStepData(2);
+
+    const isValid = validateStep(0) && validateStep(1) && validateStep(2);
+    if (!isValid) {
+      return false;
+    }
+
+    showCreateNewConfirm();
+  });
+
+  $("#createNewConfirmModal").on("click", function (e) {
+    if (e.target.id === "createNewConfirmModal") {
+      dismissCustomDialog();
+    }
+  });
+
+  $("#createNewConfirmModal .confirm-close").on("click", function () {
+    dismissCustomDialog();
   });
 
   $(".step").click(function () {
@@ -1356,12 +2834,30 @@ $("#nextBtn").html('Next <span><i class="fa-solid fa-angle-right"></i></span>&nb
     if (idx === 2) {
       const tech = Number($("#technicians").val() || 0);
       const hrs = Number($("#hours").val() || 0);
-      const costCenter = $("#costCenterSelect").val().trim();
-      const tags = $("#tagsSelect").val().trim();
+      const costCenter = String($("#costCenterSelect").val() || "").trim();
+      const serviceManager = String(
+        $("#serviceManagerSelect").val() || "",
+      ).trim();
+      const tags = String($("#tagsSelect").val() || "").trim();
       let valid = true;
 
+      if (serviceManager === "") {
+        showError(
+          "#serviceManagerSelect",
+          "#serviceManagerError",
+          "Service Manager is required.",
+        );
+        valid = false;
+      } else {
+        clearError("#serviceManagerSelect", "#serviceManagerError");
+      }
+
       if (costCenter === "") {
-        showError("#costCenterSelect", "#costCenterError", "Cost Center is required.");
+        showError(
+          "#costCenterSelect",
+          "#costCenterError",
+          "Cost Center is required.",
+        );
         valid = false;
       } else {
         clearError("#costCenterSelect", "#costCenterError");
@@ -1396,6 +2892,21 @@ $("#nextBtn").html('Next <span><i class="fa-solid fa-angle-right"></i></span>&nb
         clearError("#hours", "#hoursError");
       }
 
+      // OT validation: if OT technicians or OT apprentice entered, OT Hours must be provided
+      const otTechnicians = Number($("#otTechnicians").val() || 0);
+      const otApprentice = Number($("#otApprentice").val() || 0);
+      const otHours = Number($("#otHours").val() || 0);
+      if ((otTechnicians > 0 || otApprentice > 0) && (!Number.isFinite(otHours) || otHours <= 0 || otHours > 24)) {
+        showError(
+          "#otHours",
+          "#otHoursError",
+          "OT Hours must be between 0 and 24 when OT staff are entered.",
+        );
+        valid = false;
+      } else {
+        clearError("#otHours", "#otHoursError");
+      }
+
       return valid;
     }
     return true;
@@ -1403,25 +2914,68 @@ $("#nextBtn").html('Next <span><i class="fa-solid fa-angle-right"></i></span>&nb
 
   function saveStepData(idx) {
     if (idx === 0) {
-      jobData.customer.jobNumber = $("#jobNumber").val().trim();
-      jobData.customer.name = $("#customerName").val().trim();
-      jobData.customer.phone = $("#customerPhone").val().trim();
-      jobData.customer.email = $("#customerEmail").val().trim();
-      jobData.customer.tenancy = $("#customerTenancy").val().trim();
-      jobData.customer.notes = $("#customerNotes").val().trim();
+      syncLookupContextToJobData();
+      jobData.customer.jobNumber = String($("#jobNumber").val() || "").trim();
+      const selectedContactValue = String(
+        $("#customerName").val() || "",
+      ).trim();
+      const selectedContactLabel = String(
+        $("#customerName option:selected").text() || "",
+      ).trim();
+      const manualContactName = String(
+        $("#customerNameInput").val() || "",
+      ).trim();
+      const selectedContactId =
+        selectedContactValue && selectedContactValue !== "other"
+          ? selectedContactValue
+          : "";
+      jobData.customer.name = String($("#autoJobBtn").val() || "").trim();
+      jobData.customer.phone = String($("#customerPhone").val() || "").trim();
+      jobData.customer.email = String($("#customerEmail").val() || "").trim();
+      jobData.customer.tenancy = String(
+        $("#customerTenancy").val() || "",
+      ).trim();
+      jobData.customer.tenancyLabel = String(
+        $("#customerTenancy option:selected").text() || "",
+      ).trim();
+      jobData.customer.notes = String($("#customerNotes").val() || "").trim();
+      jobData.customer.siteContact = selectedContactId;
+      jobData.customer.siteContactLabel =
+        String($("#siteContractName").text() || "").trim() ||
+        jobData.customer.siteContactLabel;
+      jobData.customer.customerContact = selectedContactId;
+      jobData.customer.contactName =
+        selectedContactValue === "other"
+          ? manualContactName
+          : selectedContactValue
+            ? selectedContactLabel
+            : "";
     }
     if (idx === 1) {
-      const selectedDescription = $("#assetDescriptionSelect").val();
-      const selectedLocation = $("#assetLocation").val();
-      jobData.asset.description =
-        selectedDescription === "other"
-          ? $("#assetDescriptionInput").val().trim()
-          : selectedDescription;
-      jobData.asset.location =
-        selectedLocation === "other"
-          ? $("#assetLocationInput").val().trim()
-          : selectedLocation;
-      jobData.asset.customerAssetId = $("#customerAssetId").val().trim();
+      const customerAssetIdSelectValue = String(
+        $("#customerAssetId").val() || "",
+      ).trim();
+      const customerAssetIdInputValue = String(
+        $("#customerAssetIdInput").val() || "",
+      ).trim();
+      const assetDescriptionValue = String(
+        $("#assetDescriptionInput").val() || "",
+      ).trim();
+      const assetLocationValue = String($("#assetLocation").val() || "").trim();
+      jobData.asset.description = assetDescriptionValue;
+      jobData.asset.descriptionLabel = assetDescriptionValue;
+      jobData.asset.location = assetLocationValue;
+      jobData.asset.locationLabel = assetLocationValue;
+      jobData.asset.customerAssetId =
+        customerAssetIdInputValue ||
+        (customerAssetIdSelectValue && customerAssetIdSelectValue !== "other"
+          ? customerAssetIdSelectValue
+          : "");
+      jobData.asset.make = String($("#assertMake").val() || "").trim();
+      jobData.asset.model = String($("#assertModel").val() || "").trim();
+      jobData.asset.serialNumber = String(
+        $("#assertSerialNumber").val() || "",
+      ).trim();
       // faults already bound
     }
     if (idx === 2) {
@@ -1430,13 +2984,23 @@ $("#nextBtn").html('Next <span><i class="fa-solid fa-angle-right"></i></span>&nb
       const hours = Number($("#hours").val() || 0);
       const totalHours = (technicians + apprentice) * hours;
 
-      jobData.estimates.technicians = technicians + apprentice;
+      jobData.estimates.technicians = technicians;
       jobData.estimates.hours = hours;
       jobData.estimates.totalHours = totalHours;
-      jobData.estimates.apprentice = $("#apprentice").is(":checked");
-      jobData.estimates.afterHours = $("#afterHours").is(":checked");
-      jobData.estimates.costCenter = $("#costCenterSelect").val().trim();
-      jobData.estimates.tags = $("#tagsSelect").val().trim();
+      jobData.estimates.apprentice = apprentice;
+      jobData.estimates.otTechnicians = Number($("#otTechnicians").val() || 0);
+      jobData.estimates.otApprentice = Number($("#otApprentice").val() || 0);
+      jobData.estimates.otHours = Number($("#otHours").val() || 0);
+      jobData.estimates.costCenter = String(
+        $("#costCenterSelect").val() || "",
+      ).trim();
+      jobData.estimates.costCenterLabel = String(
+        $("#costCenterSelect option:selected").text() || "",
+      ).trim();
+      jobData.estimates.tags = String($("#tagsSelect").val() || "").trim();
+      jobData.estimates.tagsLabel = String(
+        $("#tagsSelect option:selected").text() || "",
+      ).trim();
     }
   }
 
@@ -1452,42 +3016,800 @@ $("#nextBtn").html('Next <span><i class="fa-solid fa-angle-right"></i></span>&nb
     $("#revMan").text(jobData.estimates.totalHours || "-");
   }
 
-  function submitJob() {
+  function buildLeadDescriptionHtml() {
+    const customerName = String(jobData.customer.name || "").trim();
+    const customerContactName = String(
+      jobData.customer.contactName || "",
+    ).trim();
+    const customerPhone = String(jobData.customer.phone || "").trim();
+    const customerEmail = String(jobData.customer.email || "").trim();
+    const siteLabel = String(
+      jobData.customer.tenancyLabel || jobData.customer.tenancy || "",
+    ).trim();
+    const assetDescription = String(jobData.asset.description || "").trim();
+    const assetLocation = String(jobData.asset.location || "").trim();
+    const customerAssetId = String(jobData.asset.customerAssetId || "").trim();
+    const assetMake = String(jobData.asset.make || "").trim();
+    const assetModel = String(jobData.asset.model || "").trim();
+    const assetSerialNumber = String(jobData.asset.serialNumber || "").trim();
+    const notes = String($("#customerNotes").val() || "").trim();
+    const technicianCount = Number(jobData.estimates.technicians || 0);
+    const apprenticeCount = Number(jobData.estimates.apprentice || 0);
+    const hours = Number(jobData.estimates.hours || 0);
+    const otTechnicians = Number(jobData.estimates.otTechnicians || 0);
+    const otApprentice = Number(jobData.estimates.otApprentice || 0);
+    const otHours = Number(jobData.estimates.otHours || 0);
+    const costCenterLabel = String(
+      jobData.estimates.costCenterLabel || "",
+    ).trim();
+    const serviceManagerLabel = String(
+      $("#serviceManagerSelect option:selected").text() || "",
+    ).trim();
+    const tagLabel = String(
+      $("#tagsSelect option:selected").text() || "",
+    ).trim();
+    const totalHours = Number(jobData.estimates.totalHours || 0);
+
+    const userData = (() => {
+      try {
+        const rawUser = localStorage.getItem("user");
+        return rawUser ? JSON.parse(rawUser) : null;
+      } catch (error) {
+        console.warn("Unable to parse user data for lead description.", error);
+        return null;
+      }
+    })();
+
+    const salespersonValue = userData?.Name;
+
+    const detailRows = [
+      ["Customer Name", customerName],
+      ["Customer Contact Name", customerContactName],
+      ["Phone", customerPhone],
+      ["Email", customerEmail],
+      ["Site", siteLabel],
+      ["Customer Asset ID or Excel Barcode", customerAssetId],
+      ["Asset Description", assetDescription],
+      ["Asset Location", assetLocation],
+      ["Asset Make", assetMake],
+      ["Asset Model", assetModel],
+      ["Asset Serial Number", assetSerialNumber],
+      ["Technicians", technicianCount ? String(technicianCount) : ""],
+      ["Apprentice", apprenticeCount ? String(apprenticeCount) : ""],
+      // [
+      //   "Total Technicians",
+      //   technicianCount + apprenticeCount
+      //     ? String(technicianCount + apprenticeCount)
+      //     : "",
+      // ],
+      // ["Total Hours", totalHours ? String(totalHours) : ""],
+      ["Hours", hours ? String(hours) : ""],
+      ...(otTechnicians ? [["OT Technicians", String(otTechnicians)]] : []),
+      ...(otApprentice ? [["OT Apprentice", String(otApprentice)]] : []),
+      ...(otHours ? [["OT Hours", String(otHours)]] : []),
+      ["Cost Center", costCenterLabel],
+      ["Service Manager", serviceManagerLabel],
+      ["Tag", tagLabel],
+      ["Salesperson", salespersonValue],
+      ["Notes", notes],
+    ].filter(([, value]) => Boolean(value));
+
+    (jobData.faults || []).forEach((fault, index) => {
+      const description = String(fault.description || "").trim();
+      const work = String(fault.work || "").trim();
+      const parts = String(fault.parts || "").trim();
+      const equipment = String(fault.equipment || "").trim();
+      const partsItems = (fault.partsItems || [])
+        .map(
+          (item) =>
+            `${String(item.name || "").trim()} x ${String(item.qty || "").trim()}`,
+        )
+        .join(", ");
+      const equipmentItems = (fault.equipmentItems || [])
+        .map(
+          (item) =>
+            `${String(item.name || "").trim()} x ${String(item.qty || "").trim()}`,
+        )
+        .join(", ");
+      const consumablesItems = (fault.consumablesItems || [])
+        .map(
+          (item) =>
+            `${String(item.name || "").trim()} x ${String(item.qty || "").trim()}`,
+        )
+        .join(", ");
+
+      if (description) detailRows.push([`Fault Description`, description]);
+      if (work) detailRows.push([`Work Required (Select script)`, work]);
+      if (parts) detailRows.push([`Fault - Parts & Material`, parts]);
+      if (partsItems) detailRows.push([`Parts & Material Required`, partsItems]);
+      if (equipment) detailRows.push([`Fault - Equipment`, equipment]);
+      if (equipmentItems)
+        detailRows.push([`Tool Recovery (Special Equipments & Consumables)`, equipmentItems]);
+      if (consumablesItems)
+        detailRows.push([`Fault - Consumables`, consumablesItems]);
+    });
+
+    // Ensure Notes appears just above any 'Parts Items' / 'Parts & Material Required' rows.
+    const partsItemsRows = detailRows.filter(([label]) => /Parts\s*&\s*Material\s*Required/i.test(label) || /Parts Items/i.test(label));
+    const otherPartsRows = detailRows.filter(
+      ([label]) => /Parts/i.test(label) && !/Parts\s*&\s*Material\s*Required/i.test(label) && !/Parts Items/i.test(label),
+    );
+    const nonPartsRows = detailRows.filter(([label]) => !/Parts/i.test(label));
+
+    // Extract the Notes row from non-parts rows so we can place it before partsItemsRows
+    let notesRow = null;
+    const remainingNonParts = [];
+    for (const row of nonPartsRows) {
+      if (String(row[0] || "").trim() === "Notes") {
+        notesRow = row;
+      } else {
+        remainingNonParts.push(row);
+      }
+    }
+
+    const orderedDetailRows = [
+      ...remainingNonParts,
+      ...otherPartsRows,
+      ...(notesRow ? [notesRow] : []),
+      ...partsItemsRows,
+    ];
+
+    const detailTable = orderedDetailRows.length
+      ? `<table style="border-collapse: collapse; width: 100%; font-family: Arial, sans-serif; font-size:14px; color:#222; line-height:1.5;">${orderedDetailRows
+          .map(([label, value]) => {
+            const isParts = /Parts/i.test(label) || String(label).trim() === "Notes";
+            const valueHtml = isParts
+              ? `<span style=\"color:red\">${escapeHtml(value)}</span>`
+              : escapeHtml(value);
+            return `<tr><td style="border:1px solid #ddd; padding:6px 8px; font-weight:bold; width:35%;">${escapeHtml(label)}</td><td style="border:1px solid #ddd; padding:6px 8px;">${valueHtml}</td></tr>`;
+          })
+          .join("")}</table>`
+      : "";
+
+    return [
+      `<div style="font-family: Arial, sans-serif; font-size:14px; color:#222; line-height:1.5;">`,
+      `<p><strong>Lead Details: Created by ${salespersonValue}, Job#${jobData.customer.jobNumber}</strong></p>`,
+      detailTable,
+      `</div>`,
+    ]
+      .filter(Boolean)
+      .join("");
+  }
+
+  function buildLeadPayload() {
+    const customerJobNumber = String(jobData.customer.jobNumber || "").trim();
+    const customerId =
+      Number(jobData.customer.customerId || jobData.customer.id || 0) ||
+      Number(customerJobNumber || 0);
+    const customerName = String(jobData.customer.name || "").trim();
+    const customerPhone = String(jobData.customer.phone || "").trim();
+    const customerNotes = String(jobData.customer.notes || "").trim();
+    const siteValue = String(jobData.customer.tenancy || "").trim();
+    const customerContactId =
+      Number(jobData.customer.customerContact || 0) || 0;
+    const siteLabel = String(jobData.customer.tenancyLabel || "").trim();
+    const selectedCostCenter =
+      jobData.estimates.costCenter ||
+      String($("#costCenterSelect").val() || "").trim();
+    const selectedTagValue = String($("#tagsSelect").val() || "").trim();
+    const selectedTagId = Number(selectedTagValue) || 0;
+    const notes = String($("#customerNotes").val() || "").trim();
+    const description = buildLeadDescriptionHtml();
+
+    const contactNumber = Number(customerPhone.replace(/\D/g, "")) || 0;
+    const userData = localStorage.getItem("user");
+    const user = JSON.parse(userData);
+    console.log("Name:", user);
+
+    const projectManager = String(
+      $("#serviceManagerSelect").val() || "",
+    ).trim();
+    const today = new Date();
+    const yyyy = today.getFullYear(); // Returns a 4-digit number (e.g., 2026)
+    const mm = today.getMonth() + 1; //String(today.getMonth() + 1).padStart(2, '0'); // Ensures a 2-digit format (e.g., '07')
+    const MM1 = String(today.getMonth() + 1).padStart(2, "0"); // Ensures a 2-digit format (e.g., '07')
+    const dd = String(today.getDate()).padStart(2, "0"); // Ensures a 2-digit format (e.g., '17')
+    const yyyyMmDd = `${yyyy}-${MM1}-${dd}`;
+
+    const customFields = [
+      { CustomField: 7, Value: "QUOTE Request - LEAD Form" },
+      { CustomField: 4, Value: user.Name || "" },
+      { CustomField: 6, Value: normalizeLeadTeamName(user.TeamName) || "" },
+      { CustomField: 5, Value: normalizeSalerPersonPosition(user.position) || "" },
+    ].filter((field) => String(field.Value || "").trim() !== "");
+
+    return {
+      Customer: customerId || 0,
+      Site: Number(siteValue) || 0,
+      LeadName: customerJobNumber,
+      CustomerContact:
+        customerContactId || contactNumber || Number(customerJobNumber) || 0,
+      AdditionalContacts: [],
+      SiteContact:
+        customerContactId || contactNumber || Number(customerJobNumber) || 0,
+      Stage: "Open",
+      FollowUpDate: yyyyMmDd,
+      Description: description || "",
+      Notes: notes || "",
+      CostCenter: Number(selectedCostCenter) || 0,
+      Tags: [380, selectedTagId], //691
+      Salesperson: user.ID,
+      ProjectManager: Number(projectManager) || 0,
+      Status: 78,
+      Forecast: {
+        EstimatedPrice: 0,
+        Probability: 0,
+        ExpectedYear: yyyy,
+        ExpectedMonth: mm,
+      },
+      AutoAdjustStatus: true,
+      //CustomFields: customFields,
+    };
+  }
+
+  async function fileToBase64(file) {
+    if (!file) {
+      return null;
+    }
+
+    return new Promise((resolve, reject) => {
+      const reader = new FileReader();
+      reader.onload = function () {
+        const dataUrl = reader.result || "";
+        const parts = String(dataUrl).split(",");
+        resolve(parts[1] || "");
+      };
+      reader.onerror = function (err) {
+        reject(err);
+      };
+      reader.readAsDataURL(file);
+    });
+  }
+
+  async function buildLeadSubmissionJobData() {
+    const payload = buildLeadPayload();
+    const user = JSON.parse(localStorage.getItem("user") || "{}");
+
+    const customFields = [
+      { CustomField: 7, Value: "QUOTE Request - LEAD Form" },
+      { CustomField: 4, Value: user.Name || "" },
+      { CustomField: 6, Value: normalizeLeadTeamName(user.TeamName) || ""  },
+      { CustomField: 5, Value: normalizeSalerPersonPosition(user.position) || "" },
+    ].filter((field) => String(field.Value || "").trim() !== "");
+
+    const attachments = [];
+    const pdfFile = await createLeadPdfFile();
+
+    if (pdfFile) {
+      const base64 = await fileToBase64(pdfFile);
+      if (base64) {
+        attachments.push({
+          fileName: pdfFile.name || "Lead Description.pdf",
+          contentType: pdfFile.type || "application/pdf",
+          base64,
+        });
+      }
+    }
+
+    for (const file of photoFiles || []) {
+      if (!file || typeof file !== "object") {
+        continue;
+      }
+
+      const base64 = await fileToBase64(file);
+      if (base64) {
+        attachments.push({
+          fileName: file.name || "lead-photo.jpg",
+          contentType: file.type || "application/octet-stream",
+          base64,
+        });
+      }
+    }
+
+    return {
+      ...payload,
+      customFields,
+      attachments,
+    };
+  }
+
+  function normalizeLeadTeamName(teamName) {
+    const value = String(teamName || "").trim();
+    if (!value) {
+      return "";
+    }
+
+    const normalized = value.toLowerCase();
+    if(value =="Service One Team") return "Service ONE";
+    if(value =="Service Two Team") return "Service TWO";
+    if(value =="Service Three Team") return "Service THREE";
+    if(value =="Apprentice Team") return "Apprentice Team";
+    return value;
+  }
+
+  function normalizeSalerPersonPosition(teamGroup) {
+    const value = String(teamGroup || "").trim();
+    if (!value) {
+      return "";
+    }
+
+   if(value =="Apprentice") return "Industrial (RAC) Apprentice";
+   if(value =="HVAC Service Manager") return "Commercial (HVAC) Service Manager";
+   if(value =="RAC Supervisor") return "Industrial (RAC) Supervisor";
+   if(value =="Technician") return "Industrial (RAC) Technician";
+   if(value =="Maintenance Technician") return "Industrial (RAC) Technician";
+    return value;
+  }
+
+  function buildQuotePayload() {
+    const lead = buildLeadPayload();
+    const tags = [
+      ...(Array.isArray(lead.Tags) ? lead.Tags : []),
+      lead.Salesperson,
+      lead.ProjectManager,
+    ].filter((value, index, array) => value != null && value !== "" && array.indexOf(value) === index);
+
+    const quoteWorkDescription =
+      Array.isArray(jobData.faults)
+        ? jobData.faults
+            .map((fault) => String(fault.workDescription || fault.work || "").trim())
+            .filter(Boolean)
+            .join("\n")
+        : "";
+
+    return Object.assign(
+      {},
+      {
+        Customer: lead.Customer || 0,
+        Site: lead.Site || 0,
+        CustomerContact: lead.CustomerContact || 0,
+        AdditionalContacts: lead.AdditionalContacts || [],
+        SiteContact: lead.SiteContact || 0,
+        Type: "Service",
+        Notes: lead.Description || "",
+        Description: quoteWorkDescription || "",
+        Tags: lead.Tags || [],
+        Salesperson: lead.Salesperson || 0,
+        ProjectManager: lead.ProjectManager || 0,
+        // Technicians: lead.Salesperson || 0,
+        // Technician: lead.Salesperson || 0,
+        IsVariation: false,
+        //LinkedJobID: Number(jobData.customer.jobNumber) || 0,
+        AutoAdjustStatus: !!lead.AutoAdjustStatus,
+        Name:
+          (Array.isArray(jobData.faults)
+            ? jobData.faults.find((fault) => String(fault.work || "").trim())?.work
+            : "") || "",
+      },
+    );
+  }
+
+  function getTotalRecoveryItemByToolId(toolId) {
+    const items = Array.isArray(window.totalRecoveryItems)
+      ? window.totalRecoveryItems
+      : [];
+    return (
+      items.find((it) => {
+        const id =
+          Number(
+            (it && it.Catalog && (it.Catalog.ID || it.Catalog.Id)) ||
+              it.ID ||
+              it.Id ||
+              0,
+          ) || 0;
+        return id && String(id) === String(toolId);
+      }) || null
+    );
+  }
+
+  function getRecoveryField(item, field) {
+    if (!item) return 0;
+    const value =
+      (item && item.Catalog && item.Catalog[field]) || item[field] || 0;
+    return Number(value || 0);
+  }
+
+  function buildSelectedRecoveryCatalogPayload() {
+    const payloads = [];
+
+    for (const fault of jobData.faults || []) {
+      for (const equipmentItem of fault.equipmentItems || []) {
+        const toolId = String(equipmentItem.toolId || "").trim();
+        const qty = Number(equipmentItem.qty || 0);
+        if (!toolId || !qty) {
+          continue;
+        }
+
+        const item = getTotalRecoveryItemByToolId(toolId);
+        const catalogId = Number(
+          (item && item.Catalog && (item.Catalog.ID || item.Catalog.Id)) ||
+            item?.ID ||
+            item?.Id ||
+            toolId ||
+            0,
+        );
+        if (!catalogId) {
+          continue;
+        }
+
+        payloads.push({
+          Catalog: catalogId,
+          Total: {
+            Qty: qty,
+          },
+        });
+      }
+    }
+
+    return payloads.length ? payloads : null;
+  }
+
+  function buildSelectedRecoveryLaborPayload() {
+    const payloads = [];
+
+    // Add technician/apprentice labour entries based on estimates
+    try {
+      const techCount = Number(jobData.estimates.technicians || 0);
+      const apprCount = Number(jobData.estimates.apprentice || 0);
+      const hrs = Number(jobData.estimates.hours || 0);
+      const afterHours = false;
+
+      if (techCount > 0) {
+        const techLaborType =
+          typeof window.getLaborTypeId === "function"
+            ? window.getLaborTypeId("Technician", afterHours)
+            : 0;
+
+        if (techLaborType) {
+          for (let index = 0; index < techCount; index += 1) {
+            payloads.push({
+              LaborType: techLaborType,
+              Total: { Qty: hrs },
+            });
+          }
+        }
+      }
+
+      if (apprCount > 0) {
+        const apprLaborType =
+          typeof window.getLaborTypeId === "function"
+            ? window.getLaborTypeId("Apprentice", afterHours)
+            : 0;
+
+        if (apprLaborType) {
+          for (let index = 0; index < apprCount; index += 1) {
+            payloads.push({
+              LaborType: apprLaborType,
+              Total: { Qty: hrs },
+            });
+          }
+        }
+      }
+    
+      // OT (after-hours) labour entries if provided
+      try {
+        const otTechCount = Number(jobData.estimates.otTechnicians || 0);
+        const otApprCount = Number(jobData.estimates.otApprentice || 0);
+        const otHrs = Number(jobData.estimates.otHours || 0);
+
+        if (otTechCount > 0 && otHrs > 0) {
+          const otTechLaborType =
+            typeof window.getLaborTypeId === "function"
+              ? window.getLaborTypeId("Technician", true)
+              : 0;
+          if (otTechLaborType) {
+            for (let i = 0; i < otTechCount; i += 1) {
+              payloads.push({ LaborType: otTechLaborType, Total: { Qty: otHrs } });
+            }
+          }
+        }
+
+        if (otApprCount > 0 && otHrs > 0) {
+          const otApprLaborType =
+            typeof window.getLaborTypeId === "function"
+              ? window.getLaborTypeId("Apprentice", true)
+              : 0;
+          if (otApprLaborType) {
+            for (let i = 0; i < otApprCount; i += 1) {
+              payloads.push({ LaborType: otApprLaborType, Total: { Qty: otHrs } });
+            }
+          }
+        }
+      } catch (err) {
+        console.warn("Failed to append OT labour payloads:", err);
+      }
+      payloads.push({
+        LaborType: window.getLaborTypeId("Senior Technician", false),
+        Total: { Qty: 1 },
+      });
+    } catch (e) {
+      console.warn("Failed to append technician/apprentice labor payloads:", e);
+    }
+
+    return payloads.length ? payloads : null;
+  }
+
+  function sendLeadCreationEmail(response, jobData) {
+    const leadId = response?.ID || response?.Id || response?.id || response?.LeadId || response?.leadId;
+    const pdfAttachment = Array.isArray(jobData.attachments)
+      ? jobData.attachments.find(attachment => String(attachment.contentType || "").toLowerCase() === "application/pdf")
+      : null;
+    let loggedInUser = {};
+    try {
+      loggedInUser = JSON.parse(localStorage.getItem("user") || "{}");
+    } catch (error) {
+      console.warn("Unable to read logged-in user for lead email:", error);
+    }
+
+    if (!leadId || !loggedInUser.Email) {
+      console.warn("Lead notification email skipped: lead ID or recipient email is unavailable.");
+      return;
+    }
+
+    return $.ajax({
+      url: "/api/sendEmailLeadForm",
+      method: "POST",
+      contentType: "application/json",
+      data: JSON.stringify({
+        name: loggedInUser.Name || loggedInUser.name || "User",
+        email: jobData.customer?.email || loggedInUser.Email || loggedInUser.email || "",
+        leadId,
+        customerName: String($("#autoJobBtn").val() || "").trim(),
+        site: String($("#customerTenancy option:selected").text() || "").trim(),
+        fileName: `Lead_${leadId}.pdf`,
+        base64: pdfAttachment?.base64 || ""
+      })
+    }).done(function (emailResponse) {
+      console.log("Lead notification email sent successfully.", emailResponse);
+    }).fail(function (xhr) {
+      console.warn("Lead created, but notification email failed:", xhr.responseJSON || xhr.statusText);
+    });
+  }
+
+  function archiveLeadAfterQuote(leadResponse, quoteResponse) {
+    const leadId = leadResponse?.ID || leadResponse?.Id || leadResponse?.id || leadResponse?.LeadId || leadResponse?.leadId;
+    const quoteId = quoteResponse?.ID || quoteResponse?.Id || quoteResponse?.id || quoteResponse?.QuoteId || quoteResponse?.quoteId;
+    if (!leadId || !quoteId) {
+      return;
+    }
+
+    const simproEnv = window.localStorage?.getItem("SIMPRO_ENV") || "PROD";
+    $.ajax({
+      url: "/api/lead/archive",
+      method: "PATCH",
+      contentType: "application/json",
+      data: JSON.stringify({ leadId, simproEnv })
+    }).done(function (archiveResponse) {
+      console.log(`Lead ${leadId} archived after quote ${quoteId} was created.`, archiveResponse);
+    }).fail(function (xhr) {
+      console.warn(`Quote ${quoteId} created, but lead ${leadId} could not be archived:`, xhr.responseJSON || xhr.statusText);
+    });
+  }
+
+  async function submitJob(options = {}) {
+    const { onSuccess, onError } = options || {};
+
+    if (!validateStep(2)) {
+      return;
+    }
+
     saveStepData(0);
     saveStepData(1);
     saveStepData(2);
-    const payload = {
-      customer: jobData.customer,
-      asset: jobData.asset,
-      faults: jobData.faults,
-      estimates: jobData.estimates,
-      photos: jobData.photos.map((f, i) => ({
-        name: f.name,
-        size: f.size,
-        type: f.type,
-      })),
-    };
+    const payload = buildLeadPayload();
     const json = JSON.stringify(payload, null, 2);
-    $("#modalJobNum").text(jobData.customer.jobNumber || "");
-    $("#modalCustomer").text(jobData.customer.name || "");
-    $("#modalTime").text(new Date().toLocaleString());
-    $("#jsonOutput").text(json);
-    const modal = new bootstrap.Modal(document.getElementById("submitModal"));
-    modal.show();
 
-    $("#downloadJson")
-      .off("click")
-      .on("click", function () {
-        const blob = new Blob([json], { type: "application/json" });
-        const url = URL.createObjectURL(blob);
-        const a = document.createElement("a");
-        a.href = url;
-        a.download = `${(jobData.customer.jobNumber || "job").replace(/[^a-z0-9\-]/gi, "_")}.json`;
-        document.body.appendChild(a);
-        a.click();
-        a.remove();
-        URL.revokeObjectURL(url);
+    if (window.submitLeadToSimpro) {
+      const jobData = await buildLeadSubmissionJobData();
+
+      window.submitLeadToSimpro(jobData, {
+        deferLoadingEnd: true,
+        showSuccessAlert: false,
+        onSuccess: async function (response) {
+          console.log(response);
+          sendLeadCreationEmail(response, jobData);
+
+          // --- Create Quote automatically using same data ---
+          let quoteResponse = null;
+          try {
+            const quotePayload = buildQuotePayload();
+            if (window.submitQuoteToSimpro) {
+              try {
+                quoteResponse = await window.submitQuoteToSimpro(quotePayload, {
+                  autoCreateSection: true,
+                  costCenterId: Number($("#costCenterSelect").val() || 0) || 0,
+                  costCenterName: String(
+                    $("#costCenterSelect option:selected").text() || "",
+                  ).trim(),
+                  catalogPayload: buildSelectedRecoveryCatalogPayload(),
+                  laborPayload: buildSelectedRecoveryLaborPayload(),
+                  attachments: Array.isArray(jobData.attachments) ? jobData.attachments : [],
+                  customFields: Array.isArray(jobData.customFields)
+                    ? jobData.customFields
+                    : [],
+                  showSuccessAlert: false,
+                });
+                console.log("Quote request finished.");
+              } catch (qerr) {
+                quoteResponse = qerr && qerr.responseJSON ? qerr.responseJSON : null;
+                console.warn("Quote creation failed:", qerr);
+              }
+              archiveLeadAfterQuote(response, quoteResponse);
+            } else {
+              console.warn("submitQuoteToSimpro is not available.");
+            }
+          } catch (err) {
+            console.error("Failed to create quote:", err);
+          }
+
+          // finish loading only after quote flow completes
+          if (typeof window.setLeadSubmitLoading === "function") {
+            window.setLeadSubmitLoading(false);
+          }
+
+          // Show a single combined dialog for lead + quote results
+          try {
+            const leadResp = response || {};
+            const quoteResp = quoteResponse || {};
+            const leadOk = Boolean(
+              Number(leadResp?.ID || leadResp?.Id || leadResp?.id || leadResp?.leadId || leadResp?.leadCreated || 0),
+            );
+            const quoteOk = Boolean(
+              Number(quoteResp?.ID || quoteResp?.Id || quoteResp?.id || quoteResp?.quoteId || quoteResp?.quoteCreated || 0),
+            );
+            let finalMsg = "";
+            if (leadOk && quoteOk) {
+              finalMsg = "Lead and Quote created successfully.";
+            } else if (leadOk) {
+              finalMsg = "Lead created successfully. Quote creation may have failed.";
+            } else if (quoteOk) {
+              finalMsg = "Quote created successfully. Lead creation may have failed.";
+            } else if (leadResp?.message || quoteResp?.message) {
+              finalMsg = String(leadResp?.message || quoteResp?.message || "Operation completed.");
+            } else {
+              finalMsg = "Operation completed.";
+            }
+
+            // Helper to extract human-readable error text from various possible response shapes
+            function extractMsg(obj) {
+              if (!obj) return null;
+              if (typeof obj === "string") return obj;
+              if (typeof obj.message === "string" && obj.message.trim()) return obj.message.trim();
+              if (typeof obj.error === "string" && obj.error.trim()) return obj.error.trim();
+              if (typeof obj.detail === "string" && obj.detail.trim()) return obj.detail.trim();
+              if (typeof obj.error_description === "string" && obj.error_description.trim()) return obj.error_description.trim();
+
+              const collectErrors = (arr) => {
+                if (!Array.isArray(arr)) return null;
+                const msgs = arr
+                  .map((err) => {
+                    if (!err) return null;
+                    if (typeof err === "string" && err.trim()) return err.trim();
+                    if (typeof err.message === "string" && err.message.trim()) return err.message.trim();
+                    if (typeof err.msg === "string" && err.msg.trim()) return err.msg.trim();
+                    if (typeof err.error === "string" && err.error.trim()) return err.error.trim();
+                    // fallback: stringify the object
+                    try {
+                      return JSON.stringify(err);
+                    } catch (e) {
+                      return null;
+                    }
+                  })
+                  .filter(Boolean);
+                return msgs.length ? msgs.join("; ") : null;
+              };
+
+              // Common shapes: { error: { errors: [ { message } ] } }
+              if (obj.error && Array.isArray(obj.error.errors)) {
+                const m = collectErrors(obj.error.errors);
+                if (m) return m;
+              }
+
+              // Top-level errors array
+              if (Array.isArray(obj.errors) && obj.errors.length) {
+                const m = collectErrors(obj.errors);
+                if (m) return m;
+              }
+
+              // Nested data.errors or data.message
+              if (obj.data) {
+                if (typeof obj.data.message === "string" && obj.data.message.trim()) return obj.data.message.trim();
+                if (Array.isArray(obj.data.errors) && obj.data.errors.length) {
+                  const m = collectErrors(obj.data.errors);
+                  if (m) return m;
+                }
+              }
+
+              // As a last resort, try to stringify an `error` object
+              if (obj.error && typeof obj.error === "object") {
+                try {
+                  const s = JSON.stringify(obj.error);
+                  if (s) return s;
+                } catch (e) {
+                  /* ignore */
+                }
+              }
+
+              return null;
+            }
+
+            const leadErr = !leadOk ? extractMsg(leadResp) : null;
+            const quoteErr = !quoteOk ? extractMsg(quoteResp) : null;
+            if (leadErr) finalMsg += ` Lead error: ${leadErr}`;
+            if (quoteErr) finalMsg += (leadErr ? ";" : "") + ` Quote error: ${quoteErr}`;
+
+            if (typeof showAlertDialogSuccess === "function") {
+              showAlertDialogSuccess(finalMsg);
+            } else if (window.alert) {
+              window.alert(finalMsg);
+            }
+          } catch (e) {
+            console.warn("Error showing combined result dialog:", e);
+          }
+
+          if (typeof onSuccess === "function") {
+            onSuccess(response, payload, json);
+            return;
+          }
+
+          resetWizard();
+        },
+        onError: function (error) {
+          // Ensure loading ends even when lead creation fails
+          if (typeof window.setLeadSubmitLoading === "function") {
+            window.setLeadSubmitLoading(false);
+          }
+
+          if (typeof onError === "function") {
+            onError(error, payload, json);
+            return;
+          }
+
+          showAlertDialog(
+            "Failed to create lead. Please try again. Staff not found.",
+          );
+        },
       });
+    } else {
+      console.error("submitLeadToSimpro is not available.");
+      if (typeof onError === "function") {
+        onError(null, payload, json);
+        return;
+      }
+      showAlertDialog("Failed to create lead. Please try again.");
+    }
+
+    // $("#modalJobNum").text(jobData.customer.jobNumber || "");
+    // $("#modalCustomer").text(jobData.customer.name || "");
+    // $("#modalTime").text(new Date().toLocaleString());
+    // $("#jsonOutput").text(json);
+
+    // const modalElement = document.getElementById("submitModal");
+    // if (modalElement) {
+    //   if (window.bootstrap && typeof window.bootstrap.Modal === "function") {
+    //     const modal = new window.bootstrap.Modal(modalElement);
+    //     modal.show();
+    //   } else {
+    //     modalElement.classList.add("show");
+    //     modalElement.style.display = "block";
+    //     modalElement.setAttribute("aria-hidden", "false");
+    //     document.body.classList.add("modal-open");
+    //   }
+    // }
+
+    // $("#downloadJson")
+    //   .off("click")
+    //   .on("click", function () {
+    //     const blob = new Blob([json], { type: "application/json" });
+    //     const url = URL.createObjectURL(blob);
+    //     const a = document.createElement("a");
+    //     a.href = url;
+    //     a.download = `${(jobData.customer.jobNumber || "job").replace(/[^a-z0-9\-]/gi, "_")}.json`;
+    //     document.body.appendChild(a);
+    //     a.click();
+    //     a.remove();
+    //     URL.revokeObjectURL(url);
+    //   });
   }
 
   // initialize
@@ -1505,4 +3827,49 @@ $("#nextBtn").html('Next <span><i class="fa-solid fa-angle-right"></i></span>&nb
     this.style.height = "auto";
     this.style.height = this.scrollHeight + "px";
   });
+
+  //convert lead description to PDF
+  async function createLeadPdfFile() {
+    const html = buildLeadDescriptionHtml();
+
+    const container = document.createElement("div");
+
+    container.innerHTML = html;
+
+    container.style.position = "fixed";
+    container.style.left = "-9999px";
+    container.style.top = "0";
+    container.style.width = "794px"; // A4 width
+    container.style.background = "#fff";
+    container.style.padding = "20px";
+
+    document.body.appendChild(container);
+
+    //await new Promise(resolve => setTimeout(resolve, 300));
+
+    const canvas = await html2canvas(container, {
+      scale: 1.2,
+      useCORS: true,
+      backgroundColor: "#ffffff",
+    });
+
+    document.body.removeChild(container);
+
+    const imgData = canvas.toDataURL("image/jpeg", 0.85);
+
+    const { jsPDF } = window.jspdf;
+
+    const pdf = new jsPDF("p", "mm", "a4");
+
+    const pdfWidth = 210;
+    const pdfHeight = (canvas.height * pdfWidth) / canvas.width;
+
+    pdf.addImage(imgData, "JPEG", 0, 0, pdfWidth, pdfHeight);
+
+    const blob = pdf.output("blob");
+
+    return new File([blob], "Lead Description.pdf", {
+      type: "application/pdf",
+    });
+  }
 });

@@ -1,12 +1,12 @@
 $(function () {
   function loadCostCenters() {
     const settings = {
-      url: "https://excel.simprocloud.com/api/v1.0/companies/6/setup/accounts/costCenters/?search=any&pageSize=50&page=1&limit=10",
+      url: `${window.SIMPRO_CONFIG.baseUrl}/companies/${window.SIMPRO_CONFIG.companyId}/setup/accounts/costCenters/?search=any&pageSize=50&page=1&limit=10`,
       method: "GET",
       timeout: 0,
       headers: {
         Accept: "application/json",
-        Authorization: "Bearer c9c47eab18f514ad102ae8c78ce2a444e3bc4dab"
+        Authorization: `Bearer ${window.SIMPRO_CONFIG.authToken}`
       }
     };
 
@@ -18,11 +18,16 @@ $(function () {
 
         $select.find("option:not(:first)").remove();
 
-        const sortedItems = [...items].sort(function (a, b) {
-          const nameA = (a && a.Name) || "";
-          const nameB = (b && b.Name) || "";
-          const priorityA = /^(air conditioning service|refrigeration service)$/i.test(nameA.trim()) ? 0 : 1;
-          const priorityB = /^(air conditioning service|refrigeration service)$/i.test(nameB.trim()) ? 0 : 1;
+        const filteredItems = [...items].filter(function (item) {
+          const name = String(item?.Name || "").trim();
+          return /air conditioning service/i.test(name) || /Refrigeration Service/i.test(name);
+        });
+
+        const sortedItems = filteredItems.sort(function (a, b) {
+          const nameA = String(a?.Name || "").trim();
+          const nameB = String(b?.Name || "").trim();
+          const priorityA = /air conditioning service/i.test(nameA) ? 0 : 1;
+          const priorityB = /air conditioning service/i.test(nameB) ? 0 : 1;
 
           if (priorityA !== priorityB) {
             return priorityA - priorityB;
