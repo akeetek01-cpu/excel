@@ -10,6 +10,7 @@ router.post("/lead", controller.submitLeadToSimpro);
 router.patch("/lead/archive", controller.archiveLead);
 router.post("/quote", controller.submitQuoteToSimpro);
 router.get("/users", controller.getUsers);
+router.get("/managers", controller.getManagers);
 router.put("/users", controller.updateUser);
 
 router.post("/usersbyemail", controller.getUsersByEmail);

@@ -1,15 +1,9 @@
 $(function() {
-  // populate #serviceManagerSelect from cached user or /api/users
+  // populate #serviceManagerSelect from cached user or /api/managers
 
   function populateManagerSelect(managers, defaultVal) {
     const $sel = $("#serviceManagerSelect");
-    const $salesTeam = $("#salesTeamId");
-    if (!$sel.length && !$salesTeam.length) return;
-
-    // set sales team if available on user
-    if ($salesTeam.length && typeof defaultVal !== 'object') {
-      // leave salesTeam population to caller if needed
-    }
+    if (!$sel.length) return;
 
     // ensure element is a select; if not, just set text for display
     if (!$sel.is('select')) {
@@ -41,30 +35,11 @@ $(function() {
 
   function loadManagers(defaultManagerIdOrName) {
     return $.ajax({
-      url: '/api/users',
+      url: '/api/managers',
       method: 'GET',
       timeout: 0
-    }).done(function(response) {
-      const users = response && typeof response === 'object' ? Object.values(response) : [];
-      const mgrMap = new Map();
-
-      users.forEach(u => {
-        if (!u) return;
-        // prefer ManagerID/ManagerName pairs
-        if (u.ManagerID != null && u.ManagerName) {
-          mgrMap.set(String(u.ManagerID), u.ManagerName);
-        }
-        // also include users who are managers themselves (their role contains Manager)
-        if (u.position && /manager/i.test(u.position) && u.ID && u.Name) {
-          mgrMap.set(String(u.ID), u.Name);
-        }
-      });
-
-      // produce sorted array (by name)
-      const managers = Array.from(mgrMap.entries()).map(([id, name]) => ({ id, name }));
-      managers.sort((a, b) => a.name.localeCompare(b.name));
-
-      populateManagerSelect(managers, defaultManagerIdOrName);
+    }).done(function(managers) {
+      populateManagerSelect(Array.isArray(managers) ? managers : [], defaultManagerIdOrName);
     }).fail(function() {
       populateManagerSelect([], defaultManagerIdOrName);
     });

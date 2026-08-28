@@ -133,6 +133,39 @@ exports.getUsers = async (req, res) => {
   }
 };
 
+exports.getManagers = async (req, res) => {
+  const dbRef = ref(db);
+  try {
+    const snapshot = await get(child(dbRef, "employees"));
+    const managerMap = new Map();
+
+    if (snapshot.exists()) {
+      snapshot.forEach((childSnap) => {
+        const user = childSnap.val();
+        if (!user) return;
+
+        if (user.ManagerID != null && user.ManagerName) {
+          managerMap.set(String(user.ManagerID), user.ManagerName);
+        }
+
+        const position = user.position || user.Position;
+        const id = user.ID || user.Id || childSnap.key;
+        const name = user.Name || user.name;
+        if (position && /manager/i.test(position) && id && name) {
+          managerMap.set(String(id), name);
+        }
+      });
+    }
+
+    const managers = Array.from(managerMap, ([id, name]) => ({ id, name }))
+      .sort((first, second) => first.name.localeCompare(second.name));
+
+    return res.json(managers);
+  } catch (err) {
+    return res.status(500).json({ error: "Error fetching managers" });
+  }
+};
+
 exports.getUsersByEmail = async (req, res) => {
   const { email } = req.body;
   if (!email) {
