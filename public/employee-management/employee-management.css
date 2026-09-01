@@ -17,7 +17,7 @@ body {
     margin: 0;
     color: var(--ink);
     background: radial-gradient(circle at 100% 0, #d9eee9 0, transparent 34%), var(--wash);
-    font-family: "DM Sans", sans-serif;
+    font-family: "Poppins", sans-serif;
 }
 
 .page-shell {
@@ -56,7 +56,7 @@ body {
 h1,
 h2 {
     margin: 0;
-    font-family: "Space Grotesk", sans-serif;
+    /* font-family: "Space Grotesk", sans-serif; */
 }
 
 h1 {

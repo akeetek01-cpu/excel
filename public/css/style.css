@@ -70,7 +70,7 @@ h2 {
 
 /* Logo */
 .logo {
-  height: 50px;
+  height: 38px;
   margin-bottom: 20px;
 }
 
@@ -107,7 +107,7 @@ h2 {
 }
 
 /* Button */
-.btn1 {
+/* .btn1 {
   width: 100%;
   padding: 16px;
   border-radius: 14px;
@@ -128,7 +128,7 @@ h2 {
   border-radius: 25px;
   cursor: pointer;
   gap: 5px;
-}
+} */
 
 .btn2 {
   background: #09aaa5;
@@ -178,9 +178,50 @@ textarea {
 }
 
 .welcome {
-  text-align: center;
-  font-size: 26px;
-  margin: 15px 0 35px;
+  color: #fff;
+  font-size: 22px;
+  font-weight: 600;
+  margin: 4px 0 24px;
+}
+
+.btn1.btn {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  width: 100%;
+  background: #12c8c0;
+  color: white;
+  border: none;
+  border-radius: 12px;
+  padding: 15px 18px;
+  font-size: 15px;
+  font-weight: 600;
+  cursor: pointer;
+  margin-bottom: 12px;
+}
+
+/* .btn1.btn:hover {
+  background: #26c3af;
+} */
+
+.btn1.btn span {
+  font-size: 16px;
+  line-height: 1;
+}
+
+.btn1.btn.d-none {
+  display: none;
+}
+
+
+
+
+
+.welcome {
+  text-align: start;
+  font-size: 25px;
+  font-weight: 500;
+  margin: 40px 0 35px;
 }
 
 .btn.button--loading,
