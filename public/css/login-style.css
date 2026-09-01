@@ -96,7 +96,7 @@ max-width: 520px;
         display: flex;
         align-items: center;
         justify-content: center;
-        margin: 8px auto 50px;
+        margin: 8px auto 40px;
         background: rgba(0,0,0,0.01);
       }
       .icon-box svg {
