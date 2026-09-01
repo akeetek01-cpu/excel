@@ -7,10 +7,6 @@
     <title>Employee Management</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-
-    <link
-        href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Space+Grotesk:wght@500;600;700&display=swap"
-        rel="stylesheet">
     <link rel="stylesheet" href="../css/dataTables.dataTables.min.css">
     <link rel="stylesheet" href="../css/hcg-select.css">
     <link rel="stylesheet" href="employee-management.css">
@@ -44,29 +40,35 @@
                                 aria-label="Find employee">
                                 <option value="">Search name, email, or ID</option>
                             </select></label></div>
+                                          <div><label class="wide-field"><span class="field-label">Find manager</span><select data-hcg-select
+                                data-placeholder="Search manager name, email, or ID" id="managerSearch"
+                                aria-label="Find manager">
+                                <option value="">Search manager name, email, or ID</option>
+                            </select></label></div>
+                                         <div><label class="wide-field"><span class="field-label">Find team</span><select data-hcg-select
+                                data-placeholder="Search team by name or ID" id="teamSearch" aria-label="Find team">
+                                <option value="">Search team by name or ID</option>
+                            </select></label></div>
+                            <label>Password<div class="password-control"><input id="employeePassword" name="Password"
+                                type="password" autocomplete="new-password" required><button id="togglePasswordButton"
+                                class="password-toggle" type="button" aria-label="Show password"
+                                aria-pressed="false">Show</button></div></label>
+      
                     <label>Employee ID<input id="employeeId" name="ID" type="number" required readonly></label>
                     <label>Full name<input id="employeeName" name="Name" type="text" required readonly></label>
                     <label>Email<input id="employeeEmail" name="Email" type="email" required readonly></label>
                     <label>Mobile<input id="employeeMobile" name="Mobile" type="text"></label>
                     <label>Position<input id="employeeRole" name="position" type="text" readonly></label>
-                        <label>Password<div class="password-control"><input id="employeePassword" name="Password"
-                            type="password" autocomplete="new-password" required><button id="togglePasswordButton"
-                            class="password-toggle" type="button" aria-label="Show password" aria-pressed="false">Show</button></div></label>
-                    <div><label class="wide-field"><span class="field-label">Find manager</span><select data-hcg-select
-                                data-placeholder="Search manager name, email, or ID" id="managerSearch"
-                                aria-label="Find manager">
-                                <option value="">Search manager name, email, or ID</option>
-                            </select></label></div>
+                    
                     <label>Manager ID<input id="managerId" name="ManagerID" type="number" readonly></label>
                     <label>Manager name<input id="managerName" name="ManagerName" type="text" readonly></label>
-                    <div><label class="wide-field"><span class="field-label">Find team</span><select data-hcg-select
-                                data-placeholder="Search team by name or ID" id="teamSearch" aria-label="Find team">
-                                <option value="">Search team by name or ID</option>
-                            </select></label></div>
+       
                     <label>Team ID<input id="teamId" name="TeamId" type="number" readonly></label>
                     <label>Team name<input id="teamName" name="TeamName" type="text" readonly></label>
-                    <label class="active-account"><input id="isAccountActive" name="isAccountActive" type="checkbox"> Active account</label>
-                    <label class="active-account"><input id="isAdmin" name="isAdmin" type="checkbox"> Administrator</label>
+                    <label class="active-account"><input id="isAccountActive" name="isAccountActive" type="checkbox">
+                        Active account</label>
+                    <label class="active-account"><input id="isAdmin" name="isAdmin" type="checkbox">
+                        Administrator</label>
 
                 </div>
                 <div class="form-actions">
@@ -118,8 +120,7 @@
             <p id="createNewConfirmModalMessage" style="margin:0 0 16px; color:#555;">Do you want to keep the customer
                 details and start a new lead with the rest cleared?</p>
             <div style="display:flex; justify-content:flex-end; gap:10px;">
-                <button type="button" class="button button-secondary confirm-no"
-                    style="display:none;">No</button>
+                <button type="button" class="button button-secondary confirm-no" style="display:none;">No</button>
                 <button type="button" class="button button-primary confirm-yes">OK</button>
             </div>
         </div>

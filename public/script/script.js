@@ -3343,11 +3343,21 @@ $(function () {
 
   function buildQuotePayload() {
     const lead = buildLeadPayload();
+    const user = JSON.parse(localStorage.getItem("user") || "{}");
+    const salespersonName = String(user?.Name || user?.name || "").trim();
+    const projectManagerName = String(
+      $("#serviceManagerSelect option:selected").text() || "",
+    ).trim();
+    const staffTagIds =
+      typeof window.getStaffTagIds === "function"
+        ? window.getStaffTagIds([salespersonName, projectManagerName])
+        : [];
     const tags = [
       ...(Array.isArray(lead.Tags) ? lead.Tags : []),
-      lead.Salesperson,
-      lead.ProjectManager,
-    ].filter((value, index, array) => value != null && value !== "" && array.indexOf(value) === index);
+      ...staffTagIds,
+    ].filter(
+      (value, index, values) => value > 0 && values.indexOf(value) === index,
+    );
 
     const quoteWorkDescription =
       Array.isArray(jobData.faults)
@@ -3368,7 +3378,7 @@ $(function () {
         Type: "Service",
         Notes: lead.Description || "",
         Description: quoteWorkDescription || "",
-        Tags: lead.Tags || [],
+        Tags: tags,
         Salesperson: lead.Salesperson || 0,
         ProjectManager: lead.ProjectManager || 0,
         // Technicians: lead.Salesperson || 0,

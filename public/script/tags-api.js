@@ -1,7 +1,11 @@
 $(function () {
+  window.projectTagItems = Array.isArray(window.projectTagItems)
+    ? window.projectTagItems
+    : [];
+
   function loadTags() {
     const settings = {
-      url: `${window.SIMPRO_CONFIG.baseUrl}/companies/${window.SIMPRO_CONFIG.companyId}/setup/tags/projects/?search=any&pageSize=100&page=1&orderby=Name&limit=100`,
+      url: `${window.SIMPRO_CONFIG.baseUrl}/companies/${window.SIMPRO_CONFIG.companyId}/setup/tags/projects/?search=any&columns=ID,Name&pageSize=250&page=1&limit=100`,
       method: "GET",
       timeout: 0,
       headers: {
@@ -13,6 +17,7 @@ $(function () {
     $.ajax(settings)
       .done(function (response) {
         const items = Array.isArray(response) ? response : response?.items || [];
+        window.projectTagItems = items;
         const $select = $("#tagsSelect");
         const currentValue = $select.val();
         const environmentName = String(window.localStorage?.getItem("SIMPRO_ENV") || "").toUpperCase();
@@ -50,6 +55,21 @@ $(function () {
         console.error("Failed to load tags:", textStatus, errorThrown);
       });
   }
+
+  window.getStaffTagIds = function (staffNames) {
+    const names = Array.isArray(staffNames) ? staffNames : [staffNames];
+    const normalizedNames = names
+      .map((name) => String(name || "").trim().toLowerCase())
+      .filter(Boolean)
+      .flatMap((name) =>
+        name.startsWith("staff - ") ? [name] : [name, `staff - ${name}`],
+      );
+
+    return window.projectTagItems
+      .filter((tag) => normalizedNames.includes(String(tag?.Name || "").trim().toLowerCase()))
+      .map((tag) => Number(tag?.ID || tag?.Id || 0))
+      .filter((id, index, ids) => id > 0 && ids.indexOf(id) === index);
+  };
 
   window.loadTags = loadTags;
   loadTags();
